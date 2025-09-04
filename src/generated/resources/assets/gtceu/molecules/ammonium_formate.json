@@ -1,0 +1,130 @@
+{
+  "contents": [
+    {
+      "index": 0,
+      "element": "N",
+      "u": 0.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "index": 1,
+      "element": "H",
+      "u": 1.0,
+      "v": -1.0,
+      "type": "atom"
+    },
+    {
+      "index": 2,
+      "element": "H",
+      "u": -1.0,
+      "v": 1.0,
+      "type": "atom"
+    },
+    {
+      "index": 3,
+      "element": "H",
+      "u": 0.57735026,
+      "v": 0.57735026,
+      "type": "atom"
+    },
+    {
+      "index": 4,
+      "element": "H",
+      "u": -0.57735026,
+      "v": -0.57735026,
+      "type": "atom"
+    },
+    {
+      "a": 0,
+      "b": 1,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 0,
+      "b": 2,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 0,
+      "b": 3,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 0,
+      "b": 4,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "sup": "+",
+      "atoms": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "type": "parens"
+    },
+    {
+      "index": 5,
+      "element": "H",
+      "u": 1.4433757,
+      "v": 1.4433757,
+      "type": "atom"
+    },
+    {
+      "index": 6,
+      "element": "C",
+      "u": 2.020726,
+      "v": 2.020726,
+      "type": "atom"
+    },
+    {
+      "index": 7,
+      "element": "O",
+      "u": 3.1754265,
+      "v": 1.4433757,
+      "type": "atom"
+    },
+    {
+      "index": 8,
+      "element": "O",
+      "u": 1.4433757,
+      "v": 3.1754265,
+      "type": "atom"
+    },
+    {
+      "a": 5,
+      "b": 6,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 6,
+      "b": 7,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 6,
+      "b": 8,
+      "bond_type": "double",
+      "type": "bond"
+    },
+    {
+      "sup": "-",
+      "atoms": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "type": "parens"
+    }
+  ]
+}

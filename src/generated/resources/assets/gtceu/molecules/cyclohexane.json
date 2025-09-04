@@ -1,0 +1,83 @@
+{
+  "additional_offset": 4,
+  "contents": [
+    {
+      "index": 0,
+      "element": "",
+      "u": 0.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "index": 1,
+      "element": "",
+      "u": -1.0,
+      "v": 1.0,
+      "type": "atom"
+    },
+    {
+      "index": 2,
+      "element": "",
+      "u": -1.0,
+      "v": 2.0,
+      "type": "atom"
+    },
+    {
+      "index": 3,
+      "element": "",
+      "u": 0.0,
+      "v": 2.0,
+      "type": "atom"
+    },
+    {
+      "index": 4,
+      "element": "",
+      "u": 1.0,
+      "v": 1.0,
+      "type": "atom"
+    },
+    {
+      "index": 5,
+      "element": "",
+      "u": 1.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "a": 0,
+      "b": 1,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 1,
+      "b": 2,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 2,
+      "b": 3,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 4,
+      "b": 5,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 5,
+      "b": 0,
+      "bond_type": "single",
+      "type": "bond"
+    }
+  ]
+}

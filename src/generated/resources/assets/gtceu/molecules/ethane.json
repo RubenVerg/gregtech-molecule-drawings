@@ -1,0 +1,24 @@
+{
+  "contents": [
+    {
+      "index": 0,
+      "element": "",
+      "u": 0.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "index": 1,
+      "element": "",
+      "u": 1.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "a": 0,
+      "b": 1,
+      "bond_type": "single",
+      "type": "bond"
+    }
+  ]
+}

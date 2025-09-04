@@ -1,0 +1,177 @@
+{
+  "additional_offset": 8,
+  "contents": [
+    {
+      "index": 0,
+      "element": "",
+      "u": 0.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "index": 1,
+      "element": "",
+      "u": 0.0,
+      "v": 1.0,
+      "type": "atom"
+    },
+    {
+      "index": 2,
+      "element": "",
+      "u": 1.0,
+      "v": 1.0,
+      "type": "atom"
+    },
+    {
+      "index": 3,
+      "element": "",
+      "u": 1.0,
+      "v": 2.0,
+      "type": "atom"
+    },
+    {
+      "index": 4,
+      "element": "",
+      "u": 2.0,
+      "v": 2.0,
+      "type": "atom"
+    },
+    {
+      "index": 5,
+      "element": "",
+      "u": 2.0,
+      "v": 3.0,
+      "type": "atom"
+    },
+    {
+      "index": 6,
+      "element": "O",
+      "u": -1.0,
+      "v": 2.0,
+      "type": "atom"
+    },
+    {
+      "index": 7,
+      "element": "O",
+      "u": 0.0,
+      "v": 3.0,
+      "type": "atom"
+    },
+    {
+      "index": 8,
+      "element": "",
+      "u": -1.0,
+      "v": 3.0,
+      "type": "atom"
+    },
+    {
+      "index": 9,
+      "element": "",
+      "u": -2.0,
+      "v": 4.0,
+      "type": "atom"
+    },
+    {
+      "index": 10,
+      "element": "",
+      "u": -2.0,
+      "v": 5.0,
+      "type": "atom"
+    },
+    {
+      "index": 11,
+      "element": "",
+      "u": -3.0,
+      "v": 6.0,
+      "type": "atom"
+    },
+    {
+      "a": 0,
+      "b": 1,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 1,
+      "b": 2,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 2,
+      "b": 3,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 4,
+      "b": 5,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 3,
+      "b": 7,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 6,
+      "b": 8,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 7,
+      "b": 8,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 8,
+      "b": 9,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 9,
+      "b": 10,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 10,
+      "b": 11,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "sub": "n",
+      "atoms": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "type": "parens"
+    }
+  ]
+}

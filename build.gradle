@@ -127,9 +127,10 @@ legacyForge {
         }
     }
 }
+
 jar {
     manifest.attributes([
-            "MixinConfigs": "examplemod.mixins.json"
+            "MixinConfigs": "moldraw.mixins.json"
     ])
 }
 
@@ -141,14 +142,17 @@ dependencies {
     // Mixin
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor')
 
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
+
     // JEI, EMI, Jade
     modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
     modRuntimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
-    modRuntimeOnly("dev.emi:emi-forge:${emi_version}+${minecraft_version}")
     modRuntimeOnly("curse.maven:jade-324717:5390389")
 
     // GregTech and dependencies
+    modImplementation("dev.emi:emi-forge:${emi_version}+${minecraft_version}")
     modImplementation("com.gregtechceu.gtceu:gtceu-${minecraft_version}:${gtceu_version}:slim") { transitive = false }
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:${ldlib_version}") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")

@@ -12,15 +12,15 @@ license = "${mod_license}"
     version = "${version}"
     displayName = "${mod_name}"
     displayURL = "${mod_url}"
+    displayTest="IGNORE_ALL_VERSION"
     # This will be displayed as your mod's logo in the Mods panel.
-    # logoFile="icon.png" #optional
+    logoFile="logo.png"
     # Some more fluff displayed in the Mods panel. Feel free to issue your special thanks here!
     # credits="Thanks to Mojang for making this great game" #optional
     # Some more fluff displayed in the Mods panel. Plug your stuff here!
     authors="${mod_author}"
     description = '''
-Example Description
-...ain is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain,... (Lorem Ipsum translated to english.)
+This client-side only mod adds data-driven molecule drawings for GregTech chemicals.
 '''
 
     [[dependencies.${mod_id}]]
@@ -35,9 +35,9 @@ Example Description
         versionRange = "[${minecraft_version},)"
         ordering = "NONE"
         side = "BOTH"
-    [[dependencies.${mod_id}]]
-        modId = "gtceu"
-        mandatory = true
-        versionRange = "[${gtceu_version},)"
-        ordering = "AFTER"
-        side = "BOTH"
+#    [[dependencies.${mod_id}]]
+#        modId = "gtceu"
+#        mandatory = true
+#        versionRange = "[${gtceu_version},)"
+#        ordering = "AFTER"
+#        side = "BOTH"

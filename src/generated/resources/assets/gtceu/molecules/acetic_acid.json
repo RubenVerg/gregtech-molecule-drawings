@@ -1,0 +1,50 @@
+{
+  "contents": [
+    {
+      "index": 0,
+      "element": "",
+      "u": 0.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "index": 1,
+      "element": "",
+      "u": 1.0,
+      "v": 0.0,
+      "type": "atom"
+    },
+    {
+      "index": 2,
+      "element": "O",
+      "u": 2.0,
+      "v": -1.0,
+      "type": "atom"
+    },
+    {
+      "index": 3,
+      "element": "OH",
+      "u": 1.0,
+      "v": 1.0,
+      "type": "atom"
+    },
+    {
+      "a": 0,
+      "b": 1,
+      "bond_type": "single",
+      "type": "bond"
+    },
+    {
+      "a": 1,
+      "b": 2,
+      "bond_type": "double_centered",
+      "type": "bond"
+    },
+    {
+      "a": 1,
+      "b": 3,
+      "bond_type": "single",
+      "type": "bond"
+    }
+  ]
+}
