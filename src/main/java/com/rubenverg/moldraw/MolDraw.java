@@ -159,6 +159,8 @@ public class MolDraw {
 
     @SubscribeEvent
     public void tooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
+        // event.getTooltipElements().add(0, Either.right(new MoleculeTooltipComponent(new Molecule()
+        // )));
         Material material;
         if (event.getItemStack().getItem() instanceof BucketItem bi) {
             material = ChemicalHelper.getMaterial(bi.getFluid());

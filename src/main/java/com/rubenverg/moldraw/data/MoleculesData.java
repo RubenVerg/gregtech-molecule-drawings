@@ -557,6 +557,527 @@ public class MoleculesData {
                 .bond(1, 2)
                 .bond(1, 3)
                 .bond(3, 4, Bond.Type.DOUBLE));
+        molecules.put(GTCEu.id("glycolonitrile"), new Molecule()
+                .uv()
+                .atom(Element.create("HO"), 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .atom(Element.N, 1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, Bond.Type.TRIPLE));
+        molecules.put(GTCEu.id("diethylenetriamine"), new Molecule()
+                .uv()
+                .atom(Element.create("H₂N"), 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .atom(Element.N, 2, 1)
+                .atom(Element.H, 2.5f, 0.5f)
+                .invAtom(2, 2)
+                .invAtom(3, 2)
+                .atom(Element.create("NH₂"), 3, 3)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(3, 5)
+                .bond(5, 6)
+                .bond(6, 7));
+        molecules.put(GTCEu.id("nitrobenzene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .atom(Element.N, 2, -1)
+                .atom(Element.O, 2, -2)
+                .atom(Element.O, 3, -1)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(6, 8));
+        molecules.put(GTCEu.id("glyceryl_trinitrate"), new Molecule()
+                .uv()
+                .atom(Element.O, 0, 0) // 0
+                .atom(Element.N, 0, 1) // 1
+                .atom(Element.O, -1, 2) // 2
+                .atom(Element.O, 1, 1) // 3
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(1, 3)
+                .invAtom(1, 2) // 4
+                .invAtom(2, 2) // 5
+                .bond(3, 4)
+                .bond(4, 5)
+                .atom(Element.O, 3, 1) // 6
+                .atom(Element.N, 3, 0) // 7
+                .atom(Element.O, 2, 0) // 8
+                .atom(Element.O, 4, -1) // 9
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(7, 8)
+                .bond(7, 9)
+                .invAtom(2, 3) // 10
+                .atom(Element.O, 3, 3) // 11
+                .atom(Element.N, 3, 4) // 12
+                .atom(Element.O, 4, 4) // 13
+                .atom(Element.O, 2, 5) // 14
+                .bond(5, 10)
+                .bond(10, 11)
+                .bond(11, 12)
+                .bond(12, 13)
+                .bond(12, 14));
+        molecules.put(GTCEu.id("polydimethylsiloxane"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .atom(Element.O, 0, 1)
+                .atom(Element.Si, 1, 1)
+                .invAtom(2, 0)
+                .invAtom(0, 2)
+                .invAtom(1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(2, 4)
+                .bond(2, 5)
+                .add(Parens.polymer(1, 2, 3, 4)));
+        molecules.put(GTCEu.id("cumene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .invAtom(2, -1)
+                .invAtom(3, -1)
+                .invAtom(2, -2)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(6, 8));
+        molecules.put(GTCEu.id("tetrafluoroethylene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.F, -1, 1)
+                .atom(Element.F, 0, -1)
+                .atom(Element.F, 2, -1)
+                .atom(Element.F, 1, 1)
+                .bond(0, 1, Bond.Type.DOUBLE_CENTERED)
+                .bond(0, 2)
+                .bond(0, 3)
+                .bond(1, 4)
+                .bond(1, 5));
+        molecules.put(GTCEu.id("vinyl_acetate"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, 1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O, 3, 0)
+                .invAtom(2, 2)
+                .bond(0, 1, Bond.Type.DOUBLE)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE_CENTERED)
+                .bond(3, 5));
+        molecules.put(GTCEu.id("dimethylhydrazine"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .atom(Element.N, 1, 0)
+                .atom(Element.H, 1.5f, -0.5f)
+                .atom(Element.N, 1, 1)
+                .atom(Element.H, 0.5f, 1.5f)
+                .invAtom(2, 1)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(1, 3)
+                .bond(3, 4)
+                .bond(3, 5));
+        molecules.put(GTCEu.id("dimethyldichlorosilane"), new Molecule()
+                .uv()
+                .atom(Element.Si, 0, 0)
+                .invAtom(1, 0)
+                .invAtom(0, 1)
+                .atom(Element.Cl, -1, 0)
+                .atom(Element.Cl, 0, -1)
+                .bond(0, 1)
+                .bond(0, 2)
+                .bond(0, 3)
+                .bond(0, 4));
+        molecules.put(GTCEu.id("styrene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .bond(4, 6)
+                .bond(6, 7, Bond.Type.DOUBLE));
+        molecules.put(GTCEu.id("dichlorobenzene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .atom(Element.Cl, 2, -1)
+                .atom(Element.Cl, -2, 3)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .bond(5, 6)
+                .bond(2, 7));
+        molecules.put(GTCEu.id("bisphenol_a"), new Molecule()
+                .uv()
+                .atom(Element.create("HO"), 0, 0) // 0
+                .invAtom(1, 0) // 1
+                .invAtom(1, 1) // 2
+                .invAtom(2, 1) // 3
+                .invAtom(3, 0) // 4
+                .invAtom(3, -1) // 5
+                .invAtom(2, -1) // 6
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 6, Bond.Type.DOUBLE)
+                .bond(6, 1)
+                .invAtom(4, 0) // 7
+                .invAtom(5, 0) // 8
+                .invAtom(4, -1) // 9
+                .bond(4, 7)
+                .bond(7, 8)
+                .bond(7, 9)
+                .invAtom(4, 1) // 10
+                .invAtom(3, 2) // 11
+                .invAtom(3, 3) // 12
+                .invAtom(4, 3) // 13
+                .invAtom(5, 2) // 14
+                .invAtom(5, 1) // 15
+                .atom(Element.create("OH"), 4, 4) // 16
+                .bond(7, 10)
+                .bond(10, 11)
+                .bond(11, 12, Bond.Type.DOUBLE)
+                .bond(12, 13)
+                .bond(13, 14, Bond.Type.DOUBLE)
+                .bond(14, 15)
+                .bond(15, 10, Bond.Type.DOUBLE)
+                .bond(13, 16));
+        molecules.put(GTCEu.id("vinyl_chloride"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(0, 1)
+                .atom(Element.Cl, -1, 2)
+                .bond(0, 1, Bond.Type.DOUBLE)
+                .bond(1, 2));
+        molecules.put(GTCEu.id("diphenyl_isophthalate"), new Molecule()
+                .uv()
+                .invAtom(0, 0) // 0
+                .invAtom(-1, 1) // 1
+                .invAtom(-1, 2) // 2
+                .invAtom(0, 2) // 3
+                .invAtom(1, 1) // 4
+                .invAtom(1, 0) // 5
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .atom(Element.O, 2, 1) // 6
+                .invAtom(2, 2) // 7
+                .atom(Element.O, 1, 3) // 8
+                .bond(4, 6)
+                .bond(6, 7)
+                .bond(7, 8)
+                .invAtom(3, 2) // 9
+                .invAtom(3, 3) // 10
+                .invAtom(4, 3) // 11
+                .invAtom(5, 2) // 12
+                .invAtom(5, 1) // 13
+                .invAtom(4, 1) // 14
+                .bond(7, 9)
+                .bond(9, 10, Bond.Type.DOUBLE)
+                .bond(10, 11)
+                .bond(11, 12, Bond.Type.DOUBLE)
+                .bond(12, 13)
+                .bond(13, 14, Bond.Type.DOUBLE)
+                .bond(14, 9)
+                .invAtom(4, 4) // 15
+                .atom(Element.O, 3, 5) // 16
+                .atom(Element.O, 5, 4) // 17
+                .bond(11, 15)
+                .bond(15, 16)
+                .bond(15, 17)
+                .invAtom(5, 5) // 18
+                .invAtom(4, 6) // 19
+                .invAtom(4, 7) // 20
+                .invAtom(5, 7) // 21
+                .invAtom(6, 6) // 22
+                .invAtom(6, 5) // 23
+                .bond(17, 18)
+                .bond(18, 19)
+                .bond(19, 20, Bond.Type.DOUBLE)
+                .bond(20, 21)
+                .bond(21, 22, Bond.Type.DOUBLE)
+                .bond(22, 23)
+                .bond(23, 18, Bond.Type.DOUBLE));
+        molecules.put(GTCEu.id("phthalic_acid"), new Molecule()
+                .uv()
+                .invAtom(0, 0) // 0
+                .invAtom(-1, 1) // 1
+                .invAtom(-1, 2) // 2
+                .invAtom(0, 2) // 3
+                .invAtom(1, 1) // 4
+                .invAtom(1, 0) // 5
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .invAtom(2, -1) // 6
+                .atom(Element.create("HO"), 2, -2) // 7
+                .atom(Element.O, 3, -1) // 8
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(6, 8, Bond.Type.DOUBLE_CENTERED)
+                .invAtom(2, 1) // 9
+                .atom(Element.create("OH"), 3, 0) // 10
+                .atom(Element.O, 2, 2) // 11
+                .bond(4, 9)
+                .bond(9, 10)
+                .bond(9, 11, Bond.Type.DOUBLE_CENTERED));
+        molecules.put(GTCEu.id("diaminobenzidine"), new Molecule()
+                .uv()
+                .invAtom(0, 0) // 0
+                .invAtom(-1, 1) // 1
+                .invAtom(-1, 2) // 2
+                .invAtom(0, 2) // 3
+                .invAtom(1, 1) // 4
+                .invAtom(1, 0) // 5
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .atom(Element.create("H₂N"), -2, 1) // 6
+                .atom(Element.create("NH₂"), -2, 3) // 7
+                .bond(1, 6)
+                .bond(2, 7)
+                .invAtom(2, 1) // 8
+                .invAtom(2, 2) // 9
+                .invAtom(3, 2) // 10
+                .invAtom(4, 1) // 11
+                .invAtom(4, 0) // 12
+                .invAtom(3, 0) // 13
+                .bond(4, 8)
+                .bond(8, 9, Bond.Type.DOUBLE)
+                .bond(9, 10)
+                .bond(10, 11, Bond.Type.DOUBLE)
+                .bond(11, 12)
+                .bond(12, 13, Bond.Type.DOUBLE)
+                .bond(13, 8)
+                .atom(Element.create("NH₂"), 3, 3) // 14
+                .atom(Element.create("NH₂"), 5, 1) // 15
+                .bond(10, 14)
+                .bond(11, 15));
+        molecules.put(GTCEu.id("dichlorobenzidine"), new Molecule()
+                .uv()
+                .invAtom(0, 0) // 0
+                .invAtom(-1, 1) // 1
+                .invAtom(-1, 2) // 2
+                .invAtom(0, 2) // 3
+                .invAtom(1, 1) // 4
+                .invAtom(1, 0) // 5
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .atom(Element.create("H₂N"), -2, 1) // 6
+                .atom(Element.Cl, 0, -1) // 7
+                .bond(1, 6)
+                .bond(0, 7)
+                .invAtom(2, 1) // 8
+                .invAtom(2, 2) // 9
+                .invAtom(3, 2) // 10
+                .invAtom(4, 1) // 11
+                .invAtom(4, 0) // 12
+                .invAtom(3, 0) // 13
+                .bond(4, 8)
+                .bond(8, 9, Bond.Type.DOUBLE)
+                .bond(9, 10)
+                .bond(10, 11, Bond.Type.DOUBLE)
+                .bond(11, 12)
+                .bond(12, 13, Bond.Type.DOUBLE)
+                .bond(13, 8)
+                .atom(Element.Cl, 3, 3) // 14
+                .atom(Element.create("NH₂"), 5, 1) // 15
+                .bond(10, 14)
+                .bond(11, 15));
+        molecules.put(GTCEu.id("nitrochlorobenzene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .atom(Element.N, 2, -1)
+                .atom(Element.O, 2, -2)
+                .atom(Element.O, 3, -1)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(6, 8)
+                .atom(Element.Cl, -2, 3)
+                .bond(2, 9));
+        molecules.put(GTCEu.id("chlorobenzene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .atom(Element.Cl, 2, -1)
+                .bond(5, 6));
+        molecules.put(GTCEu.id("octane"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .invAtom(3, 2)
+                .invAtom(3, 3)
+                .invAtom(4, 3)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 6)
+                .bond(6, 7));
+        molecules.put(GTCEu.id("ethyl_tertbutyl_ether"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(0, 1)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .atom(Element.O, 1, 1)
+                .invAtom(1, 2)
+                .invAtom(2, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(1, 3)
+                .bond(1, 4)
+                .bond(4, 5)
+                .bond(5, 6));
+        molecules.put(GTCEu.id("cyclohexanone_oxime"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 0)
+                .atom(Element.N, 2, -1)
+                .atom(Element.create("HO"), 2, -2)
+                .bond(5, 6, Bond.Type.DOUBLE)
+                .bond(6, 7));
+        molecules.put(GTCEu.id("butyraldehyde"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O, 2, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(4, 3, Bond.Type.DOUBLE));
+        molecules.put(GTCEu.id("acetic_anhydride"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, 2, -1)
+                .atom(Element.O, 1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O, 3, 0)
+                .invAtom(2, 2)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE_CENTERED)
+                .bond(1, 3)
+                .bond(3, 4)
+                .bond(4, 5, Bond.Type.DOUBLE_CENTERED)
+                .bond(4, 6));
+        molecules.put(GTCEu.id("aminophenol"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .atom(Element.create("OH"), 2, -1)
+                .atom(Element.create("NH₂"), -2, 3)
+                .bond(0, 1)
+                .bond(1, 2, Bond.Type.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.Type.DOUBLE)
+                .bond(5, 6)
+                .bond(2, 7));
         return molecules;
     }
 }

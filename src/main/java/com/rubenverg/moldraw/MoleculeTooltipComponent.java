@@ -42,7 +42,7 @@ public record MoleculeTooltipComponent(
             var result = new Vector2f();
             xy.sub(xyStart, result);
             result.mul(SCALE);
-            return new Vector2i((int) result.x + 5, -(int) result.y + (atomAtTop ? lineHeight / 2 : 3));
+            return new Vector2i((int) result.x + 8, -(int) result.y + (atomAtTop ? lineHeight / 2 : 3));
         }
 
         public ClientMoleculeTooltipComponent(MoleculeTooltipComponent component) {
@@ -63,7 +63,7 @@ public record MoleculeTooltipComponent(
 
         @Override
         public int getWidth(Font font) {
-            return xySize.x + 16;
+            return xySize.x + 20;
         }
 
         @Override
