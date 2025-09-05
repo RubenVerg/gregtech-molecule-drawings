@@ -63,7 +63,7 @@ public record MoleculeTooltipComponent(
 
         @Override
         public int getWidth(Font font) {
-            return xySize.x + 20;
+            return xySize.x + 32;
         }
 
         @Override

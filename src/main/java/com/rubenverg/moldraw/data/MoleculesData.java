@@ -1078,6 +1078,157 @@ public class MoleculesData {
                 .bond(5, 0, Bond.Type.DOUBLE)
                 .bond(5, 6)
                 .bond(2, 7));
+        molecules.put(GTCEu.id("butanol"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .atom(Element.create("OH"), 2, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4));
+        molecules.put(GTCEu.id("tributyl_phosphate"), new Molecule()
+                .uv()
+                .invAtom(0, 0) // 0
+                .invAtom(1, 0) // 1
+                .invAtom(1, 1) // 2
+                .invAtom(2, 1) // 3
+                .atom(Element.O, 2, 2) // 4
+                .atom(Element.P, 3, 2) // 5
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .atom(Element.O, 3, 3) // 6
+                .invAtom(4, 3) // 7
+                .invAtom(4, 4) // 8
+                .invAtom(5, 4) // 9
+                .invAtom(5, 5) // 10
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(7, 8)
+                .bond(8, 9)
+                .bond(9, 10)
+                .atom(Element.O, 2, 3) // 11
+                .invAtom(1, 3) // 12
+                .invAtom(1, 2) // 13
+                .invAtom(0, 2) // 14
+                .invAtom(0, 1) // 15
+                .bond(5, 11)
+                .bond(11, 12)
+                .bond(12, 13)
+                .bond(13, 14)
+                .bond(14, 15)
+                .atom(Element.O, 4, 1) // 16
+                .bond(5, 16, Bond.Type.DOUBLE_CENTERED));
+        molecules.put(GTCEu.id("chloroethane"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.Cl, 1, 1)
+                .bond(0, 1)
+                .bond(1, 2));
+        molecules.put(GTCEu.id("acetylene"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .bond(0, 1, Bond.Type.TRIPLE));
+        molecules.put(GTCEu.id("chloroacetate"), new Molecule()
+                .uv()
+                .atom(Element.Cl, 0, 0)
+                .invAtom(0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 2, 0)
+                .atom(Element.create("OH"), 1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, Bond.Type.DOUBLE_CENTERED)
+                .bond(2, 4));
+        molecules.put(GTCEu.id("cyanoacetic_acid"), new Molecule()
+                .uv()
+                .atom(Element.N, 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O, 3, 0)
+                .atom(Element.create("OH"), 2, 2)
+                .bond(0, 1, Bond.Type.TRIPLE)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE_CENTERED)
+                .bond(3, 5));
+        molecules.put(GTCEu.id("ethyl_cyanoacetate"), new Molecule()
+                .uv()
+                .atom(Element.N, 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O, 3, 0)
+                .atom(Element.O, 2, 2)
+                .invAtom(3, 2)
+                .invAtom(3, 3)
+                .bond(0, 1, Bond.Type.TRIPLE)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE_CENTERED)
+                .bond(3, 5)
+                .bond(5, 6)
+                .bond(6, 7));
+        molecules.put(GTCEu.id("ethyl_cyanoacrylate"), new Molecule()
+                .uv()
+                .atom(Element.N, 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O, 3, 0)
+                .atom(Element.O, 2, 2)
+                .invAtom(3, 2)
+                .invAtom(3, 3)
+                .invAtom(0, 2)
+                .bond(0, 1, Bond.Type.TRIPLE)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE_CENTERED)
+                .bond(3, 5)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(2, 8, Bond.Type.DOUBLE_CENTERED));
+        molecules.put(GTCEu.id("dimethyl_sulfide"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .atom(Element.S, 1, 0)
+                .invAtom(1, 1)
+                .bond(0, 1)
+                .bond(1, 2));
+        molecules.put(GTCEu.id("dimethyl_sulfoxide"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .atom(Element.S, 1, 0)
+                .invAtom(1, 1)
+                .atom(Element.O, 2, -1)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(1, 3, Bond.Type.DOUBLE_CENTERED));
+        molecules.put(GTCEu.id("ammonium_oxalate"), new Molecule()
+                .uv()
+                .atom(Element.N, 0, 0) // 0
+                .atom(Element.create("H₄"), 1 / 3f, 1 / 3f) // 1
+                .atom(Element.O, 1, 1) // 2
+                .invAtom(2, 1) // 3
+                .atom(Element.O, 3, 0) // 4
+                .invAtom(2, 2) // 5
+                .atom(Element.O, 3, 2) // 6
+                .atom(Element.O, 1, 3) // 7
+                .bond(2, 3)
+                .bond(3, 4, Bond.Type.DOUBLE_CENTERED)
+                .bond(3, 5)
+                .bond(5, 6)
+                .bond(5, 7, Bond.Type.DOUBLE_CENTERED)
+                .add(new Parens("2", "+", 0, 1))
+                .add(new Parens("", "2-", 2, 3, 4, 5, 6, 7)));
         return molecules;
     }
 }
