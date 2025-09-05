@@ -22,6 +22,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.google.common.hash.HashCode;
@@ -57,6 +58,7 @@ public class MolDraw {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+            modEventBus.addListener(this::modConstruct);
             modEventBus.addListener(this::gatherData);
             modEventBus.addListener(this::registerClientTooltipComponents);
             modEventBus.addListener(this::registerClientReloadListeners);
@@ -73,6 +75,10 @@ public class MolDraw {
             .registerTypeAdapter(Parens.class, Parens.Json.INSTANCE)
             .setPrettyPrinting()
             .create();
+
+    public void modConstruct(FMLConstructModEvent event) {
+        event.enqueueWork(MolDrawConfig::init);
+    }
 
     public void gatherData(GatherDataEvent event) {
         final var gen = event.getGenerator();
@@ -159,6 +165,7 @@ public class MolDraw {
 
     @SubscribeEvent
     public void tooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
+        if (!MolDrawConfig.INSTANCE.enabled) return;
         // event.getTooltipElements().add(0, Either.right(new MoleculeTooltipComponent(new Molecule()
         // )));
         Material material;

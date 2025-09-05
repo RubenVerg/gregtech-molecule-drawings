@@ -10,6 +10,7 @@ import net.minecraft.world.level.material.Fluid;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rubenverg.moldraw.MolDraw;
+import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import org.spongepowered.asm.mixin.Final;
@@ -51,6 +52,7 @@ public class FluidEmiStackMixin {
             require = 0)
     private void moldraw$addFluidTooltip(CallbackInfoReturnable<List<ClientTooltipComponent>> cir,
                                          @Local(name = "list") List<ClientTooltipComponent> list) {
+        if (!MolDrawConfig.INSTANCE.enabled) return;
         final var material = ChemicalHelper.getMaterial(fluid);
         if (Objects.isNull(material)) return;
         final var mol = MolDraw.getMolecule(material);
