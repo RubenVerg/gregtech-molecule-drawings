@@ -66,7 +66,6 @@ repositories {
     maven {
         url = "https://thedarkcolour.github.io/KotlinForForge/"
     }
-
 }
 
 version = mod_version
