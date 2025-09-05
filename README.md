@@ -1,5 +1,7 @@
 # GregTech Molecule Drawings
 
+> *This branch is for GregTech 1.6.x*
+
 ## Adding your own molecules
 
 Molecules are stored in resource packs under `assets/<namespace>/molecules/<compound>.json`, corresponding to the GT material with ID `<namespace>:<compound>`.

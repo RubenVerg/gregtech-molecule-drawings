@@ -9,9 +9,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "gtceu-1.6" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "gtceu-1.6" ]
 
 jobs:
   build:
@@ -39,5 +39,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: 'gtmoldraw'
+        name: 'gtmoldraw (for GTCEu 1.6.x)'
         path: './build/libs/'
