@@ -24,6 +24,10 @@ public record Atom(
                 position);
     }
 
+    public boolean isInvisible() {
+        return element.invisible;
+    }
+
     public static class Json implements JsonSerializer<Atom>, JsonDeserializer<Atom> {
 
         private Json() {}
@@ -43,10 +47,10 @@ public record Atom(
             if (obj.has("u") && obj.has("v")) {
                 position.x = obj.get("u").getAsFloat();
                 position.y = obj.get("v").getAsFloat();
+                position.mul(MathUtils.UVtoXY);
             } else if (obj.has("x") && obj.has("y")) {
                 position.x = obj.get("x").getAsFloat();
                 position.y = obj.get("y").getAsFloat();
-                MathUtils.squareToTriangle(position);
             } else {
                 throw new JsonParseException("Atom JSON must contain either u and v, or x and y");
             }
@@ -58,8 +62,8 @@ public record Atom(
             final var obj = new JsonObject();
             obj.addProperty("index", atom.index);
             obj.addProperty("element", atom.element.symbol);
-            obj.addProperty("u", atom.position.x);
-            obj.addProperty("v", atom.position.y);
+            obj.addProperty("x", atom.position.x);
+            obj.addProperty("y", atom.position.y);
             return obj;
         }
     }

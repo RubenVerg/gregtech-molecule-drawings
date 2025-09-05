@@ -5,7 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import lombok.Getter;
-import org.joml.Vector2f;
+import org.joml.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -18,24 +18,24 @@ public class Molecule {
 
     private int atomIndex = -1;
     private final List<MoleculeElement<?>> contents = new ArrayList<>();
-    private boolean isXY = false;
     @Getter
-    private int additionalOffset = 0;
+    private final Matrix2d transformation = new Matrix2d();
 
     public Molecule() {}
 
-    public Molecule(int additionalOffset) {
-        this.additionalOffset = additionalOffset;
+    public Molecule transformation(Matrix2dc matrix) {
+        matrix.get(this.transformation);
+        return this;
     }
 
     public Molecule uv() {
-        this.isXY = false;
-        return this;
+        return this.transformation(MathUtils.UVtoXY);
     }
 
     public Molecule xy() {
-        this.isXY = true;
-        return this;
+        final var mat = new Matrix2d();
+        mat.identity();
+        return this.transformation(mat);
     }
 
     public Molecule add(MoleculeElement<?> elem) {
@@ -43,23 +43,23 @@ public class Molecule {
         return this;
     }
 
-    public Molecule atom(Element element, Vector2f uv1) {
-        final var uv = new Vector2f(uv1);
-        if (isXY) MathUtils.squareToTriangle(uv);
-        this.contents.add(new Atom(++atomIndex, element, uv));
+    public Molecule atom(Element element, Vector2fc ab) {
+        final var xy = new Vector2f(ab);
+        xy.mul(this.transformation);
+        this.contents.add(new Atom(++atomIndex, element, xy));
         return this;
     }
 
-    public Molecule atom(Element element, float u, float v) {
-        return atom(element, new Vector2f(u, v));
+    public Molecule atom(Element element, float a, float b) {
+        return atom(element, new Vector2f(a, b));
     }
 
-    public Molecule invAtom(Vector2f uv) {
-        return atom(Element.Invisible.inv, uv);
+    public Molecule invAtom(Vector2f ab) {
+        return atom(Element.INVISIBLE, ab);
     }
 
-    public Molecule invAtom(float u, float v) {
-        return invAtom(new Vector2f(u, v));
+    public Molecule invAtom(float a, float b) {
+        return invAtom(new Vector2f(a, b));
     }
 
     public Molecule bond(int a, int b, Bond.Type type) {
@@ -81,10 +81,6 @@ public class Molecule {
 
     public Optional<Atom> getAtom(int index) {
         return atoms().stream().filter(atom -> atom.index() == index).findFirst();
-    }
-
-    public List<Bond> bonds() {
-        return this.contents.stream().filter(elem -> elem instanceof Bond).map(elem -> (Bond) elem).toList();
     }
 
     public Molecule subset(int... atomIndices) {
@@ -114,22 +110,6 @@ public class Molecule {
         return new Pair<>(min, max);
     }
 
-    public Pair<Vector2f, Vector2f> boundsXY() {
-        final var atoms = atoms();
-        if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
-        Vector2f min = new Vector2f(atoms.get(0).position()), max = new Vector2f(atoms.get(0).position());
-        MathUtils.triangleToSquare(min);
-        MathUtils.triangleToSquare(max);
-        var temp = new Vector2f();
-        for (final var atom : atoms) {
-            temp = new Vector2f(atom.position());
-            MathUtils.triangleToSquare(temp);
-            min.min(temp);
-            max.max(temp);
-        }
-        return new Pair<>(min, max);
-    }
-
     public static class Json implements JsonSerializer<Molecule>, JsonDeserializer<Molecule> {
 
         private Json() {}
@@ -142,9 +122,7 @@ public class Molecule {
             if (!jsonElement.isJsonObject()) throw new JsonParseException("Molecule JSON must be an object");
             final var obj = jsonElement.getAsJsonObject();
             if (!obj.has("contents")) throw new JsonParseException("Molecule JSON must contain contents property");
-            int additionalOffset = 0;
-            if (obj.has("additional_offset")) additionalOffset = obj.get("additional_offset").getAsInt();
-            final var molecule = new Molecule(additionalOffset);
+            final var molecule = new Molecule();
             obj.getAsJsonArray("contents").asList().forEach(content -> {
                 if (!content.isJsonObject()) throw new JsonParseException("Molecule JSON contents must be objects");
                 final var contentObj = content.getAsJsonObject();
@@ -163,7 +141,6 @@ public class Molecule {
         @Override
         public JsonElement serialize(Molecule molecule, Type type, JsonSerializationContext jsonSerializationContext) {
             final var obj = new JsonObject();
-            if (molecule.additionalOffset != 0) obj.addProperty("additional_offset", molecule.additionalOffset);
             final var arr = new JsonArray();
             for (final var content : molecule.contents) {
                 final var c = jsonSerializationContext.serialize(content);

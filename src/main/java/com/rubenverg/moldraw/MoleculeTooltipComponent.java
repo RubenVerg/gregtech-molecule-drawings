@@ -34,31 +34,31 @@ public record MoleculeTooltipComponent(
 
         private final Molecule molecule;
         private final Vector2i xySize;
-        private final Vector2i xyStart;
+        private final Vector2f xyStart;
+        private final boolean atomAtTop;
         private final Map<Element, Integer> elementWidths = new HashMap<>();
 
-        private Vector2i toScale(int lineHeight, Vector2f xy) {
+        private Vector2i toScreen(int lineHeight, Vector2f xy) {
             var result = new Vector2f();
-            xy.sub(xyStart.x, xyStart.y, result);
+            xy.sub(xyStart, result);
             result.mul(SCALE);
-            return new Vector2i((int) result.x + 5, xySize.y - (int) result.y + 4 + molecule.getAdditionalOffset());
-        }
-
-        private Vector2i toXYSpace(int lineHeight, Vector2f uv) {
-            var result = new Vector2f();
-            MathUtils.triangleToSquare(uv, result);
-            return toScale(lineHeight, result);
+            return new Vector2i((int) result.x + 5, -(int) result.y + (atomAtTop ? lineHeight / 2 : 3));
         }
 
         public ClientMoleculeTooltipComponent(MoleculeTooltipComponent component) {
             this.molecule = component.molecule();
-            final var bounds = molecule.boundsXY();
+            final var bounds = molecule.bounds();
             final Vector2f diff = new Vector2f();
             bounds.getSecond().sub(bounds.getFirst(), diff);
             diff.mul(SCALE);
             diff.ceil();
             this.xySize = new Vector2i((int) diff.x, (int) diff.y);
-            this.xyStart = new Vector2i(Mth.floor(bounds.getFirst().x), Mth.floor(bounds.getFirst().y));
+            this.xyStart = new Vector2f(bounds.getFirst().x, bounds.getSecond().y);
+            this.atomAtTop = molecule.atoms().stream().anyMatch(atom -> {
+                final var distanceFromTop = Math.abs(xyStart.y - atom.position().y);
+                final var invisible = atom.isInvisible();
+                return distanceFromTop < 0.1 && !invisible;
+            });
         }
 
         @Override
@@ -80,7 +80,7 @@ public record MoleculeTooltipComponent(
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Atom atom) {
-                    final var xyPosition = toXYSpace(font.lineHeight, atom.position());
+                    final var xyPosition = toScreen(font.lineHeight, atom.position());
                     final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
                     mat.translate(translation);
                     final var width = font.width(atom.element().symbol);
@@ -92,15 +92,16 @@ public record MoleculeTooltipComponent(
                     mat.translate(translation.negate());
                     elementWidths.put(atom.element(), width);
                 } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).boundsXY();
-                    final var xySub = toScale(font.lineHeight, new Vector2f(bounds.getSecond().x, bounds.getFirst().y));
+                    final var bounds = this.molecule.subset(pp.atoms()).bounds();
+                    final var xySub = toScreen(font.lineHeight,
+                            new Vector2f(bounds.getSecond().x, bounds.getFirst().y));
                     xySub.add(9, font.lineHeight - 4);
                     final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
                     mat.translate(subTranslation);
                     font.drawInBatch(pp.sub(), (float) mouseX, (float) mouseY, COLOR, false, mat, bufferSource,
                             Font.DisplayMode.NORMAL, 0, 15728880);
                     mat.translate(subTranslation.negate());
-                    final var xySup = toScale(font.lineHeight,
+                    final var xySup = toScreen(font.lineHeight,
                             new Vector2f(bounds.getSecond().x, bounds.getSecond().y));
                     xySup.add(9, -4);
                     final var supTranslation = new Vector3f(xySup.x, xySup.y, 0);
@@ -118,19 +119,18 @@ public record MoleculeTooltipComponent(
                 if (elem instanceof Bond bond) {
                     final var atomA = this.molecule.getAtom(bond.a()).orElseThrow();
                     final var atomAWidth = elementWidths.get(atomA.element());
-                    final var atomAInvisible = atomA.element() instanceof Element.Invisible;
+                    final var atomAInvisible = atomA.isInvisible();
                     final var atomB = this.molecule.getAtom(bond.b()).orElseThrow();
                     final var atomBWidth = elementWidths.get(atomB.element());
-                    final var atomBInvisible = atomB.element() instanceof Element.Invisible;
-                    var start = toXYSpace(font.lineHeight, atomA.position());
+                    final var atomBInvisible = atomB.isInvisible();
+                    var start = toScreen(font.lineHeight, atomA.position());
                     start.add(x, y);
                     start.add(0, font.lineHeight / 2);
-                    var end = toXYSpace(font.lineHeight, atomB.position());
+                    var end = toScreen(font.lineHeight, atomB.position());
                     end.add(x, y);
                     end.add(0, font.lineHeight / 2);
                     BiPredicate<@NotNull Integer, @NotNull Integer> isCloseToAtom = (xt, yt) -> {
-                        if (atomA.element() instanceof Element.Invisible &&
-                                atomB.element() instanceof Element.Invisible)
+                        if (atomAInvisible && atomBInvisible)
                             return true;
                         Vector2ic t = new Vector2i(xt, yt);
                         var diff = new Vector2i();
@@ -172,11 +172,11 @@ public record MoleculeTooltipComponent(
                             break;
                     }
                 } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).boundsXY();
-                    final var xyMin = toScale(font.lineHeight, bounds.getFirst());
+                    final var bounds = this.molecule.subset(pp.atoms()).bounds();
+                    final var xyMin = toScreen(font.lineHeight, bounds.getFirst());
                     xyMin.add(x, y);
                     xyMin.add(-4, font.lineHeight + 1);
-                    final var xyMax = toScale(font.lineHeight, bounds.getSecond());
+                    final var xyMax = toScreen(font.lineHeight, bounds.getSecond());
                     xyMax.add(x, y);
                     xyMax.add(4, -2);
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, COLOR);

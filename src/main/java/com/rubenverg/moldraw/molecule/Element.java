@@ -8,13 +8,15 @@ public class Element {
     private static final Map<String, Element> elements = new HashMap<>();
 
     public final String symbol;
+    public final boolean invisible;
 
-    protected Element(String symbol) {
+    protected Element(String symbol, boolean invisible) {
         this.symbol = symbol;
+        this.invisible = invisible;
     }
 
     public static Element create(String symbol) {
-        return elements.computeIfAbsent(symbol, Element::new);
+        return elements.computeIfAbsent(symbol, s -> new Element(s, false));
     }
 
     public static Element H = Element.create("H");
@@ -136,18 +138,6 @@ public class Element {
     public static Element Ts = Element.create("Ts");
     public static Element Og = Element.create("Og");
 
+    public static Element INVISIBLE = elements.computeIfAbsent("", s -> new Element(s, true));
     public static Element BULLET = Element.create("•");
-
-    public static class Invisible extends Element {
-
-        private Invisible() {
-            super("");
-        }
-
-        public static Element inv = new Invisible();
-
-        static {
-            Element.elements.put("", inv);
-        }
-    }
 }

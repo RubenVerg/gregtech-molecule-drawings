@@ -1,45 +1,14 @@
 package com.rubenverg.moldraw.molecule;
 
-import net.minecraft.util.Mth;
-
 import org.joml.*;
 
 import java.lang.Math;
 
 public class MathUtils {
 
-    public static Matrix2dc T2S = new Matrix2d(
+    public static Matrix2dc UVtoXY = new Matrix2d(
             Math.sqrt(3) / 2, 0.5,
             Math.sqrt(3) / 2, -0.5);
-    public static Matrix2dc S2T = new Matrix2d();
-
-    static {
-        T2S.invert((Matrix2d) S2T);
-    }
-
-    public static void triangleToSquare(Vector2fc vec, Vector2f result) {
-        vec.mul(T2S, result);
-        // MolDraw.LOGGER.info("{} -> {}", vec, result);
-    }
-
-    public static void triangleToSquare(Vector2f vec) {
-        vec.mul(T2S);
-        // MolDraw.LOGGER.info("{} -> {}", vec, result);
-    }
-
-    public static void squareToTriangle(Vector2f vec) {
-        vec.mul(S2T);
-    }
-
-    public static double roundAway(double number) {
-        if (number < 0) return Math.floor(number);
-        return Math.ceil(number);
-    }
-
-    public static float roundAway(float number) {
-        if (number < 0) return Mth.floor(number);
-        return Mth.ceil(number);
-    }
 
     public static double COS18 = Math.cos(Math.toRadians(18));
     public static double SIN18 = Math.sin(Math.toRadians(18));
