@@ -24,4 +24,8 @@ public class MolDrawConfig {
 
     @Configurable
     public boolean debugMode = false;
+
+    @Configurable
+    @Configurable.Range(min = 10, max = 50)
+    public int scale = 20;
 }
