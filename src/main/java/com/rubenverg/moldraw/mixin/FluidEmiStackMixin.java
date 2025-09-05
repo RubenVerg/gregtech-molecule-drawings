@@ -52,7 +52,7 @@ public class FluidEmiStackMixin {
     private void moldraw$addFluidTooltip(CallbackInfoReturnable<List<ClientTooltipComponent>> cir,
                                          @Local(name = "list") List<ClientTooltipComponent> list) {
         final var material = ChemicalHelper.getMaterial(fluid);
-        if (material.isNull()) return;
+        if (Objects.isNull(material)) return;
         final var mol = MolDraw.getMolecule(material);
         if (Objects.isNull(mol)) return;
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
