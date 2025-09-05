@@ -1,38 +1,136 @@
-# GregTech Addon Template
-## Template for GregTech Modern addons on 1.20.1
+# GregTech Molecule Drawings
 
- Original template by [screret](https://github.com/screret), maintained by [JuiceyBeans](https://github.com/JuiceyBeans)
+## Adding your own molecules
 
-<hr>
+Molecules are stored in resource packs under `assets/<namespace>/molecules/<compound>.json`, corresponding to the GT material with ID `<namespace>:<compound>`.
 
-## How do I make an addon for GregTech Modern?
-Well for one, you WILL need to know Java to make an addon. There's no getting around this. A good starting point would be [MOOC](https://java-programming.mooc.fi/) or [W3Schools](https://www.w3schools.com/java/
-)
+Molecules follow this schema:
 
-Unfortunately, there isn't any official documentation so far for making GregTech Modern addons. There are a couple of mods you can look at to reference though!
+```typescript
+interface AtomCommon {
+  type: 'atom';
+  index: number;
+  element?: string;
+}
 
-Repositories for other addons:
+interface AtomXY extends AtomCommon {
+  x: number;
+  y: number;
+}
 
-- [GT Community Additions](https://github.com/mordgren/GTCA)
-- [Gregtech: Extended Chemistry Extended](https://github.com/jmoiron/Gregtech-Extended-Chemistry)
-- [GCYLM](https://github.com/eve336/gcylm)
-- [Gregicality Rocketry](https://github.com/Argent-Matter/gcyr/)
+interface AtomUV extends AtomCommon {
+  u: number;
+  v: number;
+}
 
-Additionally, you may be able to find help on the [GregTech CEu Discord](https://discord.gg/bWSWuYvURP)!
+type BondType = 'single' | 'double' | 'double_centered' | 'triple';
 
-<hr>
+interface Bond {
+  type: 'bond';
+  a: number;
+  b: number;
+  bond_type: BondType;
+}
 
-## This template comes packaged with [Spotless](https://github.com/diffplug/spotless)!
+interface Parens {
+  type: 'parens';
+  sup?: string;
+  sub?: string;
+  atoms: number[];
+}
 
-### 1. What is Spotless?
-- Spotless keeps your code neatly formatted. It's essentially a grammar check for your code!
-### 2. Can I choose not to use Spotless?
-- Yes! Spotless is completely optional and will not affect your project by default
-### 3. How do I run Spotless?
-- You can run Spotless anytime by:
-  - Running the `spotlessApply` task from the Gradle tab in IntelliJ
-  - Installing the [Spotless Gradle plugin for IntelliJ](https://plugins.jetbrains.com/plugin/18321-spotless-gradle)
-  - Typing in `gradlew.bat :spotlessApply` if you're on Windows
-  - Typing in `bash gradlew :spotlessApply` if you're on Linux
-### 4. So how do I check if Spotless has been applied to my code?
-- Running `spotlessApply` will format all files for you automatically! If you want GitHub to check each commit for if Spotless has been run, you can add [this](https://github.com/Frontiers-PackForge/CosmicCore/blob/main-1.20.1-forge/.github/workflows/spotless.yml) and [this](https://github.com/Frontiers-PackForge/CosmicCore/blob/main-1.20.1-forge/.github/actions/build_setup/action.yml) to your project
+type MoleculeElement = AtomXY | AtomUV | Bond | Parens;
+
+interface Molecule {
+  contents: MoleculeElement[];
+}
+```
+
+An atom's position can either be stored as a pair of `x` and `y` coordinates or a pair of `u` and `v` coordinates, which are the unit vectors tilted 30 degrees respectively anticlockwise and clockwise from the positive horizontal semiaxis. Most often, encoding positions with `u` and `v` is easier since organic compounds' skeletal diagrams follow a hexagonal grid as much as possible.
+
+For example, this is the encoding of benzene:
+
+```json
+{
+  "contents": [
+    {
+      "type": "atom",
+      "index": 0,
+      "element": "",
+      "u": 0.0,
+      "v": 0.0
+    },
+    {
+      "type": "atom",
+      "index": 1,
+      "element": "",
+      "u": -1.0,
+      "v": 1.0
+    },
+    {
+      "type": "atom",
+      "index": 2,
+      "element": "",
+      "u": -1.0,
+      "v": 2.0
+    },
+    {
+      "type": "atom",
+      "index": 3,
+      "element": "",
+      "u": 0.0,
+      "v": 2.0
+    },
+    {
+      "type": "atom",
+      "index": 4,
+      "element": "",
+      "u": 1.0,
+      "v": 1.0
+    },
+    {
+      "type": "atom",
+      "index": 5,
+      "element": "",
+      "u": 1.0,
+      "v": 0.0
+    },
+    {
+      "type": "bond",
+      "a": 0,
+      "b": 1,
+      "bond_type": "single"
+    },
+    {
+      "type": "bond",
+      "a": 1,
+      "b": 2,
+      "bond_type": "double"
+    },
+    {
+      "type": "bond",
+      "a": 2,
+      "b": 3,
+      "bond_type": "single"
+    },
+    {
+      "type": "bond",
+      "a": 3,
+      "b": 4,
+      "bond_type": "double"
+    },
+    {
+      "type": "bond",
+      "a": 4,
+      "b": 5,
+      "bond_type": "single"
+    },
+    {
+      "type": "bond",
+      "a": 5,
+      "b": 0,
+      "bond_type": "double"
+    }
+  ]
+}
+```
