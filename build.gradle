@@ -66,9 +66,6 @@ repositories {
     maven {
         url = "https://thedarkcolour.github.io/KotlinForForge/"
     }
-    flatDir {
-        dirs "ldlib"
-    }
 }
 
 version = mod_version
@@ -156,9 +153,7 @@ dependencies {
     // GregTech and dependencies
     modImplementation("dev.emi:emi-forge:${emi_version}+${minecraft_version}")
     modImplementation("com.gregtechceu.gtceu:gtceu-${minecraft_version}:${gtceu_version}:slim") { transitive = false }
-    // modImplementation("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:${ldlib_version}") { transitive = false }
-    modImplementation("local:ldlib-forge-1.20.1:1.0.40.b") { transitive = false }
-    // modImplementation("com.github.Low-Drag-MC.LDLib-MultiLoader:ldlib-common-1.20.1:f74ba7a62b")
+    modImplementation("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:${ldlib_version}") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
     modImplementation("dev.toma.configuration:configuration-forge-${minecraft_version}:${configuration_version}")
 
