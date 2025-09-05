@@ -1389,6 +1389,33 @@ public class MoleculesData {
                 .bond(0, 1, Bond.Type.DOUBLE_CENTERED)
                 .bond(0, 2)
                 .bond(2, 3));
+        molecules.put(GTCEu.id("tetranitromethane"), new Molecule()
+                .xy()
+                .invAtom(0, 0)
+                .atom(Element.N, 1, 0)
+                .atom(Element.O, 1 + MathUtils.COS30f, 0.5f)
+                .atom(Element.O, 1 + MathUtils.COS30f, -0.5f)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(1, 3)
+                .atom(Element.N, -1, 0)
+                .atom(Element.O, -1 - MathUtils.COS30f, 0.5f)
+                .atom(Element.O, -1 - MathUtils.COS30f, -0.5f)
+                .bond(0, 4)
+                .bond(4, 5)
+                .bond(4, 6)
+                .atom(Element.N, 0, 1)
+                .atom(Element.O, 0.5f, 1 + MathUtils.COS30f)
+                .atom(Element.O, -0.5f, 1 + MathUtils.COS30f)
+                .bond(0, 7)
+                .bond(7, 8)
+                .bond(7, 9)
+                .atom(Element.N, 0, -1)
+                .atom(Element.O, 0.5f, -1 - MathUtils.COS30f)
+                .atom(Element.O, -0.5f, -1 - MathUtils.COS30f)
+                .bond(0, 10)
+                .bond(10, 11)
+                .bond(10, 12));
         return molecules;
     }
 }
