@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import lombok.Getter;
 import org.joml.*;
 
+import java.lang.Math;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,6 +109,20 @@ public class Molecule {
             max.max(atom.position());
         }
         return new Pair<>(min, max);
+    }
+
+    public static Molecule tetragonal(Element center, Element top, Element back, Element front, Element side) {
+        return new Molecule()
+                .xy()
+                .atom(center, 0, 0)
+                .atom(top, 0, 1)
+                .atom(back, (float) Math.cos(Math.toRadians(-15)), (float) Math.sin(Math.toRadians(-15)))
+                .atom(front, (float) Math.cos(Math.toRadians(-60)), (float) Math.sin(Math.toRadians(-60)))
+                .atom(side, (float) Math.cos(Math.toRadians(-150)), (float) Math.sin(Math.toRadians(-150)))
+                .bond(0, 1)
+                .bond(0, 2, Bond.Type.INWARD)
+                .bond(0, 3, Bond.Type.OUTWARD)
+                .bond(0, 4);
     }
 
     public static class Json implements JsonSerializer<Molecule>, JsonDeserializer<Molecule> {

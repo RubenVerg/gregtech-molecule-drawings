@@ -26,6 +26,8 @@ public record Bond(
         DOUBLE("double"),
         DOUBLE_CENTERED("double_centered"),
         TRIPLE("triple"),
+        OUTWARD("outward"),
+        INWARD("inward"),
         ;
 
         public final String jsonName;

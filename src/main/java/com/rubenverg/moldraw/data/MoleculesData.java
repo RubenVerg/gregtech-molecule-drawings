@@ -1416,6 +1416,10 @@ public class MoleculesData {
                 .bond(0, 10)
                 .bond(10, 11)
                 .bond(10, 12));
+        molecules.put(GTCEu.id("chloromethane"),
+                Molecule.tetragonal(Element.C, Element.Cl, Element.H, Element.H, Element.H));
+        molecules.put(GTCEu.id("chloroform"),
+                Molecule.tetragonal(Element.C, Element.H, Element.Cl, Element.Cl, Element.Cl));
         return molecules;
     }
 }
