@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -31,6 +32,7 @@ public record MoleculeTooltipComponent(
 
         public static int SCALE = 20;
         public static int COLOR = Objects.requireNonNull(ChatFormatting.YELLOW.getColor()) | (0xff << 24);
+        public static int DEBUG_COLOR = Objects.requireNonNull(ChatFormatting.RED.getColor()) | (0xff << 24);
 
         private final Molecule molecule;
         private final Vector2i xySize;
@@ -87,10 +89,17 @@ public record MoleculeTooltipComponent(
                     final var centerTranslation = new Vector3f(Mth.floor(-(float) width / 2) + 1, 1, 0);
                     mat.translate(centerTranslation);
                     font.drawInBatch(atom.element().symbol, (float) mouseX, (float) mouseY, COLOR, false, mat,
-                            bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
+                            bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(centerTranslation.negate());
                     mat.translate(translation.negate());
                     elementWidths.put(atom.element(), width);
+                    if (MolDrawConfig.INSTANCE.debugMode) {
+                        final var debugTranslation = new Vector3f(xyPosition.x - 5, xyPosition.y - 2, 3);
+                        mat.translate(debugTranslation);
+                        font.drawInBatch(Integer.toString(atom.index()), (float) mouseX, (float) mouseY, DEBUG_COLOR,
+                                false, mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                        mat.translate(debugTranslation.negate());
+                    }
                 } else if (elem instanceof Parens pp) {
                     final var bounds = this.molecule.subset(pp.atoms()).bounds();
                     final var xySub = toScreen(font.lineHeight,
