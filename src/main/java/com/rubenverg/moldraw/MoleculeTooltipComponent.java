@@ -30,7 +30,6 @@ public record MoleculeTooltipComponent(
     @MethodsReturnNonnullByDefault
     public static class ClientMoleculeTooltipComponent implements ClientTooltipComponent {
 
-        public static int SCALE = 20;
         public static int COLOR = Objects.requireNonNull(ChatFormatting.YELLOW.getColor()) | (0xff << 24);
         public static int DEBUG_COLOR = Objects.requireNonNull(ChatFormatting.RED.getColor()) | (0xff << 24);
 
@@ -43,7 +42,7 @@ public record MoleculeTooltipComponent(
         private Vector2i toScreen(int lineHeight, Vector2f xy) {
             var result = new Vector2f();
             xy.sub(xyStart, result);
-            result.mul(SCALE);
+            result.mul(MolDrawConfig.INSTANCE.scale);
             return new Vector2i((int) result.x + 8, -(int) result.y + (atomAtTop ? lineHeight / 2 : 3));
         }
 
@@ -52,7 +51,7 @@ public record MoleculeTooltipComponent(
             final var bounds = molecule.bounds();
             final Vector2f diff = new Vector2f();
             bounds.getSecond().sub(bounds.getFirst(), diff);
-            diff.mul(SCALE);
+            diff.mul(MolDrawConfig.INSTANCE.scale);
             diff.ceil();
             this.xySize = new Vector2i((int) diff.x, (int) diff.y);
             this.xyStart = new Vector2f(bounds.getFirst().x, bounds.getSecond().y);
