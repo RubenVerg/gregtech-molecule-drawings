@@ -10,14 +10,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
+import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 
 import java.lang.Math;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -132,13 +132,13 @@ public record MoleculeTooltipComponent(
                     final var atomB = this.molecule.getAtom(bond.b()).orElseThrow();
                     final var atomBWidth = elementWidths.get(atomB.element());
                     final var atomBInvisible = atomB.isInvisible();
-                    var start = toScreen(font.lineHeight, atomA.position());
+                    final var start = toScreen(font.lineHeight, atomA.position());
                     start.add(x, y);
                     start.add(0, font.lineHeight / 2);
-                    var end = toScreen(font.lineHeight, atomB.position());
+                    final var end = toScreen(font.lineHeight, atomB.position());
                     end.add(x, y);
                     end.add(0, font.lineHeight / 2);
-                    BiPredicate<@NotNull Integer, @NotNull Integer> isCloseToAtom = (xt, yt) -> {
+                    final BiPredicate<@NotNull Integer, @NotNull Integer> isCloseToAtom = (xt, yt) -> {
                         if (atomAInvisible && atomBInvisible)
                             return true;
                         Vector2ic t = new Vector2i(xt, yt);
@@ -155,29 +155,44 @@ public record MoleculeTooltipComponent(
                     };
                     double dy = end.y - start.y, dx = end.x - start.x;
                     double length = Math.hypot(dx, dy);
+                    final BiPredicate<@NotNull Integer, @NotNull Integer> isCloseToAtomAndOnLine = (xt, yt) -> {
+                        if (!isCloseToAtom.test(xt, yt)) return false;
+                        return Math.hypot(xt - start.x, yt - start.y) % 3 < 1;
+                    };
                     int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
                     int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
+                    List<Pair<Integer, Integer>> allTargets = new ArrayList<>();
+                    plotLine(addX, addY, -addX, -addY, (_xt, _yt) -> true,
+                            (xp, yp) -> allTargets.add(new Pair<>(xp, yp)));
                     switch (bond.type()) {
                         case SINGLE:
-                            plotLine(start.x, start.y, end.x, end.y, COLOR, isCloseToAtom, guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
                             break;
                         case DOUBLE:
-                            plotLine(start.x, start.y, end.x, end.y, COLOR, isCloseToAtom, guiGraphics);
-                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, COLOR, isCloseToAtom,
-                                    guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
+                                    COLOR, guiGraphics);
                             break;
                         case DOUBLE_CENTERED:
-                            plotLine(start.x + addHX, start.y + addHY, end.x + addHX, end.y + addHY, COLOR,
-                                    isCloseToAtom, guiGraphics);
-                            plotLine(start.x - addHX, start.y - addHY, end.x - addHX, end.y - addHY, COLOR,
-                                    isCloseToAtom, guiGraphics);
+                            plotLine(start.x + addHX, start.y + addHY, end.x + addHX, end.y + addHY, isCloseToAtom,
+                                    COLOR, guiGraphics);
+                            plotLine(start.x - addHX, start.y - addHY, end.x - addHX, end.y - addHY, isCloseToAtom,
+                                    COLOR, guiGraphics);
                             break;
                         case TRIPLE:
-                            plotLine(start.x, start.y, end.x, end.y, COLOR, isCloseToAtom, guiGraphics);
-                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, COLOR, isCloseToAtom,
-                                    guiGraphics);
-                            plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, COLOR, isCloseToAtom,
-                                    guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
+                                    COLOR, guiGraphics);
+                            plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, isCloseToAtom,
+                                    COLOR, guiGraphics);
+                            break;
+                        case INWARD:
+                        case OUTWARD:
+                            for (final var pair : allTargets) {
+                                plotLine(start.x, start.y, end.x + pair.getFirst(), end.y + pair.getSecond(),
+                                        bond.type() == Bond.Type.INWARD ? isCloseToAtomAndOnLine : isCloseToAtom, COLOR,
+                                        guiGraphics);
+                            }
                             break;
                     }
                 } else if (elem instanceof Parens pp) {
@@ -198,14 +213,15 @@ public record MoleculeTooltipComponent(
             }
         }
 
-        public static void plotLine(int x0, int y0, int x1, int y1, int color,
-                                    BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw, GuiGraphics graphics) {
+        public static void plotLine(int x0, int y0, int x1, int y1,
+                                    BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw,
+                                    BiConsumer<Integer, Integer> doDraw) {
             final int dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
             final int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
             int error = dx + dy;
             while (true) {
                 // This is horribly unoptimized
-                if (shouldDraw.test(x0, y0)) graphics.fill(x0, y0, x0 + 1, y0 + 1, color);
+                if (shouldDraw.test(x0, y0)) doDraw.accept(x0, y0);
                 final int e2 = 2 * error;
                 if (e2 >= dy) {
                     if (x0 == x1) break;
@@ -218,6 +234,12 @@ public record MoleculeTooltipComponent(
                     y0 += sy;
                 }
             }
+        }
+
+        public static void plotLine(int x0, int y0, int x1, int y1,
+                                    BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw, int color,
+                                    GuiGraphics graphics) {
+            plotLine(x0, y0, x1, y1, shouldDraw, (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color));
         }
     }
 }
