@@ -9,7 +9,8 @@
     },
     {
       "index": 1,
-      "element": "OH",
+      "element": "O",
+      "right": "H",
       "x": 0.8660254,
       "y": 0.5,
       "type": "atom"

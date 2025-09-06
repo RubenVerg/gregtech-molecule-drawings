@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 import java.lang.Math;
@@ -44,19 +45,39 @@ public class Molecule {
         return this;
     }
 
-    public Molecule atom(Element element, Vector2fc ab) {
-        final var xy = new Vector2f(ab);
-        xy.mul(this.transformation);
-        this.contents.add(new Atom(++atomIndex, element, xy));
+    public Molecule skipAnAtom() {
+        ++atomIndex;
         return this;
     }
 
+    public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
+                         @Nullable Element.Counted below, @Nullable Element.Counted left, Vector2fc ab) {
+        final var xy = new Vector2f(ab);
+        xy.mul(this.transformation);
+        this.contents.add(new Atom(++atomIndex, element, Optional.ofNullable(above), Optional.ofNullable(right),
+                Optional.ofNullable(below), Optional.ofNullable(left), xy));
+        return this;
+    }
+
+    public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
+                         @Nullable Element.Counted below, @Nullable Element.Counted left, float a, float b) {
+        return atom(element, above, right, below, left, new Vector2f(a, b));
+    }
+
+    public Molecule atom(Element element, int count, Vector2f ab) {
+        return atom(element.count(count), null, null, null, null, ab);
+    }
+
+    public Molecule atom(Element element, int count, float a, float b) {
+        return atom(element, count, new Vector2f(a, b));
+    }
+
     public Molecule atom(Element element, float a, float b) {
-        return atom(element, new Vector2f(a, b));
+        return atom(element, 1, a, b);
     }
 
     public Molecule invAtom(Vector2f ab) {
-        return atom(Element.INVISIBLE, ab);
+        return atom(Element.INVISIBLE, 1, ab);
     }
 
     public Molecule invAtom(float a, float b) {

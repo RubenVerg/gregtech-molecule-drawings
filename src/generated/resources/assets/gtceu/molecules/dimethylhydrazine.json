@@ -10,29 +10,17 @@
     {
       "index": 1,
       "element": "N",
+      "above": "H",
       "x": 0.8660254,
       "y": 0.5,
       "type": "atom"
     },
     {
-      "index": 2,
-      "element": "H",
-      "x": 0.8660254,
-      "y": 1.0,
-      "type": "atom"
-    },
-    {
       "index": 3,
       "element": "N",
+      "below": "H",
       "x": 1.7320508,
       "y": 0.0,
-      "type": "atom"
-    },
-    {
-      "index": 4,
-      "element": "H",
-      "x": 1.7320508,
-      "y": -0.5,
       "type": "atom"
     },
     {
@@ -50,19 +38,7 @@
     },
     {
       "a": 1,
-      "b": 2,
-      "bond_type": "single",
-      "type": "bond"
-    },
-    {
-      "a": 1,
       "b": 3,
-      "bond_type": "single",
-      "type": "bond"
-    },
-    {
-      "a": 3,
-      "b": 4,
       "bond_type": "single",
       "type": "bond"
     },

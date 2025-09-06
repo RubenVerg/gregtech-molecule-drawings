@@ -80,14 +80,22 @@
     },
     {
       "index": 6,
-      "element": "H₂N",
+      "element": "N",
+      "left": [
+        "H",
+        2
+      ],
       "x": -0.8660254,
       "y": -1.5,
       "type": "atom"
     },
     {
       "index": 7,
-      "element": "NH₂",
+      "element": "N",
+      "right": [
+        "H",
+        2
+      ],
       "x": 0.8660254,
       "y": -2.5,
       "type": "atom"
@@ -190,14 +198,22 @@
     },
     {
       "index": 14,
-      "element": "NH₂",
+      "element": "N",
+      "right": [
+        "H",
+        2
+      ],
       "x": 5.196152,
       "y": 0.0,
       "type": "atom"
     },
     {
       "index": 15,
-      "element": "NH₂",
+      "element": "N",
+      "right": [
+        "H",
+        2
+      ],
       "x": 5.196152,
       "y": 2.0,
       "type": "atom"

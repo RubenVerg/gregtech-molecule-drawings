@@ -2,7 +2,8 @@
   "contents": [
     {
       "index": 0,
-      "element": "HO",
+      "element": "O",
+      "left": "H",
       "x": 0.0,
       "y": 0.0,
       "type": "atom"
@@ -174,7 +175,8 @@
     },
     {
       "index": 16,
-      "element": "OH",
+      "element": "O",
+      "right": "H",
       "x": 6.928203,
       "y": 0.0,
       "type": "atom"
