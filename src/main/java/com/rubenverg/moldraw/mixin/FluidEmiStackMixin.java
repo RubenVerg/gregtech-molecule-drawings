@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.Fluid;
 
@@ -31,9 +30,6 @@ public class FluidEmiStackMixin {
     @Shadow
     @Final
     private Fluid fluid;
-    @Shadow
-    @Final
-    private CompoundTag nbt;
 
     @Unique
     private static String moldraw$simpleGetText(FormattedCharSequence seq) {
@@ -59,7 +55,15 @@ public class FluidEmiStackMixin {
         if (Objects.isNull(mol)) return;
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
                 moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).equals(material.getChemicalFormula()))
-                .findFirst().orElseThrow();
-        list.set(idx, ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
+                .findFirst();
+        if (idx.isPresent()) list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
+        else {
+            final var quantityIdx = IntStream.range(0, list.size())
+                    .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
+                            moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
+                    .findFirst();
+            list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
+                    ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
+        }
     }
 }
