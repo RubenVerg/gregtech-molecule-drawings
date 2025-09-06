@@ -1,5 +1,10 @@
 package com.rubenverg.moldraw.molecule;
 
+import com.google.gson.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,4 +145,52 @@ public class Element {
 
     public static Element INVISIBLE = elements.computeIfAbsent("", s -> new Element(s, true));
     public static Element BULLET = Element.create("•");
+
+    public Counted one() {
+        return count(1);
+    }
+
+    public Counted count(int count) {
+        return new Counted(this, count);
+    }
+
+    public record Counted(Element element, int count) {
+
+        @Override
+        public @NotNull String toString() {
+            if (count == 1) return element.symbol;
+            final var builder = new StringBuilder(element.symbol);
+            for (final var ch : Integer.toString(count).getBytes(StandardCharsets.UTF_8)) {
+                builder.appendCodePoint(ch + '₀' - '0');
+            }
+            return builder.toString();
+        }
+
+        public static class Json implements JsonSerializer<Counted>, JsonDeserializer<Counted> {
+
+            private Json() {}
+
+            public static Json INSTANCE = new Json();
+
+            @Override
+            public Counted deserialize(JsonElement jsonElement, Type type,
+                                       JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                if (jsonElement.isJsonPrimitive()) return Element.create(jsonElement.getAsString()).count(1);
+                else if (jsonElement.isJsonArray())
+                    return Element.create(jsonElement.getAsJsonArray().get(0).getAsString())
+                            .count(jsonElement.getAsJsonArray().get(1).getAsInt());
+                else throw new JsonParseException("Invalid element JSON");
+            }
+
+            @Override
+            public JsonElement serialize(Counted counted, Type type,
+                                         JsonSerializationContext jsonSerializationContext) {
+                if (counted.count == 1) return new JsonPrimitive(counted.element.symbol);
+                final var arr = new JsonArray();
+                arr.add(counted.element.symbol);
+                arr.add(counted.count);
+                return arr;
+            }
+        }
+    }
 }

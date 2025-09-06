@@ -9,10 +9,16 @@ Molecules are stored in resource packs under `assets/<namespace>/molecules/<comp
 Molecules follow this schema:
 
 ```typescript
+type Element = string | [string, number];
+
 interface AtomCommon {
   type: 'atom';
   index: number;
-  element?: string;
+  element?: Element;
+  above?: Element;
+  right?: Element;
+  below?: Element;
+  left?: Element;
 }
 
 interface AtomXY extends AtomCommon {
@@ -25,7 +31,7 @@ interface AtomUV extends AtomCommon {
   v: number;
 }
 
-type BondType = 'single' | 'double' | 'double_centered' | 'triple';
+type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward';
 
 interface Bond {
   type: 'bond';

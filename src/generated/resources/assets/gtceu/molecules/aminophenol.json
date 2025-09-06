@@ -44,14 +44,19 @@
     },
     {
       "index": 6,
-      "element": "OH",
+      "element": "O",
+      "right": "H",
       "x": 0.8660254,
       "y": 1.5,
       "type": "atom"
     },
     {
       "index": 7,
-      "element": "NH₂",
+      "element": "N",
+      "right": [
+        "H",
+        2
+      ],
       "x": 0.8660254,
       "y": -2.5,
       "type": "atom"

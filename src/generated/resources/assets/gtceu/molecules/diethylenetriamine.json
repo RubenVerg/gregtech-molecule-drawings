@@ -2,7 +2,11 @@
   "contents": [
     {
       "index": 0,
-      "element": "H₂N",
+      "element": "N",
+      "left": [
+        "H",
+        2
+      ],
       "x": 0.0,
       "y": 0.0,
       "type": "atom"
@@ -24,15 +28,9 @@
     {
       "index": 3,
       "element": "N",
+      "above": "H",
       "x": 2.598076,
       "y": 0.5,
-      "type": "atom"
-    },
-    {
-      "index": 4,
-      "element": "H",
-      "x": 2.598076,
-      "y": 1.0,
       "type": "atom"
     },
     {
@@ -51,7 +49,11 @@
     },
     {
       "index": 7,
-      "element": "NH₂",
+      "element": "N",
+      "right": [
+        "H",
+        2
+      ],
       "x": 5.196152,
       "y": 0.0,
       "type": "atom"
@@ -71,12 +73,6 @@
     {
       "a": 2,
       "b": 3,
-      "bond_type": "single",
-      "type": "bond"
-    },
-    {
-      "a": 3,
-      "b": 4,
       "bond_type": "single",
       "type": "bond"
     },

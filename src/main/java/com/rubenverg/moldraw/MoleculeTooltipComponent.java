@@ -37,13 +37,17 @@ public record MoleculeTooltipComponent(
         private final Vector2i xySize;
         private final Vector2f xyStart;
         private final boolean atomAtTop;
-        private final Map<Element, Integer> elementWidths = new HashMap<>();
+        private final boolean atomAtTopTop;
+        private final boolean atomAtBotBot;
+        private final boolean atomAtLefLef;
+        private final Map<Element.Counted, Integer> elementWidths = new HashMap<>();
 
         private Vector2i toScreen(int lineHeight, Vector2f xy) {
             var result = new Vector2f();
             xy.sub(xyStart, result);
             result.mul(MolDrawConfig.INSTANCE.scale);
-            return new Vector2i((int) result.x + 8, -(int) result.y + (atomAtTop ? lineHeight / 2 : 3));
+            return new Vector2i((int) result.x + 8 + (atomAtLefLef ? 12 : 0),
+                    -(int) result.y + (atomAtTopTop ? lineHeight * 3 / 2 : atomAtTop ? lineHeight / 2 : 3));
         }
 
         public ClientMoleculeTooltipComponent(MoleculeTooltipComponent component) {
@@ -60,16 +64,34 @@ public record MoleculeTooltipComponent(
                 final var invisible = atom.isInvisible();
                 return distanceFromTop < 0.1 && !invisible;
             });
+            this.atomAtTopTop = molecule.atoms().stream().anyMatch(atom -> {
+                final var distanceFromTop = Math.abs(xyStart.y - atom.position().y);
+                final var invisible = atom.isInvisible();
+                final var hasAbove = atom.above().isPresent();
+                return distanceFromTop < 0.1 && !invisible && hasAbove;
+            });
+            this.atomAtBotBot = molecule.atoms().stream().anyMatch(atom -> {
+                final var distanceFromBot = Math.abs(bounds.getFirst().y - atom.position().y);
+                final var invisible = atom.isInvisible();
+                final var hasBelow = atom.below().isPresent();
+                return distanceFromBot < 0.1 && !invisible && hasBelow;
+            });
+            this.atomAtLefLef = molecule.atoms().stream().anyMatch(atom -> {
+                final var distanceFromLef = Math.abs(bounds.getFirst().x - atom.position().x);
+                final var invisible = atom.isInvisible();
+                final var hasLef = atom.left().isPresent();
+                return distanceFromLef < 0.1 && !invisible && hasLef;
+            });
         }
 
         @Override
         public int getWidth(Font font) {
-            return xySize.x + 32;
+            return xySize.x + 32 + (atomAtLefLef ? 12 : 0);
         }
 
         @Override
         public int getHeight() {
-            return xySize.y + 20;
+            return xySize.y + 20 + (atomAtBotBot ? 10 : 0) + (atomAtTopTop ? 10 : 0);
         }
 
         @Override
@@ -84,14 +106,52 @@ public record MoleculeTooltipComponent(
                     final var xyPosition = toScreen(font.lineHeight, atom.position());
                     final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
                     mat.translate(translation);
-                    final var width = font.width(atom.element().symbol);
+                    final var width = font.width(atom.element().toString());
                     final var centerTranslation = new Vector3f(Mth.floor(-(float) width / 2) + 1, 1, 0);
                     mat.translate(centerTranslation);
-                    font.drawInBatch(atom.element().symbol, (float) mouseX, (float) mouseY, COLOR, false, mat,
+                    font.drawInBatch(atom.element().toString(), (float) mouseX, (float) mouseY, COLOR, false, mat,
                             bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(centerTranslation.negate());
                     mat.translate(translation.negate());
                     elementWidths.put(atom.element(), width);
+                    if (atom.right().isPresent()) {
+                        final var rightTranslation = new Vector3f(xyPosition.x + Mth.floor((float) width / 2) + 1,
+                                xyPosition.y + 1, 0);
+                        mat.translate(rightTranslation);
+                        font.drawInBatch(atom.right().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                        elementWidths.put(atom.right().get(), font.width(atom.right().get().toString()));
+                        mat.translate(rightTranslation.negate());
+                    }
+                    if (atom.left().isPresent()) {
+                        final var leftWidth = font.width(atom.left().get().toString());
+                        final var leftTranslation = new Vector3f(xyPosition.x - leftWidth - 2, xyPosition.y + 1, 0);
+                        mat.translate(leftTranslation);
+                        font.drawInBatch(atom.left().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                        elementWidths.put(atom.left().get(), leftWidth);
+                        mat.translate(leftTranslation.negate());
+                    }
+                    if (atom.above().isPresent()) {
+                        final var aboveWidth = font.width(atom.above().get().toString());
+                        final var aboveTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) aboveWidth / 2) + 1,
+                                xyPosition.y - font.lineHeight + 1, 0);
+                        mat.translate(aboveTranslation);
+                        font.drawInBatch(atom.above().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                        elementWidths.put(atom.above().get(), aboveWidth);
+                        mat.translate(aboveTranslation.negate());
+                    }
+                    if (atom.below().isPresent()) {
+                        final var belowWidth = font.width(atom.below().get().toString());
+                        final var belowTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) belowWidth / 2) + 1,
+                                xyPosition.y + font.lineHeight + 1, 0);
+                        mat.translate(belowTranslation);
+                        font.drawInBatch(atom.below().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                        elementWidths.put(atom.below().get(), belowWidth);
+                        mat.translate(belowTranslation.negate());
+                    }
                     if (MolDrawConfig.INSTANCE.debugMode) {
                         final var debugTranslation = new Vector3f(xyPosition.x - 5, xyPosition.y - 2, 3);
                         mat.translate(debugTranslation);
@@ -125,11 +185,22 @@ public record MoleculeTooltipComponent(
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Bond bond) {
+                    if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
+                            Objects.isNull(this.molecule.getAtom(bond.b())))
+                        continue;
                     final var atomA = this.molecule.getAtom(bond.a()).orElseThrow();
                     final var atomAWidth = elementWidths.get(atomA.element());
+                    final var atomAAbove = atomA.above().map(elementWidths::get);
+                    final var atomARight = atomA.right().map(elementWidths::get);
+                    final var atomABelow = atomA.below().map(elementWidths::get);
+                    final var atomALeft = atomA.left().map(elementWidths::get);
                     final var atomAInvisible = atomA.isInvisible();
                     final var atomB = this.molecule.getAtom(bond.b()).orElseThrow();
                     final var atomBWidth = elementWidths.get(atomB.element());
+                    final var atomBAbove = atomB.above().map(elementWidths::get);
+                    final var atomBRight = atomB.right().map(elementWidths::get);
+                    final var atomBBelow = atomB.below().map(elementWidths::get);
+                    final var atomBLeft = atomB.left().map(elementWidths::get);
                     final var atomBInvisible = atomB.isInvisible();
                     final var start = toScreen(font.lineHeight, atomA.position());
                     start.add(x, y);
@@ -146,9 +217,37 @@ public record MoleculeTooltipComponent(
                         diff.absolute();
                         if (diff.x < atomAWidth * 2 / 3 && (!atomAInvisible && diff.y < font.lineHeight * 2 / 3))
                             return false;
+                        if (atomAAbove.isPresent() && diff.x < atomAAbove.get() * 2 / 3 &&
+                                Math.abs((start.y - font.lineHeight - 1) - yt) < font.lineHeight * 2 / 3)
+                            return false;
+                        if (atomABelow.isPresent() && diff.x < atomABelow.get() * 2 / 3 &&
+                                Math.abs((start.y + font.lineHeight + 1) - yt) < font.lineHeight * 2 / 3)
+                            return false;
+                        if (atomARight.isPresent() &&
+                                Math.abs((start.x + (atomAWidth + atomARight.get()) / 2 + 1) - xt) <
+                                        atomARight.get() * 2 / 3 &&
+                                diff.y < font.lineHeight * 2 / 3)
+                            return false;
+                        if (atomALeft.isPresent() && Math.abs((start.x - (atomAWidth + atomALeft.get()) / 2 - 1) - xt) <
+                                atomALeft.get() * 2 / 3 && diff.y < font.lineHeight * 2 / 3)
+                            return false;
                         end.sub(t, diff);
                         diff.absolute();
                         if (diff.x < atomBWidth * 2 / 3 && (!atomBInvisible && diff.y < font.lineHeight * 2 / 3))
+                            return false;
+                        if (atomBAbove.isPresent() && diff.x < atomBAbove.get() * 2 / 3 &&
+                                Math.abs((end.y - font.lineHeight - 1) - yt) < font.lineHeight * 2 / 3)
+                            return false;
+                        if (atomBBelow.isPresent() && diff.x < atomBBelow.get() * 2 / 3 &&
+                                Math.abs((end.y + font.lineHeight + 1) - yt) < font.lineHeight * 2 / 3)
+                            return false;
+                        if (atomBRight.isPresent() &&
+                                Math.abs((end.x + (atomBWidth + atomBRight.get()) / 2 + 1) - xt) <
+                                        atomBRight.get() * 2 / 3 &&
+                                diff.y < font.lineHeight * 2 / 3)
+                            return false;
+                        if (atomBLeft.isPresent() && Math.abs((end.x - (atomBWidth + atomBLeft.get()) / 2 - 1) - xt) <
+                                atomBLeft.get() * 2 / 3 && diff.y < font.lineHeight * 2 / 3)
                             return false;
                         return true;
                     };

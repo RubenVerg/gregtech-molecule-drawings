@@ -23,7 +23,8 @@
     },
     {
       "index": 3,
-      "element": "HO",
+      "element": "O",
+      "left": "H",
       "x": -0.8660254,
       "y": 0.5,
       "type": "atom"

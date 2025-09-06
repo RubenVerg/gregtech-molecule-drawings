@@ -9,7 +9,8 @@
     },
     {
       "index": 1,
-      "element": "NH",
+      "element": "N",
+      "right": "H",
       "x": 0.7818144,
       "y": 0.6235112,
       "type": "atom"

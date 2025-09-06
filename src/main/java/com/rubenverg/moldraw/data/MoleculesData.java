@@ -104,13 +104,12 @@ public class MoleculesData {
                 .invAtom(0, 0) // 0
                 .invAtom(1, 0) // 1
                 .bond(0, 1)
-                .atom(Element.N, 1 + MathUtils.COS54f, MathUtils.SIN54f) // 2
-                .atom(Element.H, 1 + MathUtils.COS54f, MathUtils.SIN54f + 0.5f) // 3
+                .atom(Element.N.one(), Element.H.one(), null, null, null, 1 + MathUtils.COS54f, MathUtils.SIN54f) // 2
+                .skipAnAtom() // 3
                 .atom(Element.N, 1 + MathUtils.COS54f, -MathUtils.SIN54f) // 4
                 .invAtom(1 + MathUtils.COS18f * MathUtils.PHIf, 0.5f) // 5
                 .invAtom(1 + MathUtils.COS18f * MathUtils.PHIf, -0.5f) // 6
                 .bond(1, 2)
-                .bond(2, 3)
                 .bond(1, 4, Bond.Type.DOUBLE)
                 .bond(2, 5)
                 .bond(4, 6)
@@ -141,14 +140,11 @@ public class MoleculesData {
                 .bond(13, 15)
                 .bond(14, 16)
                 .bond(15, 16, Bond.Type.DOUBLE)
-                .atom(Element.N,
+                .atom(Element.N.one(), Element.H.one(), null, null, null,
                         1 + MathUtils.COS18f * MathUtils.PHIf + 2 * MathUtils.COS30f + 1 +
                                 2 * MathUtils.COS30f + 0.95f,
                         MathUtils.SIN54f) // 17
-                .atom(Element.H,
-                        1 + MathUtils.COS18f * MathUtils.PHIf + 2 * MathUtils.COS30f + 1 +
-                                2 * MathUtils.COS30f + 0.95f,
-                        MathUtils.SIN54f + 0.5f) // 18
+                .skipAnAtom() // 18
                 .atom(Element.N,
                         1 + MathUtils.COS18f * MathUtils.PHIf + 2 * MathUtils.COS30f + 1 +
                                 2 * MathUtils.COS30f + 0.95f,
@@ -156,7 +152,6 @@ public class MoleculesData {
                 .invAtom(1 + MathUtils.COS18f * MathUtils.PHIf + 2 * MathUtils.COS30f + 1 +
                         2 * MathUtils.COS30f + MathUtils.COS18f * MathUtils.PHIf, 0) // 20
                 .bond(15, 17)
-                .bond(17, 18)
                 .bond(16, 19)
                 .bond(17, 20)
                 .bond(19, 20, Bond.Type.DOUBLE)
@@ -261,8 +256,8 @@ public class MoleculesData {
         molecules.put(GTCEu.id("polycaprolactam"), new Molecule()
                 .uv()
                 .invAtom(0, 0) // 0
-                .atom(Element.N, 1, 0) // 1
-                .atom(Element.H, 1.5f, -0.5f) // 2
+                .atom(Element.N.one(), Element.H.one(), null, null, null, 1, 0) // 1
+                .skipAnAtom() // 2
                 .invAtom(1, 1) // 3
                 .invAtom(2, 1) // 4
                 .invAtom(2, 2) // 5
@@ -272,7 +267,6 @@ public class MoleculesData {
                 .atom(Element.O, 5, 2) // 9
                 .invAtom(4, 4) // 10
                 .bond(0, 1)
-                .bond(1, 2)
                 .bond(1, 3)
                 .bond(3, 4)
                 .bond(4, 5)
@@ -330,7 +324,7 @@ public class MoleculesData {
         molecules.put(GTCEu.id("methanol"), new Molecule()
                 .uv()
                 .invAtom(0, 0)
-                .atom(Element.create("OH"), 1, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 0)
                 .bond(0, 1));
         molecules.put(GTCEu.id("acetone"), new Molecule()
                 .uv()
@@ -356,7 +350,7 @@ public class MoleculesData {
                 .uv()
                 .invAtom(0, 0)
                 .invAtom(1, 0)
-                .atom(Element.create("OH"), 1, 1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 1)
                 .bond(0, 1)
                 .bond(1, 2));
         molecules.put(GTCEu.id("acetic_acid"), new Molecule()
@@ -364,7 +358,7 @@ public class MoleculesData {
                 .invAtom(0, 0)
                 .invAtom(1, 0)
                 .atom(Element.O, 2, -1)
-                .atom(Element.create("OH"), 1, 1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 1)
                 .bond(0, 1)
                 .bond(1, 2, Bond.Type.DOUBLE_CENTERED)
                 .bond(1, 3));
@@ -376,7 +370,7 @@ public class MoleculesData {
                 .invAtom(0, 2)
                 .invAtom(1, 1)
                 .invAtom(1, 0)
-                .atom(Element.create("OH"), 2, -1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, -1)
                 .bond(0, 1)
                 .bond(1, 2, Bond.Type.DOUBLE)
                 .bond(2, 3)
@@ -448,12 +442,12 @@ public class MoleculesData {
                 .add(Parens.negIon(5, 6, 7, 8)));
         molecules.put(GTCEu.id("glycerol"), new Molecule()
                 .uv()
-                .atom(Element.create("HO"), 0, 0)
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
                 .invAtom(0, 1)
                 .invAtom(1, 1)
-                .atom(Element.create("OH"), 2, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 0)
                 .invAtom(1, 2)
-                .atom(Element.create("OH"), 2, 2)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 2)
                 .bond(0, 1)
                 .bond(1, 2)
                 .bond(2, 3)
@@ -475,7 +469,7 @@ public class MoleculesData {
                 .uv()
                 .atom(Element.O, 0, 0)
                 .invAtom(-1, 1)
-                .atom(Element.create("NH₂"), -1.25f, 2.25f)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, -1, 2)
                 .bond(0, 1, Bond.Type.DOUBLE_CENTERED)
                 .bond(1, 2));
         molecules.put(GTCEu.id("formaldehyde"), new Molecule()
@@ -496,7 +490,7 @@ public class MoleculesData {
                 .uv()
                 .atom(Element.O, 0, 0)
                 .invAtom(-1, 1)
-                .atom(Element.create("OH"), -1, 2)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, -1, 2)
                 .bond(0, 1, Bond.Type.DOUBLE_CENTERED)
                 .bond(1, 2));
         molecules.put(GTCEu.id("dichloroethane"), new Molecule()
@@ -524,16 +518,16 @@ public class MoleculesData {
                 .bond(5, 0));
         molecules.put(GTCEu.id("sugar"), new Molecule()
                 .uv()
-                .atom(Element.create("HO"), 0, 0) // 0
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0) // 0
                 .invAtom(0, 1) // 1
                 .invAtom(1, 1) // 2
-                .atom(Element.create("OH"), 2, 0) // 3
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 0) // 3
                 .invAtom(1, 2) // 4
-                .atom(Element.create("OH"), 0, 3) // 5
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 0, 3) // 5
                 .invAtom(2, 2) // 6
-                .atom(Element.create("OH"), 3, 1) // 7
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 1) // 7
                 .invAtom(2, 3) // 8
-                .atom(Element.create("OH"), 1, 4) // 9
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 4) // 9
                 .invAtom(3, 3) // 10
                 .atom(Element.O, 3, 4) // 11
                 .bond(0, 1)
@@ -560,7 +554,7 @@ public class MoleculesData {
                 .bond(3, 4, Bond.Type.DOUBLE));
         molecules.put(GTCEu.id("glycolonitrile"), new Molecule()
                 .uv()
-                .atom(Element.create("HO"), 0, 0)
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
                 .invAtom(1, 0)
                 .invAtom(1, 1)
                 .atom(Element.N, 1, 2)
@@ -569,18 +563,17 @@ public class MoleculesData {
                 .bond(2, 3, Bond.Type.TRIPLE));
         molecules.put(GTCEu.id("diethylenetriamine"), new Molecule()
                 .uv()
-                .atom(Element.create("H₂N"), 0, 0)
+                .atom(Element.N.one(), null, null, null, Element.H.count(2), 0, 0)
                 .invAtom(1, 0)
                 .invAtom(1, 1)
-                .atom(Element.N, 2, 1)
-                .atom(Element.H, 2.5f, 0.5f)
+                .atom(Element.N.one(), Element.H.one(), null, null, null, 2, 1)
+                .skipAnAtom()
                 .invAtom(2, 2)
                 .invAtom(3, 2)
-                .atom(Element.create("NH₂"), 3, 3)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 3, 3)
                 .bond(0, 1)
                 .bond(1, 2)
                 .bond(2, 3)
-                .bond(3, 4)
                 .bond(3, 5)
                 .bond(5, 6)
                 .bond(6, 7));
@@ -700,15 +693,13 @@ public class MoleculesData {
         molecules.put(GTCEu.id("dimethylhydrazine"), new Molecule()
                 .uv()
                 .invAtom(0, 0)
-                .atom(Element.N, 1, 0)
-                .atom(Element.H, 1.5f, -0.5f)
-                .atom(Element.N, 1, 1)
-                .atom(Element.H, 0.5f, 1.5f)
+                .atom(Element.N.one(), Element.H.one(), null, null, null, 1, 0)
+                .skipAnAtom()
+                .atom(Element.N.one(), null, null, Element.H.one(), null, 1, 1)
+                .skipAnAtom()
                 .invAtom(2, 1)
                 .bond(0, 1)
-                .bond(1, 2)
                 .bond(1, 3)
-                .bond(3, 4)
                 .bond(3, 5));
         molecules.put(GTCEu.id("dimethyldichlorosilane"), new Molecule()
                 .uv()
@@ -759,7 +750,7 @@ public class MoleculesData {
                 .bond(2, 7));
         molecules.put(GTCEu.id("bisphenol_a"), new Molecule()
                 .uv()
-                .atom(Element.create("HO"), 0, 0) // 0
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0) // 0
                 .invAtom(1, 0) // 1
                 .invAtom(1, 1) // 2
                 .invAtom(2, 1) // 3
@@ -785,7 +776,7 @@ public class MoleculesData {
                 .invAtom(4, 3) // 13
                 .invAtom(5, 2) // 14
                 .invAtom(5, 1) // 15
-                .atom(Element.create("OH"), 4, 4) // 16
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 4, 4) // 16
                 .bond(7, 10)
                 .bond(10, 11)
                 .bond(11, 12, Bond.Type.DOUBLE)
@@ -868,13 +859,13 @@ public class MoleculesData {
                 .bond(4, 5)
                 .bond(5, 0, Bond.Type.DOUBLE)
                 .invAtom(2, -1) // 6
-                .atom(Element.create("HO"), 2, -2) // 7
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 2, -2) // 7
                 .atom(Element.O, 3, -1) // 8
                 .bond(5, 6)
                 .bond(6, 7)
                 .bond(6, 8, Bond.Type.DOUBLE_CENTERED)
                 .invAtom(2, 1) // 9
-                .atom(Element.create("OH"), 3, 0) // 10
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 0) // 10
                 .atom(Element.O, 2, 2) // 11
                 .bond(4, 9)
                 .bond(9, 10)
@@ -893,8 +884,8 @@ public class MoleculesData {
                 .bond(3, 4, Bond.Type.DOUBLE)
                 .bond(4, 5)
                 .bond(5, 0, Bond.Type.DOUBLE)
-                .atom(Element.create("H₂N"), -2, 1) // 6
-                .atom(Element.create("NH₂"), -2, 3) // 7
+                .atom(Element.N.one(), null, null, null, Element.H.count(2), -2, 1) // 6
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, -2, 3) // 7
                 .bond(1, 6)
                 .bond(2, 7)
                 .invAtom(2, 1) // 8
@@ -910,8 +901,8 @@ public class MoleculesData {
                 .bond(11, 12)
                 .bond(12, 13, Bond.Type.DOUBLE)
                 .bond(13, 8)
-                .atom(Element.create("NH₂"), 3, 3) // 14
-                .atom(Element.create("NH₂"), 5, 1) // 15
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 3, 3) // 14
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 5, 1) // 15
                 .bond(10, 14)
                 .bond(11, 15));
         molecules.put(GTCEu.id("dichlorobenzidine"), new Molecule()
@@ -928,7 +919,7 @@ public class MoleculesData {
                 .bond(3, 4, Bond.Type.DOUBLE)
                 .bond(4, 5)
                 .bond(5, 0, Bond.Type.DOUBLE)
-                .atom(Element.create("H₂N"), -2, 1) // 6
+                .atom(Element.N.one(), null, null, null, Element.H.count(2), -2, 1) // 6
                 .atom(Element.Cl, 0, -1) // 7
                 .bond(1, 6)
                 .bond(0, 7)
@@ -946,7 +937,7 @@ public class MoleculesData {
                 .bond(12, 13, Bond.Type.DOUBLE)
                 .bond(13, 8)
                 .atom(Element.Cl, 3, 3) // 14
-                .atom(Element.create("NH₂"), 5, 1) // 15
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 5, 1) // 15
                 .bond(10, 14)
                 .bond(11, 15));
         molecules.put(GTCEu.id("nitrochlorobenzene"), new Molecule()
@@ -1034,7 +1025,7 @@ public class MoleculesData {
                 .bond(4, 5)
                 .bond(5, 0)
                 .atom(Element.N, 2, -1)
-                .atom(Element.create("HO"), 2, -2)
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 2, -2)
                 .bond(5, 6, Bond.Type.DOUBLE)
                 .bond(6, 7));
         molecules.put(GTCEu.id("butyraldehyde"), new Molecule()
@@ -1071,8 +1062,8 @@ public class MoleculesData {
                 .invAtom(0, 2)
                 .invAtom(1, 1)
                 .invAtom(1, 0)
-                .atom(Element.create("OH"), 2, -1)
-                .atom(Element.create("NH₂"), -2, 3)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, -1)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, -2, 3)
                 .bond(0, 1)
                 .bond(1, 2, Bond.Type.DOUBLE)
                 .bond(2, 3)
@@ -1087,7 +1078,7 @@ public class MoleculesData {
                 .invAtom(1, 0)
                 .invAtom(1, 1)
                 .invAtom(2, 1)
-                .atom(Element.create("OH"), 2, 2)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 2)
                 .bond(0, 1)
                 .bond(1, 2)
                 .bond(2, 3)
@@ -1145,7 +1136,7 @@ public class MoleculesData {
                 .invAtom(0, 1)
                 .invAtom(1, 1)
                 .atom(Element.O, 2, 0)
-                .atom(Element.create("OH"), 1, 2)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 2)
                 .bond(0, 1)
                 .bond(1, 2)
                 .bond(2, 3, Bond.Type.DOUBLE_CENTERED)
@@ -1157,7 +1148,7 @@ public class MoleculesData {
                 .invAtom(1, 1)
                 .invAtom(2, 1)
                 .atom(Element.O, 3, 0)
-                .atom(Element.create("OH"), 2, 2)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 2)
                 .bond(0, 1, Bond.Type.TRIPLE)
                 .bond(1, 2)
                 .bond(2, 3)
@@ -1218,7 +1209,7 @@ public class MoleculesData {
         molecules.put(GTCEu.id("ammonium_oxalate"), new Molecule()
                 .uv()
                 .atom(Element.N, 0, 0) // 0
-                .atom(Element.create("H₄"), 1 / 3f, 1 / 3f) // 1
+                .atom(Element.H.count(4), null, null, null, null, 1 / 4f, 1 / 4f) // 1
                 .atom(Element.O, 1, 1) // 2
                 .invAtom(2, 1) // 3
                 .atom(Element.O, 3, 0) // 4
@@ -1428,7 +1419,7 @@ public class MoleculesData {
                 .invAtom(0, 0)
                 .invAtom(0, 1)
                 .invAtom(-1, 0)
-                .atom(Element.create("HO"), 0, -1)
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, -1)
                 .invAtom(1, 0)
                 .atom(Element.N, 1, 1)
                 .bond(0, 1)
@@ -1474,7 +1465,8 @@ public class MoleculesData {
         molecules.put(GTCEu.id("caprolactam"), new Molecule()
                 .xy()
                 .invAtom(Mth.sin(Mth.TWO_PI * 0 / 7), Mth.cos(Mth.TWO_PI * 0 / 7))
-                .atom(Element.create("NH"), Mth.sin(Mth.TWO_PI * 1 / 7), Mth.cos(Mth.TWO_PI * 1 / 7))
+                .atom(Element.N.one(), null, Element.H.one(), null, null, Mth.sin(Mth.TWO_PI * 1 / 7),
+                        Mth.cos(Mth.TWO_PI * 1 / 7))
                 .invAtom(Mth.sin(Mth.TWO_PI * 2 / 7), Mth.cos(Mth.TWO_PI * 2 / 7))
                 .invAtom(Mth.sin(Mth.TWO_PI * 3 / 7), Mth.cos(Mth.TWO_PI * 3 / 7))
                 .invAtom(Mth.sin(Mth.TWO_PI * 4 / 7), Mth.cos(Mth.TWO_PI * 4 / 7))

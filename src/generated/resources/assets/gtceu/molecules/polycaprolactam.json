@@ -10,15 +10,9 @@
     {
       "index": 1,
       "element": "N",
+      "above": "H",
       "x": 0.8660254,
       "y": 0.5,
-      "type": "atom"
-    },
-    {
-      "index": 2,
-      "element": "H",
-      "x": 0.8660254,
-      "y": 1.0,
       "type": "atom"
     },
     {
@@ -80,12 +74,6 @@
     {
       "a": 0,
       "b": 1,
-      "bond_type": "single",
-      "type": "bond"
-    },
-    {
-      "a": 1,
-      "b": 2,
       "bond_type": "single",
       "type": "bond"
     },
