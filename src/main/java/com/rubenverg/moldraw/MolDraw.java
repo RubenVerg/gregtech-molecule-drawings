@@ -184,7 +184,8 @@ public class MolDraw {
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
-                .findFirst().orElse(1);
-        tooltipElements.set(idx, Either.right(new MoleculeTooltipComponent(mol)));
+                .findFirst();
+        if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
+        else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
     }
 }
