@@ -173,7 +173,7 @@ public class MolDraw {
         if (event.getItemStack().getItem() instanceof BucketItem bi) {
             material = ChemicalHelper.getMaterial(bi.getFluid());
         } else {
-            final var materialStack = ChemicalHelper.getMaterialStack(event.getItemStack());
+            final var materialStack = ChemicalHelper.getMaterialEntry(event.getItemStack().getItem());
             if (materialStack.isEmpty()) return;
             material = materialStack.material();
         }
