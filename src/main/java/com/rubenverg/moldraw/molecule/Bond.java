@@ -28,6 +28,7 @@ public record Bond(
         TRIPLE("triple"),
         OUTWARD("outward"),
         INWARD("inward"),
+        THICK("thick"),
         ;
 
         public final String jsonName;

@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
-import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
@@ -259,9 +258,11 @@ public record MoleculeTooltipComponent(
                     };
                     int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
                     int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
-                    List<Pair<Integer, Integer>> allTargets = new ArrayList<>();
-                    plotLine(addX, addY, -addX, -addY, (_xt, _yt) -> true,
-                            (xp, yp) -> allTargets.add(new Pair<>(xp, yp)));
+                    List<Vector2i> allTargets = new ArrayList<>();
+                    plotLine(addX / 2, addY / 2, -addX / 2, -addY / 2, (_xt, _yt) -> true,
+                            (xp, yp) -> allTargets.add(new Vector2i(xp, yp)));
+                    final BiConsumer<Integer, Integer> drawHalved = (xt, yt) -> guiGraphics.fill(xt / 2, yt / 2,
+                            xt / 2 + 1, yt / 2 + 1, COLOR);
                     switch (bond.type()) {
                         case SINGLE:
                             plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
@@ -287,9 +288,31 @@ public record MoleculeTooltipComponent(
                         case INWARD:
                         case OUTWARD:
                             for (final var pair : allTargets) {
-                                plotLine(start.x, start.y, end.x + pair.getFirst(), end.y + pair.getSecond(),
-                                        bond.type() == Bond.Type.INWARD ? isCloseToAtomAndOnLine : isCloseToAtom, COLOR,
-                                        guiGraphics);
+                                BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw = bond.type() ==
+                                        Bond.Type.INWARD ? (xt, yt) -> isCloseToAtomAndOnLine.test(xt / 2, yt / 2) :
+                                                (xt, yt) -> isCloseToAtom.test(xt / 2, yt / 2);
+                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2, (end.y + pair.y) * 2,
+                                        shouldDraw, drawHalved);
+                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2 + 1, (end.y + pair.y) * 2,
+                                        shouldDraw, drawHalved);
+                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2, (end.y + pair.y) * 2 + 1,
+                                        shouldDraw, drawHalved);
+                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2 + 1, (end.y + pair.y) * 2 + 1,
+                                        shouldDraw, drawHalved);
+                            }
+                            break;
+                        case THICK:
+                            for (final var pair : allTargets) {
+                                BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw = (xt, yt) -> isCloseToAtom
+                                        .test(xt / 2, yt / 2);
+                                plotLine((start.x + pair.x) * 2, (start.y + pair.y) * 2, (end.x + pair.x) * 2,
+                                        (end.y + pair.y) * 2, shouldDraw, drawHalved);
+                                plotLine((start.x + pair.x) * 2 + 1, (start.y + pair.y) * 2, (end.x + pair.x) * 2 + 1,
+                                        (end.y + pair.y) * 2, shouldDraw, drawHalved);
+                                plotLine((start.x + pair.x) * 2, (start.y + pair.y) * 2 + 1, (end.x + pair.x) * 2,
+                                        (end.y + pair.y) * 2 + 1, shouldDraw, drawHalved);
+                                plotLine((start.x + pair.x) * 2 + 1, (start.y + pair.y) * 2 + 1,
+                                        (end.x + pair.x) * 2 + 1, (end.y + pair.y) * 2 + 1, shouldDraw, drawHalved);
                             }
                             break;
                     }
