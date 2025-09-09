@@ -31,7 +31,7 @@ interface AtomUV extends AtomCommon {
   v: number;
 }
 
-type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward';
+type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward' | 'thick';
 
 interface Bond {
   type: 'bond';
