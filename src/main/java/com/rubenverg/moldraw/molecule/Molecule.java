@@ -10,11 +10,9 @@ import org.joml.*;
 
 import java.lang.Math;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntUnaryOperator;
 
 public class Molecule {
 
@@ -43,6 +41,15 @@ public class Molecule {
     public Molecule add(MoleculeElement<?> elem) {
         this.contents.add(elem);
         return this;
+    }
+
+    public Molecule addAll(Collection<MoleculeElement<?>> elems) {
+        this.contents.addAll(elems);
+        return this;
+    }
+
+    public Molecule addAll(Molecule mol) {
+        return addAll(mol.contents);
     }
 
     public Molecule skipAnAtom() {
@@ -103,6 +110,29 @@ public class Molecule {
 
     public Optional<Atom> getAtom(int index) {
         return atoms().stream().filter(atom -> atom.index() == index).findFirst();
+    }
+
+    public Molecule affine(Matrix3x2fc transformation) {
+        for (final var atom : atoms()) {
+            atom.position().mulPosition(transformation);
+        }
+        return this;
+    }
+
+    public Molecule relabeled(IntUnaryOperator mapper) {
+        final var result = new Molecule();
+        for (final var elem : this.contents) {
+            result.add(elem.replaceInOrder(Arrays.stream(elem.coveredAtoms()).map(mapper).toArray()));
+        }
+        return result;
+    }
+
+    public Molecule increment(int n) {
+        return relabeled(i -> i + n);
+    }
+
+    public Molecule copy() {
+        return relabeled(IntUnaryOperator.identity());
     }
 
     public Molecule subset(int... atomIndices) {

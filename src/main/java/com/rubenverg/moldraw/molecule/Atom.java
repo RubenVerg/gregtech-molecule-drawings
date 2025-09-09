@@ -30,7 +30,7 @@ public record Atom(
                 right,
                 below,
                 left,
-                position);
+                new Vector2f(position));
     }
 
     public boolean isInvisible() {
