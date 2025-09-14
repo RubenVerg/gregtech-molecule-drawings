@@ -50,9 +50,9 @@ public record Atom(
             final var obj = jsonElement.getAsJsonObject();
             if (!obj.has("index")) throw new JsonParseException("Atom JSON must contain an index");
             final var index = obj.get("index").getAsInt();
-            if (!obj.has("element")) throw new JsonParseException("Atom JSON must contain an element");
-            final Element.Counted element = jsonDeserializationContext.deserialize(obj.get("element"),
-                    Element.Counted.class);
+            final Element.Counted element = obj.has("element") ?
+                    jsonDeserializationContext.deserialize(obj.get("element"), Element.Counted.class) :
+                    Element.INVISIBLE.one();
             final Optional<Element.Counted> above = obj.has("above") ?
                     Optional.of(jsonDeserializationContext.deserialize(obj.get("above"), Element.Counted.class)) :
                     Optional.empty();
