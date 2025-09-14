@@ -2,6 +2,36 @@
 
 > *This branch is for GregTech 1.6.x*
 
+This clientside only mod adds molecule drawings for organic molecules from GregTech CEu and its addons and modpacks in tooltips.
+
+## Examples
+
+|Polyethylene|Polybenzimidazole|Chloroform|
+|---|---|---|
+|![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png)|![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole.png)|![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform.png)|
+
+## Additional content support
+
+MolDraw comes out of the box with support for not only most of the organic materials from base GTCEu, but also a bunch of addons and modpacks. The currently supported extensions are:
+
+* GT--
+* GregTech Community Additions
+* Gregicality Rocketry
+* Monifactory
+* Star Technology
+* Cosmic Frontiers
+* Phoenix Forge Technologies
+
+## What people say about this mod
+
+> Probably the coolest thing I've ever seen anyone do with tooltips.
+
+> My daily reminder that basically all organic chemistry is benzene with bits sticking out.
+
+> The only thing I have to say is that it's peak.
+
+> Now I can appreciate how complex the polymers I'm building are.
+
 ## Adding your own molecules
 
 Molecules are stored in resource packs under `assets/<namespace>/molecules/<compound>.json`, corresponding to the GT material with ID `<namespace>:<compound>`.
@@ -9,46 +39,53 @@ Molecules are stored in resource packs under `assets/<namespace>/molecules/<comp
 Molecules follow this schema:
 
 ```typescript
+// Amount of atoms defaults to 1
 type Element = string | [string, number];
 
 interface AtomCommon {
   type: 'atom';
-  index: number;
-  element?: Element;
-  above?: Element;
-  right?: Element;
+  index: number; // The identifier used for referring to this atom
+  element?: Element; // The main element of the atom, not present if the atom should be an invisible carbon
+  above?: Element; // An element to show above the main one
+  right?: Element; // etc
   below?: Element;
   left?: Element;
 }
 
+// An atom can either specify X and Y coordinates...
 interface AtomXY extends AtomCommon {
   x: number;
   y: number;
 }
 
+// or U and V coordinates, which are unit vectors tilted 30 degrees respectively anticlockwise and clockwise from the positive X semiaxis.
 interface AtomUV extends AtomCommon {
   u: number;
   v: number;
 }
 
+// A double bond has the first line like a single bond and the second line shifted rightwards from the starting atom; use double centered bonds if you want them to be both offset.
+// Inward and outward bonds grow in size towards the second atom.
 type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward' | 'thick';
 
 interface Bond {
   type: 'bond';
-  a: number;
-  b: number;
+  a: number; // The first atom of the bond
+  b: number; // The second atom of the bond
   bond_type: BondType;
 }
 
+// Parens are square brackets around certain atoms that show subscripts and/or superscripts.
 interface Parens {
   type: 'parens';
-  sup?: string;
-  sub?: string;
-  atoms: number[];
+  sup?: string; // Superscript text
+  sub?: string; // Subscript text
+  atoms: number[]; // List of atoms that are to be surrounded
 }
 
 type MoleculeElement = AtomXY | AtomUV | Bond | Parens;
 
+// A molecule JSON file is of type Molecule.
 interface Molecule {
   contents: MoleculeElement[];
 }
@@ -64,42 +101,36 @@ For example, this is the encoding of benzene:
     {
       "type": "atom",
       "index": 0,
-      "element": "",
       "u": 0.0,
       "v": 0.0
     },
     {
       "type": "atom",
       "index": 1,
-      "element": "",
       "u": -1.0,
       "v": 1.0
     },
     {
       "type": "atom",
       "index": 2,
-      "element": "",
       "u": -1.0,
       "v": 2.0
     },
     {
       "type": "atom",
       "index": 3,
-      "element": "",
       "u": 0.0,
       "v": 2.0
     },
     {
       "type": "atom",
       "index": 4,
-      "element": "",
       "u": 1.0,
       "v": 1.0
     },
     {
       "type": "atom",
       "index": 5,
-      "element": "",
       "u": 1.0,
       "v": 0.0
     },
