@@ -198,3 +198,20 @@ tasks.withType(JavaCompile).configureEach {
     options.release.set(17)
     options.compilerArgs << "-Aquiet=true" // Suppress mixin notes
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'gtmoldraw'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}

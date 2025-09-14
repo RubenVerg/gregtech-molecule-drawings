@@ -67,7 +67,7 @@ public class MolDraw {
         });
     }
 
-    private final Gson gson = new GsonBuilder()
+    public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Molecule.class, Molecule.Json.INSTANCE)
             .registerTypeAdapter(Element.Counted.class, Element.Counted.Json.INSTANCE)
             .registerTypeAdapter(Atom.class, Atom.Json.INSTANCE)
