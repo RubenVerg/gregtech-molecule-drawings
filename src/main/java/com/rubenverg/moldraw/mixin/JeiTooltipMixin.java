@@ -13,6 +13,6 @@ import java.util.List;
 @Mixin(JeiTooltip.class)
 public interface JeiTooltipMixin {
 
-    @Accessor
+    @Accessor(remap = false)
     List<Either<FormattedText, TooltipComponent>> getLines();
 }
