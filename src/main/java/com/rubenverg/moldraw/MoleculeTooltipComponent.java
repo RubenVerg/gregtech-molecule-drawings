@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
+import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
@@ -18,6 +19,7 @@ import java.lang.Math;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -252,9 +254,10 @@ public record MoleculeTooltipComponent(
                     };
                     double dy = end.y - start.y, dx = end.x - start.x;
                     double length = Math.hypot(dx, dy);
-                    final BiPredicate<@NotNull Integer, @NotNull Integer> isCloseToAtomAndOnLine = (xt, yt) -> {
+                    final Function<Pair<Integer, Integer>, BiPredicate<@NotNull Integer, @NotNull Integer>> isCloseToAtomAndOnLine = p -> (xt,
+                                                                                                                                           yt) -> {
                         if (!isCloseToAtom.test(xt, yt)) return false;
-                        return Math.hypot(xt - start.x, yt - start.y) % 3 < 1;
+                        return Math.hypot(xt - start.x, yt - start.y) % p.getFirst() < p.getSecond();
                     };
                     int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
                     int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
@@ -270,6 +273,12 @@ public record MoleculeTooltipComponent(
                         case DOUBLE:
                             plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
                             plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
+                                    COLOR, guiGraphics);
+                            break;
+                        case ONE_AND_HALF:
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY,
+                                    isCloseToAtomAndOnLine.apply(new Pair<>(2, 1)),
                                     COLOR, guiGraphics);
                             break;
                         case DOUBLE_CENTERED:
@@ -289,7 +298,9 @@ public record MoleculeTooltipComponent(
                         case OUTWARD:
                             for (final var pair : allTargets) {
                                 BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw = bond.type() ==
-                                        Bond.Type.INWARD ? (xt, yt) -> isCloseToAtomAndOnLine.test(xt / 2, yt / 2) :
+                                        Bond.Type.INWARD ?
+                                                (xt, yt) -> isCloseToAtomAndOnLine.apply(new Pair<>(3, 1)).test(xt / 2,
+                                                        yt / 2) :
                                                 (xt, yt) -> isCloseToAtom.test(xt / 2, yt / 2);
                                 plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2, (end.y + pair.y) * 2,
                                         shouldDraw, drawHalved);

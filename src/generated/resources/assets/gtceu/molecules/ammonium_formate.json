@@ -105,15 +105,15 @@
       "type": "bond"
     },
     {
-      "a": 6,
-      "b": 7,
-      "bond_type": "single",
+      "a": 7,
+      "b": 6,
+      "bond_type": "one_and_half",
       "type": "bond"
     },
     {
       "a": 6,
       "b": 8,
-      "bond_type": "double",
+      "bond_type": "one_and_half",
       "type": "bond"
     },
     {
