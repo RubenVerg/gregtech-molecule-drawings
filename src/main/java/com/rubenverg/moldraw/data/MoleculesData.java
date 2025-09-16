@@ -25,9 +25,7 @@ public class MoleculesData {
 
     public static Map<ResourceLocation, Molecule> molecules() {
         final Map<ResourceLocation, Molecule> molecules = new HashMap<>();
-        molecules.put(GTCEu.id("methane"), new Molecule()
-                .uv()
-                .atom(Element.BULLET, 0, 0));
+        molecules.put(GTCEu.id("methane"), Molecule.tetragonal(Element.C, Element.H, Element.H, Element.H, Element.H));
         molecules.put(GTCEu.id("ethane"), new Molecule()
                 .uv()
                 .invAtom(0, 0)
@@ -448,8 +446,8 @@ public class MoleculesData {
                 .atom(Element.O, 4, MathUtils.COS30f) // 7
                 .atom(Element.O, 4, -MathUtils.COS30f) // 8
                 .bond(5, 6)
-                .bond(6, 7)
-                .bond(6, 8, Bond.Type.DOUBLE)
+                .bond(7, 6, Bond.Type.ONE_AND_HALF)
+                .bond(6, 8, Bond.Type.ONE_AND_HALF)
                 .add(Parens.negIon(5, 6, 7, 8)));
         molecules.put(GTCEu.id("glycerol"), new Molecule()
                 .uv()

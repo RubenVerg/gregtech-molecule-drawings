@@ -2,8 +2,6 @@ package com.rubenverg.moldraw.molecule;
 
 import com.google.gson.*;
 
-import java.lang.reflect.Type;
-
 public record Bond(
                    int a,
                    int b,
@@ -29,6 +27,7 @@ public record Bond(
         OUTWARD("outward"),
         INWARD("inward"),
         THICK("thick"),
+        ONE_AND_HALF("one_and_half"),
         ;
 
         public final String jsonName;

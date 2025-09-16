@@ -63,8 +63,9 @@ interface AtomUV extends AtomCommon {
 }
 
 // A double bond has the first line like a single bond and the second line shifted rightwards from the starting atom; use double centered bonds if you want them to be both offset.
+// A one-and-a-half bond is laid out like a double bond but the second line is dotted.
 // Inward and outward bonds grow in size towards the second atom.
-type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward' | 'thick';
+type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward' | 'thick' | 'one_and_half';
 
 interface Bond {
   type: 'bond';
