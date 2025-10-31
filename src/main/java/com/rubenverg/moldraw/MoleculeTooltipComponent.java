@@ -304,6 +304,28 @@ public record MoleculeTooltipComponent(
                             plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, isCloseToAtom,
                                     color, guiGraphics);
                             break;
+                        case QUADRUPLE:
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
+                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
+                                    color, guiGraphics);
+                            plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, isCloseToAtom,
+                                    color, guiGraphics);
+                            plotLine(start.x + 2 * addX, start.y + 2 * addY, end.x + 2 * addX, end.y + 2 * addY,
+                                    isCloseToAtom,
+                                    color, guiGraphics);
+                            break;
+                        case QUADRUPLE_CENTERED:
+                            plotLine(start.x + addHX, start.y + addHY, end.x + addHX, end.y + addHY, isCloseToAtom,
+                                    color, guiGraphics);
+                            plotLine(start.x - addHX, start.y - addHY, end.x - addHX, end.y - addHY, isCloseToAtom,
+                                    color, guiGraphics);
+                            plotLine(start.x + addX + addHX, start.y + addY + addHY, end.x + addX + addHX,
+                                    end.y + addY + addHY, isCloseToAtom,
+                                    color, guiGraphics);
+                            plotLine(start.x - addX - addHX, start.y - addY - addHY, end.x - addX - addHX,
+                                    end.y - addY - addHY, isCloseToAtom,
+                                    color, guiGraphics);
+                            break;
                         case INWARD:
                         case OUTWARD:
                             for (final var pair : allTargets) {
