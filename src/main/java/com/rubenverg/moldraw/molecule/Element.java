@@ -55,6 +55,14 @@ public class Element {
         return el;
     }
 
+    public Element posIon() {
+        return new Element(symbol + "⁺", invisible, color);
+    }
+
+    public Element negIon() {
+        return new Element(symbol + "⁻", invisible, color);
+    }
+
     public static Element H = Element.createStandard("H", 0xffffff);
     public static Element He = Element.createStandard("He", 0xd9ffff);
     public static Element Li = Element.createStandard("Li", 0xcc80ff);
