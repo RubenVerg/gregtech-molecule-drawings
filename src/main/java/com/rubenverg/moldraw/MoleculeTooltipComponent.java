@@ -13,10 +13,13 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
+import java.awt.*;
 import java.lang.Math;
 import java.util.*;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -32,7 +35,29 @@ public record MoleculeTooltipComponent(
     @MethodsReturnNonnullByDefault
     public static class ClientMoleculeTooltipComponent implements ClientTooltipComponent {
 
-        public static int COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
+        public static int FALLBACK_COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
+
+        public static int configColor(@Nullable String config) {
+            final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.defaultColor);
+            if (str.length() == 2 && str.charAt(0) == '§') {
+                final var formatting = ChatFormatting.getByCode(str.charAt(1));
+                return Objects.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
+            } else if (str.length() == 7 && str.charAt(0) == '#') {
+                return Color.decode(str).getRGB() | (0xff << 24);
+            } else {
+                return FALLBACK_COLOR;
+            }
+        }
+
+        public static int colorForElement(Element element) {
+            final var defaultColor = configColor(null);
+            if (element.color instanceof Element.Color.None) return defaultColor;
+            else if (element.color instanceof Element.Color.Always always) return always.color();
+            else if (element.color instanceof Element.Color.Optional optional)
+                return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
+            else return defaultColor;
+        }
+
         public static int DEBUG_COLOR = MathUtils.chatFormattingColor(ChatFormatting.RED);
 
         private final Molecule molecule;
@@ -99,6 +124,8 @@ public record MoleculeTooltipComponent(
         @Override
         public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix,
                                MultiBufferSource.BufferSource bufferSource) {
+            final var defaultColor = configColor(null);
+
             elementWidths.clear();
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
@@ -110,7 +137,7 @@ public record MoleculeTooltipComponent(
                     final var centerTranslation = new Vector3f(Mth.floor(-(float) width / 2) + 1, 1, 0);
                     mat.translate(centerTranslation);
                     if (!atom.element().element().invisible) font.drawInBatch(atom.element().toString(), (float) mouseX,
-                            (float) mouseY, atom.element().element().color.orElse(COLOR), false, mat,
+                            (float) mouseY, colorForElement(atom.element().element()), false, mat,
                             bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(centerTranslation.negate());
                     mat.translate(translation.negate());
@@ -120,7 +147,7 @@ public record MoleculeTooltipComponent(
                                 xyPosition.y + 1, 0);
                         mat.translate(rightTranslation);
                         if (!atom.right().get().element().invisible) font.drawInBatch(atom.right().get().toString(),
-                                (float) mouseX, (float) mouseY, atom.right().get().element().color.orElse(COLOR), false,
+                                (float) mouseX, (float) mouseY, colorForElement(atom.right().get().element()), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.right().get(), font.width(atom.right().get().toString()));
                         mat.translate(rightTranslation.negate());
@@ -130,7 +157,7 @@ public record MoleculeTooltipComponent(
                         final var leftTranslation = new Vector3f(xyPosition.x - leftWidth - 2, xyPosition.y + 1, 0);
                         mat.translate(leftTranslation);
                         if (!atom.left().get().element().invisible) font.drawInBatch(atom.left().get().toString(),
-                                (float) mouseX, (float) mouseY, atom.left().get().element().color.orElse(COLOR), false,
+                                (float) mouseX, (float) mouseY, colorForElement(atom.left().get().element()), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.left().get(), leftWidth);
                         mat.translate(leftTranslation.negate());
@@ -141,7 +168,7 @@ public record MoleculeTooltipComponent(
                                 xyPosition.y - font.lineHeight + 1, 0);
                         mat.translate(aboveTranslation);
                         if (!atom.above().get().element().invisible) font.drawInBatch(atom.above().get().toString(),
-                                (float) mouseX, (float) mouseY, atom.above().get().element().color.orElse(COLOR), false,
+                                (float) mouseX, (float) mouseY, colorForElement(atom.above().get().element()), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.above().get(), aboveWidth);
                         mat.translate(aboveTranslation.negate());
@@ -152,7 +179,7 @@ public record MoleculeTooltipComponent(
                                 xyPosition.y + font.lineHeight + 1, 0);
                         mat.translate(belowTranslation);
                         if (!atom.below().get().element().invisible) font.drawInBatch(atom.below().get().toString(),
-                                (float) mouseX, (float) mouseY, atom.below().get().element().color.orElse(COLOR), false,
+                                (float) mouseX, (float) mouseY, colorForElement(atom.below().get().element()), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.below().get(), belowWidth);
                         mat.translate(belowTranslation.negate());
@@ -171,16 +198,16 @@ public record MoleculeTooltipComponent(
                     xySub.add(9, font.lineHeight - 4);
                     final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
                     mat.translate(subTranslation);
-                    font.drawInBatch(pp.sub(), (float) mouseX, (float) mouseY, COLOR, false, mat, bufferSource,
-                            Font.DisplayMode.NORMAL, 0, 15728880);
+                    font.drawInBatch(pp.sub(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
+                            Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(subTranslation.negate());
                     final var xySup = toScreen(font.lineHeight,
                             new Vector2f(bounds.getSecond().x, bounds.getSecond().y));
                     xySup.add(9, -4);
                     final var supTranslation = new Vector3f(xySup.x, xySup.y, 0);
                     mat.translate(supTranslation);
-                    font.drawInBatch(pp.sup(), (float) mouseX, (float) mouseY, COLOR, false, mat, bufferSource,
-                            Font.DisplayMode.NORMAL, 0, 15728880);
+                    font.drawInBatch(pp.sup(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
+                            Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(supTranslation.negate());
                 }
             }
@@ -188,6 +215,7 @@ public record MoleculeTooltipComponent(
 
         @Override
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+            final var defaultColor = configColor(null);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Bond bond) {
                     if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
@@ -265,11 +293,12 @@ public record MoleculeTooltipComponent(
                     };
                     int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
                     int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
+                    int colorA = colorForElement(atomA.element().element());
+                    int colorB = colorForElement(atomB.element().element());
                     IntBinaryOperator color = (xp, yp) -> {
                         final var d2a = Math.pow(xp - start.x, 2) + Math.pow(yp - start.y, 2);
                         final var d2b = Math.pow(xp - end.x, 2) + Math.pow(yp - end.y, 2);
-                        return d2a < d2b ? atomA.element().element().color.orElse(COLOR) :
-                                atomB.element().element().color.orElse(COLOR);
+                        return d2a < d2b ? colorA : colorB;
                     };
                     List<Vector2i> allTargets = new ArrayList<>();
                     plotLine(addX / 2, addY / 2, -addX / 2, -addY / 2, (_xt, _yt) -> true,
@@ -367,12 +396,12 @@ public record MoleculeTooltipComponent(
                     final var xyMax = toScreen(font.lineHeight, bounds.getSecond());
                     xyMax.add(x, y);
                     xyMax.add(4, -2);
-                    guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, COLOR);
-                    guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, COLOR);
-                    guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, COLOR);
-                    guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMax.y, COLOR);
-                    guiGraphics.vLine(xyMin.x - 2, xyMin.y, xyMax.y, COLOR);
-                    guiGraphics.vLine(xyMax.x + 2, xyMin.y, xyMax.y, COLOR);
+                    guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, defaultColor);
+                    guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, defaultColor);
+                    guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, defaultColor);
+                    guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMax.y, defaultColor);
+                    guiGraphics.vLine(xyMin.x - 2, xyMin.y, xyMax.y, defaultColor);
+                    guiGraphics.vLine(xyMax.x + 2, xyMin.y, xyMax.y, defaultColor);
                 }
             }
         }

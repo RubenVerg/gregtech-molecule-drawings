@@ -37,17 +37,30 @@ Molecules are stored in resource packs under `assets/<namespace>/molecules/<comp
 Molecules follow this schema:
 
 ```typescript
+// ARGB color or RGB hex string, which will always be used, or an object with the same and a specification of whether it's disableable by config
+type ElementColor = number | string | {
+  color: number | string;
+  optional: boolean;
+};
+
+// Just a symbol, which can be used for normal atoms, or an object specifying a symbol, whether it's invisible, and the color
+type Element = string | {
+  symbol: string;
+  invisible?: string; // New invisible elements that are intended to have different colors will still need a different symbol than the empty string; it will not be shown either way
+  color?: ElementColor;
+}; 
+
 // Amount of atoms defaults to 1
-type Element = string | [string, number];
+type CountedElement = string | [string, number];
 
 interface AtomCommon {
   type: 'atom';
   index: number; // The identifier used for referring to this atom
-  element?: Element; // The main element of the atom, not present if the atom should be an invisible carbon
-  above?: Element; // An element to show above the main one
-  right?: Element; // etc
-  below?: Element;
-  left?: Element;
+  element?: CountedElement; // The main element of the atom, not present if the atom should be an invisible carbon
+  above?: CountedElement; // An element to show above the main one
+  right?: CountedElement; // etc
+  below?: CountedElement;
+  left?: CountedElement;
 }
 
 // An atom can either specify X and Y coordinates...

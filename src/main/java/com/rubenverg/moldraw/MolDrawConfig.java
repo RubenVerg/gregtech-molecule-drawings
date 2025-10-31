@@ -26,6 +26,12 @@ public class MolDrawConfig {
     public boolean debugMode = false;
 
     @Configurable
+    public boolean coloredAtoms = true;
+
+    @Configurable
+    public String defaultColor = "§e";
+
+    @Configurable
     @Configurable.Range(min = 10, max = 50)
     public int scale = 20;
 }
