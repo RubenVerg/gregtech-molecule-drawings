@@ -220,7 +220,7 @@ public class Element {
             obj.add("symbol", new JsonPrimitive(element.symbol));
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
             if (!(element.color instanceof Element.Color.None))
-                obj.add("color", jsonSerializationContext.serialize(element.color));
+                obj.add("color", jsonSerializationContext.serialize(element.color, Element.Color.class));
             return obj;
         }
     }
