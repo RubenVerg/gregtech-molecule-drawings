@@ -46,7 +46,7 @@ type ElementColor = number | string | {
 // Just a symbol, which can be used for normal atoms, or an object specifying a symbol, whether it's invisible, and the color
 type Element = string | {
   symbol: string;
-  invisible?: string; // New invisible elements that are intended to have different colors will still need a different symbol than the empty string; it will not be shown either way
+  invisible?: boolean; // New invisible elements that are intended to have different colors will still need a different symbol than the empty string; it will not be shown either way
   color?: ElementColor;
 }; 
 
