@@ -28,6 +28,8 @@ public record Bond(
         INWARD("inward"),
         THICK("thick"),
         ONE_AND_HALF("one_and_half"),
+        QUADRUPLE("quadruple"),
+        QUADRUPLE_CENTERED("quadruple_centered"),
         ;
 
         public final String jsonName;

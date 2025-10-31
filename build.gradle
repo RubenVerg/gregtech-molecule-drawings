@@ -71,7 +71,10 @@ repositories {
 version = mod_version
 group = maven_group
 base { archivesName = archives_base_name }
-java { sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17 }
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+}
 
 legacyForge {
     version = project.minecraft_version + '-' + project.forge_version

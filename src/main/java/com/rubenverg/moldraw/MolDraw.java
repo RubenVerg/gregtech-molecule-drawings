@@ -69,6 +69,8 @@ public class MolDraw {
 
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Molecule.class, Molecule.Json.INSTANCE)
+            .registerTypeAdapter(Element.class, Element.Json.INSTANCE)
+            .registerTypeAdapter(Element.Color.class, Element.Color.Json.INSTANCE)
             .registerTypeAdapter(Element.Counted.class, Element.Counted.Json.INSTANCE)
             .registerTypeAdapter(Atom.class, Atom.Json.INSTANCE)
             .registerTypeAdapter(Bond.class, Bond.Json.INSTANCE)

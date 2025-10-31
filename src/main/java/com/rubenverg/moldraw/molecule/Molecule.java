@@ -57,6 +57,11 @@ public class Molecule {
         return this;
     }
 
+    public Molecule setIndex(int index) {
+        atomIndex = index;
+        return this;
+    }
+
     public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
                          @Nullable Element.Counted below, @Nullable Element.Counted left, Vector2fc ab) {
         final var xy = new Vector2f(ab);

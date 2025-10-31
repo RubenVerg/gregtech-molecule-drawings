@@ -1,8 +1,11 @@
 package com.rubenverg.moldraw.molecule;
 
+import net.minecraft.ChatFormatting;
+
 import org.joml.*;
 
 import java.lang.Math;
+import java.util.Objects;
 
 public class MathUtils {
 
@@ -27,4 +30,8 @@ public class MathUtils {
 
     public static double PHI = (1 + Math.sqrt(5)) / 2;
     public static float PHIf = (float) PHI;
+
+    public static int chatFormattingColor(ChatFormatting formatting) {
+        return Objects.requireNonNull(formatting.getColor()) | (0xff << 24);
+    }
 }
