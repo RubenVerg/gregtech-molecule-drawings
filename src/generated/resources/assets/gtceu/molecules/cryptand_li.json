@@ -184,7 +184,13 @@
     },
     {
       "index": 26,
-      "element": "Li⁺",
+      "element": {
+        "symbol": "Li⁺",
+        "color": {
+          "color": -3374849,
+          "optional": true
+        }
+      },
       "x": 3.36,
       "y": -1.447,
       "type": "atom"

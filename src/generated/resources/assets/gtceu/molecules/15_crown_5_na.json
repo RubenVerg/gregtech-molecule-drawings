@@ -107,7 +107,13 @@
     },
     {
       "index": 15,
-      "element": "Na⁺",
+      "element": {
+        "symbol": "Na⁺",
+        "color": {
+          "color": -5546766,
+          "optional": true
+        }
+      },
       "x": 0.0,
       "y": 0.0,
       "type": "atom"

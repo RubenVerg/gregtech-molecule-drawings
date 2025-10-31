@@ -184,7 +184,13 @@
     },
     {
       "index": 26,
-      "element": "K⁺",
+      "element": {
+        "symbol": "K⁺",
+        "color": {
+          "color": -7388972,
+          "optional": true
+        }
+      },
       "x": 3.36,
       "y": -1.447,
       "type": "atom"

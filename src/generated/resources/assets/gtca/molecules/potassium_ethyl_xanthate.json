@@ -30,8 +30,20 @@
     },
     {
       "index": 4,
-      "element": "S⁻",
-      "right": "K⁺",
+      "element": {
+        "symbol": "S⁻",
+        "color": {
+          "color": -208,
+          "optional": true
+        }
+      },
+      "right": {
+        "symbol": "K⁺",
+        "color": {
+          "color": -7388972,
+          "optional": true
+        }
+      },
       "x": 3.4641016,
       "y": 0.0,
       "type": "atom"
