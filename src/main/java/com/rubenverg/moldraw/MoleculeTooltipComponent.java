@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.IntBinaryOperator;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -31,8 +32,8 @@ public record MoleculeTooltipComponent(
     @MethodsReturnNonnullByDefault
     public static class ClientMoleculeTooltipComponent implements ClientTooltipComponent {
 
-        public static int COLOR = Objects.requireNonNull(ChatFormatting.YELLOW.getColor()) | (0xff << 24);
-        public static int DEBUG_COLOR = Objects.requireNonNull(ChatFormatting.RED.getColor()) | (0xff << 24);
+        public static int COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
+        public static int DEBUG_COLOR = MathUtils.chatFormattingColor(ChatFormatting.RED);
 
         private final Molecule molecule;
         private final Vector2i xySize;
@@ -98,8 +99,6 @@ public record MoleculeTooltipComponent(
         @Override
         public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix,
                                MultiBufferSource.BufferSource bufferSource) {
-            COLOR = Objects.requireNonNull(ChatFormatting.YELLOW.getColor()) | (0xff << 24);
-
             elementWidths.clear();
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
@@ -110,7 +109,8 @@ public record MoleculeTooltipComponent(
                     final var width = font.width(atom.element().toString());
                     final var centerTranslation = new Vector3f(Mth.floor(-(float) width / 2) + 1, 1, 0);
                     mat.translate(centerTranslation);
-                    font.drawInBatch(atom.element().toString(), (float) mouseX, (float) mouseY, COLOR, false, mat,
+                    if (!atom.element().element().invisible) font.drawInBatch(atom.element().toString(), (float) mouseX,
+                            (float) mouseY, atom.element().element().color.orElse(COLOR), false, mat,
                             bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(centerTranslation.negate());
                     mat.translate(translation.negate());
@@ -119,7 +119,8 @@ public record MoleculeTooltipComponent(
                         final var rightTranslation = new Vector3f(xyPosition.x + Mth.floor((float) width / 2) + 1,
                                 xyPosition.y + 1, 0);
                         mat.translate(rightTranslation);
-                        font.drawInBatch(atom.right().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                        if (!atom.right().get().element().invisible) font.drawInBatch(atom.right().get().toString(),
+                                (float) mouseX, (float) mouseY, atom.right().get().element().color.orElse(COLOR), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.right().get(), font.width(atom.right().get().toString()));
                         mat.translate(rightTranslation.negate());
@@ -128,7 +129,8 @@ public record MoleculeTooltipComponent(
                         final var leftWidth = font.width(atom.left().get().toString());
                         final var leftTranslation = new Vector3f(xyPosition.x - leftWidth - 2, xyPosition.y + 1, 0);
                         mat.translate(leftTranslation);
-                        font.drawInBatch(atom.left().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                        if (!atom.left().get().element().invisible) font.drawInBatch(atom.left().get().toString(),
+                                (float) mouseX, (float) mouseY, atom.left().get().element().color.orElse(COLOR), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.left().get(), leftWidth);
                         mat.translate(leftTranslation.negate());
@@ -138,7 +140,8 @@ public record MoleculeTooltipComponent(
                         final var aboveTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) aboveWidth / 2) + 1,
                                 xyPosition.y - font.lineHeight + 1, 0);
                         mat.translate(aboveTranslation);
-                        font.drawInBatch(atom.above().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                        if (!atom.above().get().element().invisible) font.drawInBatch(atom.above().get().toString(),
+                                (float) mouseX, (float) mouseY, atom.above().get().element().color.orElse(COLOR), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.above().get(), aboveWidth);
                         mat.translate(aboveTranslation.negate());
@@ -148,7 +151,8 @@ public record MoleculeTooltipComponent(
                         final var belowTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) belowWidth / 2) + 1,
                                 xyPosition.y + font.lineHeight + 1, 0);
                         mat.translate(belowTranslation);
-                        font.drawInBatch(atom.below().get().toString(), (float) mouseX, (float) mouseY, COLOR, false,
+                        if (!atom.below().get().element().invisible) font.drawInBatch(atom.below().get().toString(),
+                                (float) mouseX, (float) mouseY, atom.below().get().element().color.orElse(COLOR), false,
                                 mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         elementWidths.put(atom.below().get(), belowWidth);
                         mat.translate(belowTranslation.negate());
@@ -261,38 +265,44 @@ public record MoleculeTooltipComponent(
                     };
                     int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
                     int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
+                    IntBinaryOperator color = (xp, yp) -> {
+                        final var d2a = Math.pow(xp - start.x, 2) + Math.pow(yp - start.y, 2);
+                        final var d2b = Math.pow(xp - end.x, 2) + Math.pow(yp - end.y, 2);
+                        return d2a < d2b ? atomA.element().element().color.orElse(COLOR) :
+                                atomB.element().element().color.orElse(COLOR);
+                    };
                     List<Vector2i> allTargets = new ArrayList<>();
                     plotLine(addX / 2, addY / 2, -addX / 2, -addY / 2, (_xt, _yt) -> true,
                             (xp, yp) -> allTargets.add(new Vector2i(xp, yp)));
                     final BiConsumer<Integer, Integer> drawHalved = (xt, yt) -> guiGraphics.fill(xt / 2, yt / 2,
-                            xt / 2 + 1, yt / 2 + 1, COLOR);
+                            xt / 2 + 1, yt / 2 + 1, color.applyAsInt(xt / 2, yt / 2));
                     switch (bond.type()) {
                         case SINGLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
                             break;
                         case DOUBLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
                             plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
-                                    COLOR, guiGraphics);
+                                    color, guiGraphics);
                             break;
                         case ONE_AND_HALF:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
                             plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY,
                                     isCloseToAtomAndOnLine.apply(new Pair<>(2, 1)),
-                                    COLOR, guiGraphics);
+                                    color, guiGraphics);
                             break;
                         case DOUBLE_CENTERED:
                             plotLine(start.x + addHX, start.y + addHY, end.x + addHX, end.y + addHY, isCloseToAtom,
-                                    COLOR, guiGraphics);
+                                    color, guiGraphics);
                             plotLine(start.x - addHX, start.y - addHY, end.x - addHX, end.y - addHY, isCloseToAtom,
-                                    COLOR, guiGraphics);
+                                    color, guiGraphics);
                             break;
                         case TRIPLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, COLOR, guiGraphics);
+                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
                             plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
-                                    COLOR, guiGraphics);
+                                    color, guiGraphics);
                             plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, isCloseToAtom,
-                                    COLOR, guiGraphics);
+                                    color, guiGraphics);
                             break;
                         case INWARD:
                         case OUTWARD:
@@ -369,9 +379,10 @@ public record MoleculeTooltipComponent(
         }
 
         public static void plotLine(int x0, int y0, int x1, int y1,
-                                    BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw, int color,
+                                    BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw, IntBinaryOperator color,
                                     GuiGraphics graphics) {
-            plotLine(x0, y0, x1, y1, shouldDraw, (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color));
+            plotLine(x0, y0, x1, y1, shouldDraw,
+                    (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
         }
     }
 }

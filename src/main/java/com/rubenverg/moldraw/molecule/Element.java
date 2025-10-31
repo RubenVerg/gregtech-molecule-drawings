@@ -7,6 +7,8 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.OptionalInt;
 
 public class Element {
 
@@ -14,14 +16,34 @@ public class Element {
 
     public final String symbol;
     public final boolean invisible;
+    public final OptionalInt color;
 
     protected Element(String symbol, boolean invisible) {
         this.symbol = symbol;
         this.invisible = invisible;
+        this.color = OptionalInt.empty();
+    }
+
+    protected Element(String symbol, boolean invisible, int color) {
+        this.symbol = symbol;
+        this.invisible = invisible;
+        this.color = OptionalInt.of(color);
     }
 
     public static Element create(String symbol) {
         return elements.computeIfAbsent(symbol, s -> new Element(s, false));
+    }
+
+    public static Element create(String symbol, boolean invisible) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, invisible));
+    }
+
+    public static Element create(String symbol, int color) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, false, color));
+    }
+
+    public static Element create(String symbol, boolean invisible, int color) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, invisible, color));
     }
 
     public static Element H = Element.create("H");
@@ -154,6 +176,38 @@ public class Element {
         return new Counted(this, count);
     }
 
+    public static class Json implements JsonSerializer<Element>, JsonDeserializer<Element> {
+
+        private Json() {}
+
+        public static Element.Json INSTANCE = new Element.Json();
+
+        @Override
+        public Element deserialize(JsonElement jsonElement, Type type,
+                                   JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            if (jsonElement.isJsonPrimitive()) return Element.create(jsonElement.getAsString());
+            else if (jsonElement.isJsonObject()) {
+                final var obj = jsonElement.getAsJsonObject();
+                if (obj.has("color")) return Element.create(obj.get("symbol").getAsString(),
+                        Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean(),
+                        obj.get("color").getAsInt());
+                else return Element.create(obj.get("symbol").getAsString(),
+                        Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean());
+            } else throw new JsonParseException("Invalid element JSON");
+        }
+
+        @Override
+        public JsonElement serialize(Element element, Type type,
+                                     JsonSerializationContext jsonSerializationContext) {
+            if (element.color.isEmpty() && !element.invisible) return new JsonPrimitive(element.symbol);
+            final var obj = new JsonObject();
+            obj.add("symbol", new JsonPrimitive(element.symbol));
+            if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
+            if (element.color.isPresent()) obj.add("color", new JsonPrimitive(element.color.getAsInt()));
+            return obj;
+        }
+    }
+
     public record Counted(Element element, int count) {
 
         @Override
@@ -175,9 +229,11 @@ public class Element {
             @Override
             public Counted deserialize(JsonElement jsonElement, Type type,
                                        JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                if (jsonElement.isJsonPrimitive()) return Element.create(jsonElement.getAsString()).count(1);
+                if (jsonElement.isJsonPrimitive() || jsonElement.isJsonObject())
+                    return jsonDeserializationContext.<Element>deserialize(jsonElement, Element.class).count(1);
                 else if (jsonElement.isJsonArray())
-                    return Element.create(jsonElement.getAsJsonArray().get(0).getAsString())
+                    return jsonDeserializationContext
+                            .<Element>deserialize(jsonElement.getAsJsonArray().get(0), Element.class)
                             .count(jsonElement.getAsJsonArray().get(1).getAsInt());
                 else throw new JsonParseException("Invalid element JSON");
             }
@@ -185,9 +241,9 @@ public class Element {
             @Override
             public JsonElement serialize(Counted counted, Type type,
                                          JsonSerializationContext jsonSerializationContext) {
-                if (counted.count == 1) return new JsonPrimitive(counted.element.symbol);
+                if (counted.count == 1) return jsonSerializationContext.serialize(counted.element);
                 final var arr = new JsonArray();
-                arr.add(counted.element.symbol);
+                arr.add(jsonSerializationContext.serialize(counted.element));
                 arr.add(counted.count);
                 return arr;
             }
