@@ -51,7 +51,9 @@ public record MoleculeTooltipComponent(
 
         public static int colorForElement(Element element) {
             final var defaultColor = configColor(null);
-            if (element.color instanceof Element.Color.None) return defaultColor;
+            if (MolDrawConfig.INSTANCE.useMaterialColors && !element.material.isNull())
+                return element.material.getMaterialARGB();
+            else if (element.color instanceof Element.Color.None) return defaultColor;
             else if (element.color instanceof Element.Color.Always always) return always.color();
             else if (element.color instanceof Element.Color.Optional optional)
                 return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
@@ -125,7 +127,6 @@ public record MoleculeTooltipComponent(
         public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix,
                                MultiBufferSource.BufferSource bufferSource) {
             final var defaultColor = configColor(null);
-
             elementWidths.clear();
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
