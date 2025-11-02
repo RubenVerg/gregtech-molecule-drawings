@@ -30,6 +30,7 @@ public record Bond(
         ONE_AND_HALF("one_and_half"),
         QUADRUPLE("quadruple"),
         QUADRUPLE_CENTERED("quadruple_centered"),
+        DOTTED("dotted"),
         ;
 
         public final String jsonName;
