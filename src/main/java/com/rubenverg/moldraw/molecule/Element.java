@@ -30,7 +30,7 @@ public class Element {
         this.invisible = invisible;
         this.color = Color.NONE;
         this.standard = false;
-        this.material = null;
+        this.material = GTMaterials.NULL;
     }
 
     protected Element(String symbol, boolean invisible, Color color, @Nullable Material material) {
