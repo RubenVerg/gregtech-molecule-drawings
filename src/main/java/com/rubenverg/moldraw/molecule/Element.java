@@ -1,7 +1,12 @@
 package com.rubenverg.moldraw.molecule;
 
+import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.common.data.GTMaterials;
+
 import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.lang.reflect.Type;
@@ -17,6 +22,7 @@ public class Element {
     public final String symbol;
     public final boolean invisible;
     public final Color color;
+    public final @Nullable Material material;
     boolean standard;
 
     protected Element(String symbol, boolean invisible) {
@@ -24,13 +30,15 @@ public class Element {
         this.invisible = invisible;
         this.color = Color.NONE;
         this.standard = false;
+        this.material = null;
     }
 
-    protected Element(String symbol, boolean invisible, Color color) {
+    protected Element(String symbol, boolean invisible, Color color, @Nullable Material material) {
         this.symbol = symbol;
         this.invisible = invisible;
         this.color = color;
         this.standard = false;
+        this.material = material;
     }
 
     public static Element create(String symbol) {
@@ -41,146 +49,147 @@ public class Element {
         return elements.computeIfAbsent(symbol, s -> new Element(s, invisible));
     }
 
-    public static Element create(String symbol, Color color) {
-        return elements.computeIfAbsent(symbol, s -> new Element(s, false, color));
+    public static Element create(String symbol, Color color, @Nullable Material material) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, false, color, material));
     }
 
-    public static Element create(String symbol, boolean invisible, Color color) {
-        return elements.computeIfAbsent(symbol, s -> new Element(s, invisible, color));
+    public static Element create(String symbol, boolean invisible, Color color, @Nullable Material material) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, invisible, color, material));
     }
 
-    private static Element createStandard(String symbol, Integer color) {
-        final var el = create(symbol, Objects.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)));
+    private static Element createStandard(String symbol, Integer color, Material material) {
+        final var el = create(symbol, Objects.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)),
+                material);
         el.standard = true;
         return el;
     }
 
     public Element posIon() {
-        return new Element(symbol + "⁺", invisible, color);
+        return Element.create(symbol + "⁺", invisible, color, material);
     }
 
     public Element negIon() {
-        return new Element(symbol + "⁻", invisible, color);
+        return Element.create(symbol + "⁻", invisible, color, material);
     }
 
-    public static Element H = Element.createStandard("H", 0xffffff);
-    public static Element He = Element.createStandard("He", 0xd9ffff);
-    public static Element Li = Element.createStandard("Li", 0xcc80ff);
-    public static Element Be = Element.createStandard("Be", 0xc2ff00);
-    public static Element B = Element.createStandard("B", 0xffb5b5);
-    public static Element C = Element.createStandard("C", 0x909090);
-    public static Element N = Element.createStandard("N", 0x3050f8);
-    public static Element O = Element.createStandard("O", 0xff0d0d);
-    public static Element F = Element.createStandard("F", 0x90e050);
-    public static Element Ne = Element.createStandard("Ne", 0xb3e3f5);
-    public static Element Na = Element.createStandard("Na", 0xab5cf2);
-    public static Element Mg = Element.createStandard("Mg", 0x8aff00);
-    public static Element Al = Element.createStandard("Al", 0xbfa6a6);
-    public static Element Si = Element.createStandard("Si", 0xf0c8a0);
-    public static Element P = Element.createStandard("P", 0xff8000);
-    public static Element S = Element.createStandard("S", 0xffff30);
-    public static Element Cl = Element.createStandard("Cl", 0x1ff01f);
-    public static Element Ar = Element.createStandard("Ar", 0x80d1e3);
-    public static Element K = Element.createStandard("K", 0x8f40d4);
-    public static Element Ca = Element.createStandard("Ca", 0x3dff00);
-    public static Element Sc = Element.createStandard("Sc", 0xe6e6e6);
-    public static Element Ti = Element.createStandard("Ti", 0xbfc2c7);
-    public static Element V = Element.createStandard("V", 0xa6a6ab);
-    public static Element Cr = Element.createStandard("Cr", 0x8a99c7);
-    public static Element Mn = Element.createStandard("Mn", 0x9c7ac7);
-    public static Element Fe = Element.createStandard("Fe", 0xe06633);
-    public static Element Co = Element.createStandard("Co", 0xf090a0);
-    public static Element Ni = Element.createStandard("Ni", 0x50d050);
-    public static Element Cu = Element.createStandard("Cu", 0xc88033);
-    public static Element Zn = Element.createStandard("Zn", 0x7d80b0);
-    public static Element Ga = Element.createStandard("Ga", 0xc28f8f);
-    public static Element Ge = Element.createStandard("Ge", 0x668f8f);
-    public static Element As = Element.createStandard("As", 0xbd80e3);
-    public static Element Se = Element.createStandard("Se", 0xffa100);
-    public static Element Br = Element.createStandard("Br", 0xa62929);
-    public static Element Kr = Element.createStandard("Kr", 0x5cb8d1);
-    public static Element Rb = Element.createStandard("Rb", 0x702eb0);
-    public static Element Sr = Element.createStandard("Sr", 0x00ff00);
-    public static Element Y = Element.createStandard("Y", 0x94ffff);
-    public static Element Zr = Element.createStandard("Zr", 0x94e0e0);
-    public static Element Nb = Element.createStandard("Nb", 0x73c2c9);
-    public static Element Mo = Element.createStandard("Mo", 0x54b5b5);
-    public static Element Tc = Element.createStandard("Tc", 0x3b9e9e);
-    public static Element Ru = Element.createStandard("Ru", 0x248f8f);
-    public static Element Rh = Element.createStandard("Rh", 0x0a7d8c);
-    public static Element Pd = Element.createStandard("Pd", 0x006985);
-    public static Element Ag = Element.createStandard("Ag", 0xc0c0c0);
-    public static Element Cd = Element.createStandard("Cd", 0xffd98f);
-    public static Element In = Element.createStandard("In", 0xa67573);
-    public static Element Sn = Element.createStandard("Sn", 0x668080);
-    public static Element Sb = Element.createStandard("Sb", 0x9e63b5);
-    public static Element Te = Element.createStandard("Te", 0xd47a00);
-    public static Element I = Element.createStandard("I", 0x940094);
-    public static Element Xe = Element.createStandard("Xe", 0x429eb0);
-    public static Element Cs = Element.createStandard("Cs", 0x57178f);
-    public static Element Ba = Element.createStandard("Ba", 0x00c900);
-    public static Element La = Element.createStandard("La", 0x70d4ff);
-    public static Element Ce = Element.createStandard("Ce", 0xffffc7);
-    public static Element Pr = Element.createStandard("Pr", 0xd9ffc7);
-    public static Element Nd = Element.createStandard("Nd", 0xc7ffc7);
-    public static Element Pm = Element.createStandard("Pm", 0xa3ffc7);
-    public static Element Sm = Element.createStandard("Sm", 0x8fffc7);
-    public static Element Eu = Element.createStandard("Eu", 0x61ffc7);
-    public static Element Gd = Element.createStandard("Gd", 0x45ffc7);
-    public static Element Tb = Element.createStandard("Tb", 0x30ffc7);
-    public static Element Dy = Element.createStandard("Dy", 0x1fffc7);
-    public static Element Ho = Element.createStandard("Ho", 0x00ff9c);
-    public static Element Er = Element.createStandard("Er", 0x00e675);
-    public static Element Tm = Element.createStandard("Tm", 0x00d452);
-    public static Element Yb = Element.createStandard("Yb", 0x00bf38);
-    public static Element Lu = Element.createStandard("Lu", 0x00ab24);
-    public static Element Hf = Element.createStandard("Hf", 0x4dc2ff);
-    public static Element Ta = Element.createStandard("Ta", 0x4da6ff);
-    public static Element W = Element.createStandard("W", 0x2194d6);
-    public static Element Re = Element.createStandard("Re", 0x267dab);
-    public static Element Os = Element.createStandard("Os", 0x266696);
-    public static Element Ir = Element.createStandard("Ir", 0x175487);
-    public static Element Pt = Element.createStandard("Pt", 0xd0d0e0);
-    public static Element Au = Element.createStandard("Au", 0xffd123);
-    public static Element Hg = Element.createStandard("Hg", 0xb8b8d0);
-    public static Element Tl = Element.createStandard("Tl", 0xa6544d);
-    public static Element Pb = Element.createStandard("Pb", 0x575961);
-    public static Element Bi = Element.createStandard("Bi", 0x9e4fb5);
-    public static Element Po = Element.createStandard("Po", 0xab5c00);
-    public static Element At = Element.createStandard("At", 0x754f45);
-    public static Element Rn = Element.createStandard("Rn", 0x428296);
-    public static Element Fr = Element.createStandard("Fr", 0x420066);
-    public static Element Ra = Element.createStandard("Ra", 0x007d00);
-    public static Element Ac = Element.createStandard("Ac", 0x70abfa);
-    public static Element Th = Element.createStandard("Th", 0x00baff);
-    public static Element Pa = Element.createStandard("Pa", 0x00a1ff);
-    public static Element U = Element.createStandard("U", 0x008fff);
-    public static Element Np = Element.createStandard("Np", 0x0080ff);
-    public static Element Pu = Element.createStandard("Pu", 0x006bff);
-    public static Element Am = Element.createStandard("Am", 0x545cf2);
-    public static Element Cm = Element.createStandard("Cm", 0x785ce3);
-    public static Element Bk = Element.createStandard("Bk", 0x8a4fe3);
-    public static Element Cf = Element.createStandard("Cf", 0xa136d4);
-    public static Element Es = Element.createStandard("Es", 0xb31fd4);
-    public static Element Fm = Element.createStandard("Fm", 0xb31fba);
-    public static Element Md = Element.createStandard("Md", 0xb30da6);
-    public static Element No = Element.createStandard("No", 0xbd0d87);
-    public static Element Lr = Element.createStandard("Lr", 0xc70066);
-    public static Element Rf = Element.createStandard("Rf", 0xcc0059);
-    public static Element Db = Element.createStandard("Db", 0xd1004f);
-    public static Element Sg = Element.createStandard("Sg", 0xd90045);
-    public static Element Bh = Element.createStandard("Bh", 0xe00038);
-    public static Element Hs = Element.createStandard("Hs", 0xe6002e);
-    public static Element Mt = Element.createStandard("Mt", 0xeb0026);
-    public static Element Ds = Element.createStandard("Ds", null);
-    public static Element Rg = Element.createStandard("Rg", null);
-    public static Element Cn = Element.createStandard("Cn", null);
-    public static Element Nh = Element.createStandard("Nh", null);
-    public static Element Fl = Element.createStandard("Fl", null);
-    public static Element Mc = Element.createStandard("Mc", null);
-    public static Element Lv = Element.createStandard("Lv", null);
-    public static Element Ts = Element.createStandard("Ts", null);
-    public static Element Og = Element.createStandard("Og", null);
+    public static Element H = Element.createStandard("H", 0xffffff, GTMaterials.Hydrogen);
+    public static Element He = Element.createStandard("He", 0xd9ffff, GTMaterials.Helium);
+    public static Element Li = Element.createStandard("Li", 0xcc80ff, GTMaterials.Lithium);
+    public static Element Be = Element.createStandard("Be", 0xc2ff00, GTMaterials.Beryllium);
+    public static Element B = Element.createStandard("B", 0xffb5b5, GTMaterials.Boron);
+    public static Element C = Element.createStandard("C", 0x909090, GTMaterials.Carbon);
+    public static Element N = Element.createStandard("N", 0x3050f8, GTMaterials.Nitrogen);
+    public static Element O = Element.createStandard("O", 0xff0d0d, GTMaterials.Oxygen);
+    public static Element F = Element.createStandard("F", 0x90e050, GTMaterials.Fluorine);
+    public static Element Ne = Element.createStandard("Ne", 0xb3e3f5, GTMaterials.Neon);
+    public static Element Na = Element.createStandard("Na", 0xab5cf2, GTMaterials.Sodium);
+    public static Element Mg = Element.createStandard("Mg", 0x8aff00, GTMaterials.Magnesium);
+    public static Element Al = Element.createStandard("Al", 0xbfa6a6, GTMaterials.Aluminium);
+    public static Element Si = Element.createStandard("Si", 0xf0c8a0, GTMaterials.Silicon);
+    public static Element P = Element.createStandard("P", 0xff8000, GTMaterials.Phosphorus);
+    public static Element S = Element.createStandard("S", 0xffff30, GTMaterials.Sulfur);
+    public static Element Cl = Element.createStandard("Cl", 0x1ff01f, GTMaterials.Chlorine);
+    public static Element Ar = Element.createStandard("Ar", 0x80d1e3, GTMaterials.Argon);
+    public static Element K = Element.createStandard("K", 0x8f40d4, GTMaterials.Potassium);
+    public static Element Ca = Element.createStandard("Ca", 0x3dff00, GTMaterials.Calcium);
+    public static Element Sc = Element.createStandard("Sc", 0xe6e6e6, GTMaterials.Scandium);
+    public static Element Ti = Element.createStandard("Ti", 0xbfc2c7, GTMaterials.Titanium);
+    public static Element V = Element.createStandard("V", 0xa6a6ab, GTMaterials.Vanadium);
+    public static Element Cr = Element.createStandard("Cr", 0x8a99c7, GTMaterials.Chromium);
+    public static Element Mn = Element.createStandard("Mn", 0x9c7ac7, GTMaterials.Manganese);
+    public static Element Fe = Element.createStandard("Fe", 0xe06633, GTMaterials.Iron);
+    public static Element Co = Element.createStandard("Co", 0xf090a0, GTMaterials.Cobalt);
+    public static Element Ni = Element.createStandard("Ni", 0x50d050, GTMaterials.Nickel);
+    public static Element Cu = Element.createStandard("Cu", 0xc88033, GTMaterials.Copper);
+    public static Element Zn = Element.createStandard("Zn", 0x7d80b0, GTMaterials.Zinc);
+    public static Element Ga = Element.createStandard("Ga", 0xc28f8f, GTMaterials.Gallium);
+    public static Element Ge = Element.createStandard("Ge", 0x668f8f, GTMaterials.Germanium);
+    public static Element As = Element.createStandard("As", 0xbd80e3, GTMaterials.Arsenic);
+    public static Element Se = Element.createStandard("Se", 0xffa100, GTMaterials.Selenium);
+    public static Element Br = Element.createStandard("Br", 0xa62929, GTMaterials.Bromine);
+    public static Element Kr = Element.createStandard("Kr", 0x5cb8d1, GTMaterials.Krypton);
+    public static Element Rb = Element.createStandard("Rb", 0x702eb0, GTMaterials.Rubidium);
+    public static Element Sr = Element.createStandard("Sr", 0x00ff00, GTMaterials.Strontium);
+    public static Element Y = Element.createStandard("Y", 0x94ffff, GTMaterials.Yttrium);
+    public static Element Zr = Element.createStandard("Zr", 0x94e0e0, GTMaterials.Zirconium);
+    public static Element Nb = Element.createStandard("Nb", 0x73c2c9, GTMaterials.Niobium);
+    public static Element Mo = Element.createStandard("Mo", 0x54b5b5, GTMaterials.Molybdenum);
+    public static Element Tc = Element.createStandard("Tc", 0x3b9e9e, GTMaterials.Technetium);
+    public static Element Ru = Element.createStandard("Ru", 0x248f8f, GTMaterials.Ruthenium);
+    public static Element Rh = Element.createStandard("Rh", 0x0a7d8c, GTMaterials.Rhodium);
+    public static Element Pd = Element.createStandard("Pd", 0x006985, GTMaterials.Palladium);
+    public static Element Ag = Element.createStandard("Ag", 0xc0c0c0, GTMaterials.Silver);
+    public static Element Cd = Element.createStandard("Cd", 0xffd98f, GTMaterials.Cadmium);
+    public static Element In = Element.createStandard("In", 0xa67573, GTMaterials.Indium);
+    public static Element Sn = Element.createStandard("Sn", 0x668080, GTMaterials.Tin);
+    public static Element Sb = Element.createStandard("Sb", 0x9e63b5, GTMaterials.Antimony);
+    public static Element Te = Element.createStandard("Te", 0xd47a00, GTMaterials.Tellurium);
+    public static Element I = Element.createStandard("I", 0x940094, GTMaterials.Iodine);
+    public static Element Xe = Element.createStandard("Xe", 0x429eb0, GTMaterials.Xenon);
+    public static Element Cs = Element.createStandard("Cs", 0x57178f, GTMaterials.Caesium);
+    public static Element Ba = Element.createStandard("Ba", 0x00c900, GTMaterials.Barium);
+    public static Element La = Element.createStandard("La", 0x70d4ff, GTMaterials.Lanthanum);
+    public static Element Ce = Element.createStandard("Ce", 0xffffc7, GTMaterials.Cerium);
+    public static Element Pr = Element.createStandard("Pr", 0xd9ffc7, GTMaterials.Praseodymium);
+    public static Element Nd = Element.createStandard("Nd", 0xc7ffc7, GTMaterials.Neodymium);
+    public static Element Pm = Element.createStandard("Pm", 0xa3ffc7, GTMaterials.Promethium);
+    public static Element Sm = Element.createStandard("Sm", 0x8fffc7, GTMaterials.Samarium);
+    public static Element Eu = Element.createStandard("Eu", 0x61ffc7, GTMaterials.Europium);
+    public static Element Gd = Element.createStandard("Gd", 0x45ffc7, GTMaterials.Gadolinium);
+    public static Element Tb = Element.createStandard("Tb", 0x30ffc7, GTMaterials.Terbium);
+    public static Element Dy = Element.createStandard("Dy", 0x1fffc7, GTMaterials.Dysprosium);
+    public static Element Ho = Element.createStandard("Ho", 0x00ff9c, GTMaterials.Holmium);
+    public static Element Er = Element.createStandard("Er", 0x00e675, GTMaterials.Erbium);
+    public static Element Tm = Element.createStandard("Tm", 0x00d452, GTMaterials.Thulium);
+    public static Element Yb = Element.createStandard("Yb", 0x00bf38, GTMaterials.Ytterbium);
+    public static Element Lu = Element.createStandard("Lu", 0x00ab24, GTMaterials.Lutetium);
+    public static Element Hf = Element.createStandard("Hf", 0x4dc2ff, GTMaterials.Hafnium);
+    public static Element Ta = Element.createStandard("Ta", 0x4da6ff, GTMaterials.Tantalum);
+    public static Element W = Element.createStandard("W", 0x2194d6, GTMaterials.Tungsten);
+    public static Element Re = Element.createStandard("Re", 0x267dab, GTMaterials.Rhenium);
+    public static Element Os = Element.createStandard("Os", 0x266696, GTMaterials.Osmium);
+    public static Element Ir = Element.createStandard("Ir", 0x175487, GTMaterials.Iridium);
+    public static Element Pt = Element.createStandard("Pt", 0xd0d0e0, GTMaterials.Platinum);
+    public static Element Au = Element.createStandard("Au", 0xffd123, GTMaterials.Gold);
+    public static Element Hg = Element.createStandard("Hg", 0xb8b8d0, GTMaterials.Mercury);
+    public static Element Tl = Element.createStandard("Tl", 0xa6544d, GTMaterials.Thallium);
+    public static Element Pb = Element.createStandard("Pb", 0x575961, GTMaterials.Lead);
+    public static Element Bi = Element.createStandard("Bi", 0x9e4fb5, GTMaterials.Bismuth);
+    public static Element Po = Element.createStandard("Po", 0xab5c00, GTMaterials.Polonium);
+    public static Element At = Element.createStandard("At", 0x754f45, GTMaterials.Astatine);
+    public static Element Rn = Element.createStandard("Rn", 0x428296, GTMaterials.Radon);
+    public static Element Fr = Element.createStandard("Fr", 0x420066, GTMaterials.Francium);
+    public static Element Ra = Element.createStandard("Ra", 0x007d00, GTMaterials.Radium);
+    public static Element Ac = Element.createStandard("Ac", 0x70abfa, GTMaterials.Actinium);
+    public static Element Th = Element.createStandard("Th", 0x00baff, GTMaterials.Thorium);
+    public static Element Pa = Element.createStandard("Pa", 0x00a1ff, GTMaterials.Protactinium);
+    public static Element U = Element.createStandard("U", 0x008fff, GTMaterials.Uranium238);
+    public static Element Np = Element.createStandard("Np", 0x0080ff, GTMaterials.Neptunium);
+    public static Element Pu = Element.createStandard("Pu", 0x006bff, GTMaterials.Plutonium239);
+    public static Element Am = Element.createStandard("Am", 0x545cf2, GTMaterials.Americium);
+    public static Element Cm = Element.createStandard("Cm", 0x785ce3, GTMaterials.Curium);
+    public static Element Bk = Element.createStandard("Bk", 0x8a4fe3, GTMaterials.Berkelium);
+    public static Element Cf = Element.createStandard("Cf", 0xa136d4, GTMaterials.Californium);
+    public static Element Es = Element.createStandard("Es", 0xb31fd4, GTMaterials.Einsteinium);
+    public static Element Fm = Element.createStandard("Fm", 0xb31fba, GTMaterials.Fermium);
+    public static Element Md = Element.createStandard("Md", 0xb30da6, GTMaterials.Mendelevium);
+    public static Element No = Element.createStandard("No", 0xbd0d87, GTMaterials.Nobelium);
+    public static Element Lr = Element.createStandard("Lr", 0xc70066, GTMaterials.Lawrencium);
+    public static Element Rf = Element.createStandard("Rf", 0xcc0059, GTMaterials.Rutherfordium);
+    public static Element Db = Element.createStandard("Db", 0xd1004f, GTMaterials.Dubnium);
+    public static Element Sg = Element.createStandard("Sg", 0xd90045, GTMaterials.Seaborgium);
+    public static Element Bh = Element.createStandard("Bh", 0xe00038, GTMaterials.Bohrium);
+    public static Element Hs = Element.createStandard("Hs", 0xe6002e, GTMaterials.Hassium);
+    public static Element Mt = Element.createStandard("Mt", 0xeb0026, GTMaterials.Meitnerium);
+    public static Element Ds = Element.createStandard("Ds", null, GTMaterials.Darmstadtium);
+    public static Element Rg = Element.createStandard("Rg", null, GTMaterials.Roentgenium);
+    public static Element Cn = Element.createStandard("Cn", null, GTMaterials.Copernicium);
+    public static Element Nh = Element.createStandard("Nh", null, GTMaterials.Nihonium);
+    public static Element Fl = Element.createStandard("Fl", null, GTMaterials.Flerovium);
+    public static Element Mc = Element.createStandard("Mc", null, GTMaterials.Moscovium);
+    public static Element Lv = Element.createStandard("Lv", null, GTMaterials.Livermorium);
+    public static Element Ts = Element.createStandard("Ts", null, GTMaterials.Tennessine);
+    public static Element Og = Element.createStandard("Og", null, GTMaterials.Oganesson);
 
     public static Element INVISIBLE = elements.computeIfAbsent("", s -> new Element(s, true));
     public static Element BULLET = Element.create("•");
@@ -212,7 +221,9 @@ public class Element {
                 final var obj = jsonElement.getAsJsonObject();
                 if (obj.has("color")) return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean(),
-                        jsonDeserializationContext.deserialize(obj.get("color"), Element.Color.class));
+                        jsonDeserializationContext.deserialize(obj.get("color"), Element.Color.class),
+                        obj.has("material") ? GTCEuAPI.materialManager.getMaterial(obj.get("material").getAsString()) :
+                                null);
                 else return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean());
             } else throw new JsonParseException("Invalid element JSON");
@@ -229,6 +240,8 @@ public class Element {
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
             if (!(element.color instanceof Element.Color.None))
                 obj.add("color", jsonSerializationContext.serialize(element.color, Element.Color.class));
+            if (!Objects.isNull(element.material))
+                obj.add("material", new JsonPrimitive(element.material.getResourceLocation().toString()));
             return obj;
         }
     }

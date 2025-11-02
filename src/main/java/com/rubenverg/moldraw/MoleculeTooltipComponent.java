@@ -1,15 +1,21 @@
 package com.rubenverg.moldraw;
 
+import com.gregtechceu.gtceu.api.fluids.GTFluid;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +23,9 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 import java.awt.*;
+import java.io.IOException;
 import java.lang.Math;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -51,11 +59,37 @@ public record MoleculeTooltipComponent(
 
         public static int colorForElement(Element element) {
             final var defaultColor = configColor(null);
-            if (element.color instanceof Element.Color.None) return defaultColor;
+            if (MolDrawConfig.INSTANCE.useMaterialColors && !Objects.isNull(element.material)) {
+                if (element.material.getMaterialARGB() == 0xffffffff &&
+                        element.material.getFluid() instanceof GTFluid gtFluid) {
+                    final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
+                    try {
+                        final var resource = Minecraft.getInstance().getResourceManager()
+                                .getResourceOrThrow(texturePath.withSuffix(".png").withPrefix("textures/"));
+                        NativeImage image;
+                        try (final var stream = resource.open()) {
+                            image = NativeImage.read(stream);
+                        }
+                        var red = BigInteger.ZERO;
+                        var green = BigInteger.ZERO;
+                        var blue = BigInteger.ZERO;
+                        for (final var pixel : image.getPixelsRGBA()) {
+                            red = red.add(BigInteger.valueOf(FastColor.ABGR32.red(pixel)));
+                            green = green.add(BigInteger.valueOf(FastColor.ABGR32.green(pixel)));
+                            blue = blue.add(BigInteger.valueOf(FastColor.ABGR32.blue(pixel)));
+                        }
+                        final var size = BigInteger.valueOf((long) image.getWidth() * image.getHeight());
+                        return FastColor.ARGB32.color(0xff, red.divide(size).intValue(), green.divide(size).intValue(),
+                                blue.divide(size).intValue());
+                    } catch (IOException ignored) {
+
+                    }
+                } else return element.material.getMaterialARGB();
+            } else if (element.color instanceof Element.Color.None) return defaultColor;
             else if (element.color instanceof Element.Color.Always always) return always.color();
             else if (element.color instanceof Element.Color.Optional optional)
                 return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
-            else return defaultColor;
+            return defaultColor;
         }
 
         public static int DEBUG_COLOR = MathUtils.chatFormattingColor(ChatFormatting.RED);
@@ -125,7 +159,6 @@ public record MoleculeTooltipComponent(
         public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix,
                                MultiBufferSource.BufferSource bufferSource) {
             final var defaultColor = configColor(null);
-
             elementWidths.clear();
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {

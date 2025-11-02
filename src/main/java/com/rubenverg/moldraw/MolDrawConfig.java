@@ -29,6 +29,9 @@ public class MolDrawConfig {
     public boolean coloredAtoms = true;
 
     @Configurable
+    public boolean useMaterialColors = false;
+
+    @Configurable
     public String defaultColor = "§e";
 
     @Configurable
