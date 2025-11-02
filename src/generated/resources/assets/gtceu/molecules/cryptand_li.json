@@ -189,7 +189,8 @@
         "color": {
           "color": -3374849,
           "optional": true
-        }
+        },
+        "material": "gtceu:lithium"
       },
       "x": 3.36,
       "y": -1.447,

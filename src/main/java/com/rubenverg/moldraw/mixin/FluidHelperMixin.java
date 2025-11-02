@@ -1,6 +1,7 @@
 package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
+import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
@@ -8,6 +9,7 @@ import net.minecraftforge.fluids.FluidStack;
 import com.mojang.datafixers.util.Either;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
+import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
@@ -34,14 +36,19 @@ public class FluidHelperMixin {
         final var material = ChemicalHelper.getMaterial(ingredient.getFluid());
         if (Objects.isNull(material)) return;
         final var mol = MolDraw.getMolecule(material);
-        if (Objects.isNull(mol)) return;
         final var tooltipElements = ((JeiTooltipMixin) jeiTooltip).getLines();
         final var idx = IntStream.range(0, tooltipElements.size())
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
                 .findFirst();
-        if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
-        else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+        if (!Objects.isNull(mol)) {
+            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
+            else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+        } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1));
+            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
+            else tooltipElements.add(1, Either.left(coloredFormula));
+        }
     }
 }

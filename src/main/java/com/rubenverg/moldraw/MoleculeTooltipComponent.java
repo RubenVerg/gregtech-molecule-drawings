@@ -1,31 +1,22 @@
 package com.rubenverg.moldraw;
 
-import com.gregtechceu.gtceu.api.fluids.GTFluid;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 import java.awt.*;
-import java.io.IOException;
 import java.lang.Math;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -35,6 +26,8 @@ import java.util.function.IntBinaryOperator;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static com.rubenverg.moldraw.MoleculeColorize.*;
+
 public record MoleculeTooltipComponent(
                                        Molecule molecule)
         implements TooltipComponent {
@@ -42,55 +35,6 @@ public record MoleculeTooltipComponent(
     @ParametersAreNonnullByDefault
     @MethodsReturnNonnullByDefault
     public static class ClientMoleculeTooltipComponent implements ClientTooltipComponent {
-
-        public static int FALLBACK_COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
-
-        public static int configColor(@Nullable String config) {
-            final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.defaultColor);
-            if (str.length() == 2 && str.charAt(0) == '§') {
-                final var formatting = ChatFormatting.getByCode(str.charAt(1));
-                return Objects.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
-            } else if (str.length() == 7 && str.charAt(0) == '#') {
-                return Color.decode(str).getRGB() | (0xff << 24);
-            } else {
-                return FALLBACK_COLOR;
-            }
-        }
-
-        public static int colorForElement(Element element) {
-            final var defaultColor = configColor(null);
-            if (MolDrawConfig.INSTANCE.useMaterialColors && !Objects.isNull(element.material)) {
-                if (element.material.getMaterialARGB() == 0xffffffff &&
-                        element.material.getFluid() instanceof GTFluid gtFluid) {
-                    final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
-                    try {
-                        final var resource = Minecraft.getInstance().getResourceManager()
-                                .getResourceOrThrow(texturePath.withSuffix(".png").withPrefix("textures/"));
-                        NativeImage image;
-                        try (final var stream = resource.open()) {
-                            image = NativeImage.read(stream);
-                        }
-                        var red = BigInteger.ZERO;
-                        var green = BigInteger.ZERO;
-                        var blue = BigInteger.ZERO;
-                        for (final var pixel : image.getPixelsRGBA()) {
-                            red = red.add(BigInteger.valueOf(FastColor.ABGR32.red(pixel)));
-                            green = green.add(BigInteger.valueOf(FastColor.ABGR32.green(pixel)));
-                            blue = blue.add(BigInteger.valueOf(FastColor.ABGR32.blue(pixel)));
-                        }
-                        final var size = BigInteger.valueOf((long) image.getWidth() * image.getHeight());
-                        return FastColor.ARGB32.color(0xff, red.divide(size).intValue(), green.divide(size).intValue(),
-                                blue.divide(size).intValue());
-                    } catch (IOException ignored) {
-
-                    }
-                } else return element.material.getMaterialARGB();
-            } else if (element.color instanceof Element.Color.None) return defaultColor;
-            else if (element.color instanceof Element.Color.Always always) return always.color();
-            else if (element.color instanceof Element.Color.Optional optional)
-                return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
-            return defaultColor;
-        }
 
         public static int DEBUG_COLOR = MathUtils.chatFormattingColor(ChatFormatting.RED);
 

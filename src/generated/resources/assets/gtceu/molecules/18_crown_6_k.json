@@ -133,7 +133,8 @@
         "color": {
           "color": -7388972,
           "optional": true
-        }
+        },
+        "material": "gtceu:potassium"
       },
       "x": 0.0,
       "y": 0.0,

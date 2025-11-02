@@ -35,14 +35,16 @@
         "color": {
           "color": -208,
           "optional": true
-        }
+        },
+        "material": "gtceu:sulfur"
       },
       "right": {
         "symbol": "Na⁺",
         "color": {
           "color": -5546766,
           "optional": true
-        }
+        },
+        "material": "gtceu:sodium"
       },
       "x": 3.4641016,
       "y": 0.0,

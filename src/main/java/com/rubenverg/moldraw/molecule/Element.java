@@ -11,9 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
 
 public class Element {
 
@@ -23,6 +22,7 @@ public class Element {
     public final boolean invisible;
     public final Color color;
     public final @Nullable Material material;
+    public final List<Material> additionalMaterials;
     boolean standard;
 
     protected Element(String symbol, boolean invisible) {
@@ -31,14 +31,17 @@ public class Element {
         this.color = Color.NONE;
         this.standard = false;
         this.material = null;
+        this.additionalMaterials = new ArrayList<>();
     }
 
-    protected Element(String symbol, boolean invisible, Color color, @Nullable Material material) {
+    protected Element(String symbol, boolean invisible, Color color, @Nullable Material material,
+                      Material... additionalMaterials) {
         this.symbol = symbol;
         this.invisible = invisible;
         this.color = color;
         this.standard = false;
         this.material = material;
+        this.additionalMaterials = new ArrayList<>(Arrays.asList(additionalMaterials));
     }
 
     public static Element create(String symbol) {
@@ -49,19 +52,29 @@ public class Element {
         return elements.computeIfAbsent(symbol, s -> new Element(s, invisible));
     }
 
-    public static Element create(String symbol, Color color, @Nullable Material material) {
-        return elements.computeIfAbsent(symbol, s -> new Element(s, false, color, material));
+    public static Element create(String symbol, Color color, @Nullable Material material,
+                                 Material... additionalMaterials) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, false, color, material, additionalMaterials));
     }
 
-    public static Element create(String symbol, boolean invisible, Color color, @Nullable Material material) {
-        return elements.computeIfAbsent(symbol, s -> new Element(s, invisible, color, material));
+    public static Element create(String symbol, boolean invisible, Color color, @Nullable Material material,
+                                 Material... additionalMaterials) {
+        return elements.computeIfAbsent(symbol, s -> new Element(s, invisible, color, material, additionalMaterials));
     }
 
-    private static Element createStandard(String symbol, Integer color, Material material) {
+    private static Element createStandard(String symbol, Integer color, Material material,
+                                          Material... additionalMaterials) {
         final var el = create(symbol, Objects.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)),
-                material);
+                material, additionalMaterials);
         el.standard = true;
         return el;
+    }
+
+    public static Optional<Element> forMaterial(Material material) {
+        for (final var e : elements.values())
+            if (e.material.equals(material) || e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
+                return Optional.of(e);
+        return Optional.empty();
     }
 
     public Element posIon() {
@@ -73,6 +86,8 @@ public class Element {
     }
 
     public static Element H = Element.createStandard("H", 0xffffff, GTMaterials.Hydrogen);
+    public static Element D = Element.createStandard("D", 0xffffc0, GTMaterials.Hydrogen);
+    public static Element T = Element.createStandard("T", 0xffffa0, GTMaterials.Hydrogen);
     public static Element He = Element.createStandard("He", 0xd9ffff, GTMaterials.Helium);
     public static Element Li = Element.createStandard("Li", 0xcc80ff, GTMaterials.Lithium);
     public static Element Be = Element.createStandard("Be", 0xc2ff00, GTMaterials.Beryllium);
@@ -163,9 +178,10 @@ public class Element {
     public static Element Ac = Element.createStandard("Ac", 0x70abfa, GTMaterials.Actinium);
     public static Element Th = Element.createStandard("Th", 0x00baff, GTMaterials.Thorium);
     public static Element Pa = Element.createStandard("Pa", 0x00a1ff, GTMaterials.Protactinium);
-    public static Element U = Element.createStandard("U", 0x008fff, GTMaterials.Uranium238);
+    public static Element U = Element.createStandard("U", 0x008fff, GTMaterials.Uranium238, GTMaterials.Uranium235);
     public static Element Np = Element.createStandard("Np", 0x0080ff, GTMaterials.Neptunium);
-    public static Element Pu = Element.createStandard("Pu", 0x006bff, GTMaterials.Plutonium239);
+    public static Element Pu = Element.createStandard("Pu", 0x006bff, GTMaterials.Plutonium239,
+            GTMaterials.Plutonium241);
     public static Element Am = Element.createStandard("Am", 0x545cf2, GTMaterials.Americium);
     public static Element Cm = Element.createStandard("Cm", 0x785ce3, GTMaterials.Curium);
     public static Element Bk = Element.createStandard("Bk", 0x8a4fe3, GTMaterials.Berkelium);
@@ -193,6 +209,13 @@ public class Element {
 
     public static Element INVISIBLE = elements.computeIfAbsent("", s -> new Element(s, true));
     public static Element BULLET = Element.create("•");
+
+    public static Element Nq = Element.createStandard("Nq", null, GTMaterials.Naquadah, GTMaterials.NaquadahEnriched,
+            GTMaterials.Naquadria);
+    public static Element Ke = Element.createStandard("Ke", null, GTMaterials.Trinium);
+    public static Element Tr = Element.createStandard("Tr", null, GTMaterials.Tritanium);
+    public static Element Dr = Element.createStandard("Dr", null, GTMaterials.Duranium);
+    public static Element Nt = Element.createStandard("Nt", null, GTMaterials.Neutronium);
 
     static {
         INVISIBLE.standard = true;

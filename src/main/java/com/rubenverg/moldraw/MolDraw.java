@@ -3,6 +3,7 @@ package com.rubenverg.moldraw;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.CachedOutput;
@@ -181,14 +182,19 @@ public class MolDraw {
         }
         if (material == null) return;
         final var mol = getMolecule(material);
-        if (Objects.isNull(mol)) return;
         final var tooltipElements = event.getTooltipElements();
         final var idx = IntStream.range(0, tooltipElements.size())
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
                 .findFirst();
-        if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
-        else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+        if (!Objects.isNull(mol)) {
+            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
+            else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+        } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1));
+            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
+            else tooltipElements.add(1, Either.left(coloredFormula));
+        }
     }
 }
