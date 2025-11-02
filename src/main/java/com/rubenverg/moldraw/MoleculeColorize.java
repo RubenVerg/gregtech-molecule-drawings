@@ -84,12 +84,11 @@ public class MoleculeColorize {
         for (final var component : components) {
             text.append(coloredFormula(component));
         }
-        if (stack.amount() == 1) return text;
         final var countedText = Component.empty();
         if (components.size() > 1) countedText.append("(");
         countedText.append(text);
         if (components.size() > 1) countedText.append(")");
-        countedText.append(FormattingUtil.toSmallDownNumbers(Long.toString(stack.amount())));
+        if (stack.amount() > 1) countedText.append(FormattingUtil.toSmallDownNumbers(Long.toString(stack.amount())));
         return countedText;
     }
 }
