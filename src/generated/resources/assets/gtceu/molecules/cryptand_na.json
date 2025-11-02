@@ -189,7 +189,8 @@
         "color": {
           "color": -5546766,
           "optional": true
-        }
+        },
+        "material": "gtceu:sodium"
       },
       "x": 3.36,
       "y": -1.447,

@@ -74,7 +74,7 @@ public class MoleculeColorize {
 
     public static Component coloredFormula(MaterialStack stack) {
         if (stack.material().isElement()) {
-            final var element = Element.forSymbol(Objects.requireNonNull(stack.material().getElement()).symbol());
+            final var element = Element.forMaterial(stack.material());
             if (element.isEmpty()) return Component.literal(stack.toString());
             return Component.literal(stack.toString()).withStyle(Style.EMPTY.withColor(colorForElement(element.get())));
         }
