@@ -1,0 +1,66 @@
+package com.rubenverg.moldraw.molecule;
+
+import com.google.gson.*;
+import org.joml.Matrix2f;
+import org.joml.Matrix2fc;
+
+import java.lang.reflect.Type;
+import java.util.Objects;
+
+public record CircleTransformation(
+                                   Matrix2fc A,
+                                   int... atoms)
+        implements MoleculeElement<CircleTransformation> {
+
+    @Override
+    public int[] coveredAtoms() {
+        return atoms;
+    }
+
+    @Override
+    public CircleTransformation replaceInOrder(int[] newIndices) {
+        return new CircleTransformation(A, newIndices);
+    }
+
+    public static class Json implements JsonSerializer<CircleTransformation>, JsonDeserializer<CircleTransformation> {
+
+        private Json() {}
+
+        public static CircleTransformation.Json INSTANCE = new CircleTransformation.Json();
+
+        @Override
+        public CircleTransformation deserialize(JsonElement jsonElement, Type type,
+                                                JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            if (!jsonElement.isJsonObject())
+                throw new JsonParseException("Circle transformation JSON must be an object");
+            final var obj = jsonElement.getAsJsonObject();
+            Matrix2f mat = null;
+            if (obj.has("x") && obj.has("y"))
+                mat = new Matrix2f().identity().scale(obj.get("x").getAsFloat(), obj.get("y").getAsFloat());
+            else if (obj.has("a00") && obj.has("a01") && obj.has("a10") && obj.has("a11"))
+                mat = new Matrix2f(obj.get("a00").getAsFloat(), obj.get("a01").getAsFloat(),
+                        obj.get("a10").getAsFloat(), obj.get("a11").getAsFloat());
+            if (Objects.isNull(mat))
+                throw new JsonParseException("Circle transformation must have either x and y or a00, a01, a10, a11");
+            return new CircleTransformation(
+                    mat,
+                    obj.getAsJsonArray("atoms").asList().stream().mapToInt(JsonElement::getAsInt).toArray());
+        }
+
+        @Override
+        public JsonElement serialize(CircleTransformation ct, Type type,
+                                     JsonSerializationContext jsonSerializationContext) {
+            final var obj = new JsonObject();
+            obj.addProperty("a00", ct.A.m00());
+            obj.addProperty("a01", ct.A.m01());
+            obj.addProperty("a10", ct.A.m10());
+            obj.addProperty("a11", ct.A.m11());
+            final var atomsArr = new JsonArray();
+            for (final var atom : ct.atoms) {
+                atomsArr.add(atom);
+            }
+            obj.add("atoms", atomsArr);
+            return obj;
+        }
+    }
+}

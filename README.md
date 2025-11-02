@@ -48,6 +48,7 @@ type Element = string | {
   symbol: string;
   invisible?: boolean; // New invisible elements that are intended to have different colors will still need a different symbol than the empty string; it will not be shown either way
   color?: ElementColor;
+  material?: string; // The ID of the GregTech material associated with this element, used for the color by material setting.
 }; 
 
 // Amount of atoms defaults to 1
@@ -78,7 +79,7 @@ interface AtomUV extends AtomCommon {
 // A double bond has the first line like a single bond and the second line shifted rightwards from the starting atom; use double centered bonds if you want them to be both offset.
 // A one-and-a-half bond is laid out like a double bond but the second line is dotted.
 // Inward and outward bonds grow in size towards the second atom.
-type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'inward' | 'outward' | 'thick' | 'one_and_half';
+type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'quadruple' | 'quadruple_centered' | 'inward' | 'outward' | 'thick' | 'dotted' | 'one_and_half';
 
 interface Bond {
   type: 'bond';
@@ -95,7 +96,27 @@ interface Parens {
   atoms: number[]; // List of atoms that are to be surrounded
 }
 
-type MoleculeElement = AtomXY | AtomUV | Bond | Parens;
+// A circle drawn inside a cycle of atoms; automatically centered to their centroid.
+interface CircleCommon {
+  type: 'circle';
+  atoms: number[];
+}
+
+// An axis-aligned circle scaled by x and y.
+interface CircleXY extends CircleCommon {
+  x: number;
+  y: number;
+}
+
+// A linear trasformation applied to the unit circle.
+interface CircleMatrix extends CircleCommon {
+  a00: number;
+  a01: number;
+  a10: number;
+  a11: number;
+}
+
+type MoleculeElement = AtomXY | AtomUV | Bond | Parens | CircleXY | CircleMatrix;
 
 // A molecule JSON file is of type Molecule.
 interface Molecule {

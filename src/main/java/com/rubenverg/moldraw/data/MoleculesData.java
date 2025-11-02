@@ -7,6 +7,7 @@ import net.minecraft.util.Mth;
 
 import com.rubenverg.moldraw.molecule.*;
 import org.joml.Matrix2d;
+import org.joml.Matrix2f;
 import org.joml.Matrix3x2f;
 
 import java.util.HashMap;
@@ -3502,6 +3503,35 @@ public class MoleculesData {
                 .bond(1, 14, Bond.Type.DOUBLE_CENTERED)
                 .bond(6, 15, Bond.Type.DOUBLE_CENTERED)
                 .add(Parens.polymer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15)));
+        molecules.put(GTCEu.id("ferrocene"), new Molecule()
+                .xy()
+                .invAtom(0, 0.5f)
+                .invAtom(0.85f, 0)
+                .invAtom(1.7f, 0.5f)
+                .invAtom(1.35f, 1.1f)
+                .invAtom(0.35f, 1.1f)
+                .bond(0, 1, Bond.Type.OUTWARD)
+                .bond(2, 1, Bond.Type.OUTWARD)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 0)
+                .add(new CircleTransformation(new Matrix2f().identity().scale(0.5f, 0.3f), 0, 1, 2, 3, 4))
+                .invAtom(0, 3 - 0.5f)
+                .invAtom(0.85f, 3)
+                .invAtom(1.7f, 3 - 0.5f)
+                .invAtom(1.35f, 3 - 1.1f)
+                .invAtom(0.35f, 3 - 1.1f)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(7, 8, Bond.Type.OUTWARD)
+                .bond(8, 9, Bond.Type.THICK)
+                .bond(5, 9, Bond.Type.OUTWARD)
+                .add(new CircleTransformation(new Matrix2f().identity().scale(0.5f, 0.3f), 5, 6, 7, 8, 9))
+                .invAtom(0.85f, (0.5f + 0 + 0.5f + 1.1f + 1.1f) / 5)
+                .invAtom(0.85f, (3 * 5 - 0.5f - 0 - 0.5f - 1.1f - 1.1f) / 5)
+                .atom(Element.Fe, 0.85f, 1.5f)
+                .bond(10, 12, Bond.Type.DOTTED)
+                .bond(11, 12, Bond.Type.DOTTED));
         return molecules;
     }
 }

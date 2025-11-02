@@ -8,7 +8,7 @@ public record Parens(
                      String sub,
                      String sup,
                      int... atoms)
-        implements MoleculeElement {
+        implements MoleculeElement<Parens> {
 
     @Override
     public int[] coveredAtoms() {
@@ -16,7 +16,7 @@ public record Parens(
     }
 
     @Override
-    public MoleculeElement<?> replaceInOrder(int[] newIndices) {
+    public Parens replaceInOrder(int[] newIndices) {
         return new Parens(sub, sup, newIndices);
     }
 

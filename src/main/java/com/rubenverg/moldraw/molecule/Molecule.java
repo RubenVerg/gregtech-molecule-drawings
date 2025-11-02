@@ -202,6 +202,7 @@ public class Molecule {
                     case "atom" -> jsonDeserializationContext.deserialize(contentObj, Atom.class);
                     case "bond" -> jsonDeserializationContext.deserialize(contentObj, Bond.class);
                     case "parens" -> jsonDeserializationContext.deserialize(contentObj, Parens.class);
+                    case "circle" -> jsonDeserializationContext.deserialize(contentObj, CircleTransformation.class);
                     default -> throw new JsonParseException(
                             "Molecule JSON contents have unknown type %s".formatted(type));
                 });
@@ -216,7 +217,8 @@ public class Molecule {
             for (final var content : molecule.contents) {
                 final var c = jsonSerializationContext.serialize(content);
                 c.getAsJsonObject().addProperty("type", content instanceof Atom ? "atom" :
-                        content instanceof Bond ? "bond" : content instanceof Parens ? "parens" : "e");
+                        content instanceof Bond ? "bond" : content instanceof Parens ? "parens" :
+                                content instanceof CircleTransformation ? "circle" : "e");
                 if (c.getAsJsonObject().get("type").getAsString().equals("e")) throw new RuntimeException("???");
                 arr.add(c);
             }

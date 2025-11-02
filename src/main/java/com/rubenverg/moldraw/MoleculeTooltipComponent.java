@@ -15,7 +15,6 @@ import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 
-import java.awt.*;
 import java.lang.Math;
 import java.util.*;
 import java.util.List;
@@ -286,6 +285,11 @@ public record MoleculeTooltipComponent(
                         case SINGLE:
                             plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
                             break;
+                        case DOTTED:
+                            plotLine(start.x, start.y, end.x, end.y,
+                                    isCloseToAtomAndOnLine.apply(new Pair<>(2, 1)),
+                                    color, guiGraphics);
+                            break;
                         case DOUBLE:
                             plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
                             plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
@@ -379,6 +383,20 @@ public record MoleculeTooltipComponent(
                     guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMax.y, defaultColor);
                     guiGraphics.vLine(xyMin.x - 2, xyMin.y, xyMax.y, defaultColor);
                     guiGraphics.vLine(xyMax.x + 2, xyMin.y, xyMax.y, defaultColor);
+                } else if (elem instanceof CircleTransformation ct) {
+                    final var centroid = Arrays.stream(ct.atoms())
+                            .mapToObj(idx -> this.molecule.getAtom(idx).get().position())
+                            .reduce(new Vector2f(), (a, b) -> new Vector2f(a).add(new Vector2f(b)))
+                            .div(ct.atoms().length);
+                    for (int part = 0; part < 128; part++) {
+                        final var angle = (float) part / 64 * Mth.PI;
+                        final var u = new Vector2f(Mth.cos(angle), Mth.sin(angle));
+                        final var p = u.mul(ct.A()).add(centroid);
+                        final var r = toScreen(font.lineHeight, p).add(x, y + font.lineHeight / 2);
+                        guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1, defaultColor);
+                    }
+                    // final var cc = toScreen(font.lineHeight, centroid).add(x, y + font.lineHeight / 2);
+                    // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
                 }
             }
         }
