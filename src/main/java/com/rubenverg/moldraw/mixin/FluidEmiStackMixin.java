@@ -1,6 +1,7 @@
 package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
+import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.material.Fluid;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
+import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import org.spongepowered.asm.mixin.Final;
@@ -52,18 +54,26 @@ public class FluidEmiStackMixin {
         final var material = ChemicalHelper.getMaterial(fluid);
         if (material.isNull()) return;
         final var mol = MolDraw.getMolecule(material);
-        if (Objects.isNull(mol)) return;
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
                 moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).equals(material.getChemicalFormula()))
                 .findFirst();
-        if (idx.isPresent()) list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
-        else {
-            final var quantityIdx = IntStream.range(0, list.size())
-                    .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                            moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
-                    .findFirst();
-            list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
-                    ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
+        final var quantityIdx = IntStream.range(0, list.size())
+                .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
+                        moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
+                .findFirst();
+        if (!Objects.isNull(mol)) {
+            if (idx.isPresent())
+                list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
+            else
+                list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
+                        ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
+        } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1));
+            if (idx.isPresent())
+                list.set(idx.getAsInt(), ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
+            else
+                list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
+                        ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
         }
     }
 }

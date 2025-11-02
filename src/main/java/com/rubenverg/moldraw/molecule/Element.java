@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Element {
 
@@ -62,6 +63,10 @@ public class Element {
                 material);
         el.standard = true;
         return el;
+    }
+
+    public static Optional<Element> forSymbol(String symbol) {
+        return Optional.ofNullable(elements.get(symbol));
     }
 
     public Element posIon() {
