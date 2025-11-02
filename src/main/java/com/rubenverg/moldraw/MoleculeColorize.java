@@ -1,5 +1,6 @@
 package com.rubenverg.moldraw;
 
+import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.fluids.GTFluid;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
@@ -37,52 +38,59 @@ public class MoleculeColorize {
         }
     }
 
+    public static int colorForMaterial(Material material) {
+        if (material.getMaterialARGB() == 0xffffffff &&
+                material.getFluid() instanceof GTFluid gtFluid) {
+            final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
+            try {
+                final var resource = Minecraft.getInstance().getResourceManager()
+                        .getResourceOrThrow(texturePath.withSuffix(".png").withPrefix("textures/"));
+                NativeImage image;
+                try (final var stream = resource.open()) {
+                    image = NativeImage.read(stream);
+                }
+                var red = BigInteger.ZERO;
+                var green = BigInteger.ZERO;
+                var blue = BigInteger.ZERO;
+                for (final var pixel : image.getPixelsRGBA()) {
+                    red = red.add(BigInteger.valueOf(FastColor.ABGR32.red(pixel)));
+                    green = green.add(BigInteger.valueOf(FastColor.ABGR32.green(pixel)));
+                    blue = blue.add(BigInteger.valueOf(FastColor.ABGR32.blue(pixel)));
+                }
+                final var size = BigInteger.valueOf((long) image.getWidth() * image.getHeight());
+                return FastColor.ARGB32.color(0xff, red.divide(size).intValue(), green.divide(size).intValue(),
+                        blue.divide(size).intValue());
+            } catch (IOException ignored) {
+
+            }
+        }
+        return material.getMaterialARGB();
+    }
+
     public static int colorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.useMaterialColors && !Objects.isNull(element.material)) {
-            if (element.material.getMaterialARGB() == 0xffffffff &&
-                    element.material.getFluid() instanceof GTFluid gtFluid) {
-                final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
-                try {
-                    final var resource = Minecraft.getInstance().getResourceManager()
-                            .getResourceOrThrow(texturePath.withSuffix(".png").withPrefix("textures/"));
-                    NativeImage image;
-                    try (final var stream = resource.open()) {
-                        image = NativeImage.read(stream);
-                    }
-                    var red = BigInteger.ZERO;
-                    var green = BigInteger.ZERO;
-                    var blue = BigInteger.ZERO;
-                    for (final var pixel : image.getPixelsRGBA()) {
-                        red = red.add(BigInteger.valueOf(FastColor.ABGR32.red(pixel)));
-                        green = green.add(BigInteger.valueOf(FastColor.ABGR32.green(pixel)));
-                        blue = blue.add(BigInteger.valueOf(FastColor.ABGR32.blue(pixel)));
-                    }
-                    final var size = BigInteger.valueOf((long) image.getWidth() * image.getHeight());
-                    return FastColor.ARGB32.color(0xff, red.divide(size).intValue(), green.divide(size).intValue(),
-                            blue.divide(size).intValue());
-                } catch (IOException ignored) {
-
-                }
-            } else return element.material.getMaterialARGB();
-        } else if (element.color instanceof Element.Color.None) return defaultColor;
+        if (MolDrawConfig.INSTANCE.useMaterialColors && !Objects.isNull(element.material))
+            return colorForMaterial(element.material);
+        else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();
         else if (element.color instanceof Element.Color.Optional optional)
             return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
         return defaultColor;
     }
 
-    public static Component coloredFormula(MaterialStack stack) {
+    public static Component coloredFormula(MaterialStack stack, boolean topLevel) {
         if (stack.material().isElement()) {
             final var element = Element.forMaterial(stack.material());
-            if (element.isEmpty()) return Component.literal(stack.toString());
-            return Component.literal(stack.toString()).withStyle(Style.EMPTY.withColor(colorForElement(element.get())));
+            return Component.literal(stack.toString()).withStyle(Style.EMPTY.withColor(element
+                    .map(MoleculeColorize::colorForElement)
+                    .orElse(MolDrawConfig.INSTANCE.coloredAtoms ? colorForMaterial(stack.material()) :
+                            FALLBACK_COLOR)));
         }
         final var components = stack.material().getMaterialComponents();
         if (components.isEmpty()) return Component.literal(stack.toString());
         final var text = Component.empty();
         for (final var component : components) {
-            text.append(coloredFormula(component));
+            text.append(coloredFormula(component, false));
         }
         final var countedText = Component.empty();
         if (components.size() > 1) countedText.append("(");

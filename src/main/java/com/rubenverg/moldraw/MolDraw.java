@@ -193,7 +193,7 @@ public class MolDraw {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
-            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1));
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
             else tooltipElements.add(1, Either.left(coloredFormula));
         }

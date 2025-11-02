@@ -68,7 +68,7 @@ public class FluidEmiStackMixin {
                 list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
                         ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
         } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
-            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1));
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
             if (idx.isPresent())
                 list.set(idx.getAsInt(), ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
             else
