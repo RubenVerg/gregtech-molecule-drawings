@@ -12,7 +12,9 @@ import java.lang.Math;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
+import java.util.function.UnaryOperator;
 
 public class Molecule {
 
@@ -163,6 +165,22 @@ public class Molecule {
         for (final var atom : atoms) {
             min.min(atom.position());
             max.max(atom.position());
+        }
+        return new Pair<>(min, max);
+    }
+
+    public Pair<Vector2f, Vector2f> boundsWithSize(UnaryOperator<Vector2f> translateCoordinates,
+                                                   Function<Atom, Pair<Vector2f, Vector2f>> getSize) {
+        final var atoms = atoms();
+        if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
+        final var t0 = translateCoordinates.apply(atoms.get(0).position());
+        final var s0 = getSize.apply(atoms.get(0));
+        final Vector2f min = new Vector2f(t0).sub(s0.getFirst()), max = new Vector2f(t0).sub(s0.getSecond());
+        for (final var atom : atoms) {
+            final var t = translateCoordinates.apply(atom.position());
+            final var s = getSize.apply(atom);
+            min.min(t.sub(s.getFirst()));
+            max.max(t.add(s.getSecond()));
         }
         return new Pair<>(min, max);
     }

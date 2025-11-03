@@ -18,10 +18,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.*;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.IntBinaryOperator;
+import java.util.function.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -45,6 +42,45 @@ public record MoleculeTooltipComponent(
         private final boolean atomAtBotBot;
         private final boolean atomAtLefLef;
         private final Map<Element.Counted, Integer> elementWidths = new HashMap<>();
+
+        private UnaryOperator<Vector2f> toScaledFactory(int lineHeight) {
+            return xy -> {
+                var result = new Vector2f();
+                xy.sub(xyStart, result);
+                result.mul(MolDrawConfig.INSTANCE.scale);
+                return new Vector2f(result.x + 8 + (atomAtLefLef ? 12 : 0),
+                        -result.y + (atomAtTopTop ? lineHeight * 3 / 2f : atomAtTop ? lineHeight / 2f : 3));
+            };
+        }
+
+        private Function<Atom, Pair<Vector2f, Vector2f>> sizeOfAtomFactory(int lineHeight) {
+            return atom -> {
+                float x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+                if (!atom.element().element().invisible) {
+                    x0 += elementWidths.get(atom.element()) / 2f;
+                    x1 += elementWidths.get(atom.element()) / 2f;
+                    y0 += lineHeight / 2f;
+                    y1 += lineHeight / 2f;
+                }
+                if (atom.right().isPresent() && !atom.right().get().element().invisible) {
+                    x1 += 1 + elementWidths.get(atom.right().get());
+                }
+                if (atom.left().isPresent() && !atom.left().get().element().invisible) {
+                    x0 += 1 + elementWidths.get(atom.left().get());
+                }
+                if (atom.above().isPresent() && !atom.above().get().element().invisible) {
+                    y0 += 1 + lineHeight;
+                    x0 = Math.max(x0, elementWidths.get(atom.above().get()) / 2f);
+                    x1 = Math.max(x1, elementWidths.get(atom.above().get()) / 2f);
+                }
+                if (atom.below().isPresent() && !atom.below().get().element().invisible) {
+                    y1 += 1 + lineHeight;
+                    x0 = Math.max(x0, elementWidths.get(atom.below().get()) / 2f);
+                    x1 = Math.max(x1, elementWidths.get(atom.below().get()) / 2f);
+                }
+                return new Pair<>(new Vector2f(x0, y0), new Vector2f(x1, y1));
+            };
+        }
 
         private Vector2i toScreen(int lineHeight, Vector2f xy) {
             var result = new Vector2f();
@@ -130,7 +166,8 @@ public record MoleculeTooltipComponent(
                     }
                     if (atom.left().isPresent()) {
                         final var leftWidth = font.width(atom.left().get().toString());
-                        final var leftTranslation = new Vector3f(xyPosition.x - leftWidth - 2, xyPosition.y + 1, 0);
+                        final var leftTranslation = new Vector3f(
+                                xyPosition.x - leftWidth + Mth.floor(-(float) width / 2), xyPosition.y + 1, 0);
                         mat.translate(leftTranslation);
                         if (!atom.left().get().element().invisible) font.drawInBatch(atom.left().get().toString(),
                                 (float) mouseX, (float) mouseY, colorForElement(atom.left().get().element()), false,
@@ -168,17 +205,16 @@ public record MoleculeTooltipComponent(
                         mat.translate(debugTranslation.negate());
                     }
                 } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).bounds();
-                    final var xySub = toScreen(font.lineHeight,
-                            new Vector2f(bounds.getSecond().x, bounds.getFirst().y));
+                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),
+                            sizeOfAtomFactory(font.lineHeight));
+                    final var xySub = new Vector2i((int) bounds.getSecond().x, (int) bounds.getSecond().y);
                     xySub.add(9, font.lineHeight - 4);
                     final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
                     mat.translate(subTranslation);
                     font.drawInBatch(pp.sub(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
                             Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(subTranslation.negate());
-                    final var xySup = toScreen(font.lineHeight,
-                            new Vector2f(bounds.getSecond().x, bounds.getSecond().y));
+                    final var xySup = new Vector2i((int) bounds.getSecond().x, (int) bounds.getFirst().y);
                     xySup.add(9, -4);
                     final var supTranslation = new Vector3f(xySup.x, xySup.y, 0);
                     mat.translate(supTranslation);
@@ -370,13 +406,14 @@ public record MoleculeTooltipComponent(
                             break;
                     }
                 } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).bounds();
-                    final var xyMin = toScreen(font.lineHeight, bounds.getFirst());
+                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),
+                            sizeOfAtomFactory(font.lineHeight));
+                    final var xyMin = new Vector2i((int) bounds.getFirst().x, (int) bounds.getSecond().y);
                     xyMin.add(x, y);
-                    xyMin.add(-4, font.lineHeight + 1);
-                    final var xyMax = toScreen(font.lineHeight, bounds.getSecond());
+                    xyMin.add(-3, font.lineHeight + 3);
+                    final var xyMax = new Vector2i((int) bounds.getSecond().x, (int) bounds.getFirst().y);
                     xyMax.add(x, y);
-                    xyMax.add(4, -2);
+                    xyMax.add(4, -1);
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, defaultColor);
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, defaultColor);
                     guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, defaultColor);
