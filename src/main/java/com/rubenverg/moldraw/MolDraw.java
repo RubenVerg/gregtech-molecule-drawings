@@ -4,8 +4,8 @@ import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
-
 import com.gregtechceu.gtceu.utils.GTUtil;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -170,7 +170,8 @@ public class MolDraw {
         return molecules.get(material);
     }
 
-    private void tryColorizeFormula(Material material, OptionalInt idx, List<Either<FormattedText, TooltipComponent>> tooltipElements){
+    private void tryColorizeFormula(Material material, OptionalInt idx,
+                                    List<Either<FormattedText, TooltipComponent>> tooltipElements) {
         if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
             final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
@@ -203,15 +204,16 @@ public class MolDraw {
                 .findFirst();
 
         if (!Objects.isNull(mol)) {
-            if (MolDrawConfig.INSTANCE.onlyShowOnShift ) {
+            if (MolDrawConfig.INSTANCE.onlyShowOnShift) {
 
                 tryColorizeFormula(material, idx, tooltipElements);
 
-                if(!GTUtil.isShiftDown()) {
+                if (!GTUtil.isShiftDown()) {
                     int ttIndex = 2;
-                    if (idx.isPresent()) ttIndex = idx.getAsInt() +1;
+                    if (idx.isPresent()) ttIndex = idx.getAsInt() + 1;
 
-                    tooltipElements.add(ttIndex, Either.left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+                    tooltipElements.add(ttIndex, Either
+                            .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
 
                     return;
                 }
@@ -219,6 +221,5 @@ public class MolDraw {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else tryColorizeFormula(material, idx, tooltipElements);
-
     }
 }
