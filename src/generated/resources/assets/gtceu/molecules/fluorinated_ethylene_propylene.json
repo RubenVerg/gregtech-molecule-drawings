@@ -129,103 +129,137 @@
     {
       "a": 0,
       "b": 1,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 1,
       "b": 2,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 2,
       "b": 3,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 3,
       "b": 4,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 4,
       "b": 5,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 5,
       "b": 6,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 1,
       "b": 7,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 1,
       "b": 8,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 2,
       "b": 9,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 2,
       "b": 10,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 4,
       "b": 11,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 4,
       "b": 12,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 5,
       "b": 13,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 5,
       "b": 14,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 14,
       "b": 15,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 14,
       "b": 16,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 14,
       "b": 17,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {

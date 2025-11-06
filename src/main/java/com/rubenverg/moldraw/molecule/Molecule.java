@@ -98,13 +98,17 @@ public class Molecule {
         return invAtom(new Vector2f(a, b));
     }
 
-    public Molecule bond(int a, int b, Bond.Type type) {
-        this.contents.add(new Bond(a, b, type));
+    public Molecule bond(int a, int b, boolean centered, Bond.Line... lines) {
+        this.contents.add(new Bond(a, b, centered, lines));
         return this;
     }
 
+    public Molecule bond(int a, int b, Bond.Line... lines) {
+        return bond(a, b, false, lines);
+    }
+
     public Molecule bond(int a, int b) {
-        return bond(a, b, Bond.Type.SINGLE);
+        return bond(a, b, Bond.Line.SOLID);
     }
 
     public List<MoleculeElement<?>> contents() {
@@ -175,12 +179,12 @@ public class Molecule {
         if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
         final var t0 = translateCoordinates.apply(atoms.get(0).position());
         final var s0 = getSize.apply(atoms.get(0));
-        final Vector2f min = new Vector2f(t0).sub(s0.getFirst()), max = new Vector2f(t0).sub(s0.getSecond());
+        final Vector2f min = new Vector2f(t0).sub(s0.getFirst()), max = new Vector2f(t0).add(s0.getSecond());
         for (final var atom : atoms) {
             final var t = translateCoordinates.apply(atom.position());
             final var s = getSize.apply(atom);
-            min.min(t.sub(s.getFirst()));
-            max.max(t.add(s.getSecond()));
+            min.min(new Vector2f(t).sub(s.getFirst()));
+            max.max(new Vector2f(t).add(s.getSecond()));
         }
         return new Pair<>(min, max);
     }
@@ -194,8 +198,8 @@ public class Molecule {
                 .atom(front, (float) Math.cos(Math.toRadians(-60)), (float) Math.sin(Math.toRadians(-60)))
                 .atom(side, (float) Math.cos(Math.toRadians(-150)), (float) Math.sin(Math.toRadians(-150)))
                 .bond(0, 1)
-                .bond(0, 2, Bond.Type.INWARD)
-                .bond(0, 3, Bond.Type.OUTWARD)
+                .bond(0, 2, Bond.Line.INWARD)
+                .bond(0, 3, Bond.Line.OUTWARD)
                 .bond(0, 4);
     }
 
