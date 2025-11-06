@@ -175,12 +175,12 @@ public class Molecule {
         if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
         final var t0 = translateCoordinates.apply(atoms.get(0).position());
         final var s0 = getSize.apply(atoms.get(0));
-        final Vector2f min = new Vector2f(t0).sub(s0.getFirst()), max = new Vector2f(t0).sub(s0.getSecond());
+        final Vector2f min = new Vector2f(t0).sub(s0.getFirst()), max = new Vector2f(t0).add(s0.getSecond());
         for (final var atom : atoms) {
             final var t = translateCoordinates.apply(atom.position());
             final var s = getSize.apply(atom);
-            min.min(t.sub(s.getFirst()));
-            max.max(t.add(s.getSecond()));
+            min.min(new Vector2f(t).sub(s.getFirst()));
+            max.max(new Vector2f(t).add(s.getSecond()));
         }
         return new Pair<>(min, max);
     }
