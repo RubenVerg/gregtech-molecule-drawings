@@ -169,38 +169,35 @@ For example, this is the encoding of benzene:
     {
       "type": "bond",
       "a": 0,
-      "b": 1,
-      "bond_type": "single"
+      "b": 1
     },
     {
       "type": "bond",
       "a": 1,
       "b": 2,
-      "bond_type": "double"
+      "lines": ["solid", "solid"]
     },
     {
       "type": "bond",
       "a": 2,
-      "b": 3,
-      "bond_type": "single"
+      "b": 3
     },
     {
       "type": "bond",
       "a": 3,
       "b": 4,
-      "bond_type": "double"
+      "lines": ["solid", "solid"]
     },
     {
       "type": "bond",
-      "a": 4,
+      "a": 4
       "b": 5,
-      "bond_type": "single"
     },
     {
       "type": "bond",
       "a": 5,
       "b": 0,
-      "bond_type": "double"
+      "lines": ["solid", "solid"]
     }
   ]
 }
