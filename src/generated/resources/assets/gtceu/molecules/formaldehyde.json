@@ -17,7 +17,11 @@
     {
       "a": 0,
       "b": 1,
-      "bond_type": "double_centered",
+      "centered": true,
+      "lines": [
+        "solid",
+        "solid"
+      ],
       "type": "bond"
     }
   ]

@@ -153,7 +153,7 @@ public record MoleculeTooltipComponent(
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Atom atom) {
-                    final var xyPosition = toScaledFactory(font.lineHeight).apply(atom.position());
+                    final var xyPosition = floored(toScaledFactory(font.lineHeight).apply(atom.position()));
                     final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
                     mat.translate(translation);
                     final var width = font.width(atom.element().toString());
@@ -310,11 +310,20 @@ public record MoleculeTooltipComponent(
                     };
                     double dy = end.y - start.y, dx = end.x - start.x;
                     double length = Math.hypot(dx, dy);
-                    final Function<Pair<Integer, Integer>, BiPredicate<@NotNull Integer, @NotNull Integer>> isCloseToAtomAndOnLine = p -> (xt,
-                                                                                                                                           yt) -> {
-                        if (!isCloseToAtom.test(xt, yt)) return false;
-                        return Math.hypot(xt - start.x, yt - start.y) % p.getFirst() < p.getSecond();
-                    };
+                    final BiFunction<Integer, Integer, BiPredicate<@NotNull Integer, @NotNull Integer>> isCloseToAtomAndOnLine = (m,
+                                                                                                                                  b) -> (xt,
+                                                                                                                                         yt) -> {
+                                                                                                                                      if (!isCloseToAtom
+                                                                                                                                              .test(xt,
+                                                                                                                                                      yt))
+                                                                                                                                          return false;
+                                                                                                                                      return Math
+                                                                                                                                              .hypot(xt -
+                                                                                                                                                      start.x,
+                                                                                                                                                      yt - start.y) %
+                                                                                                                                              m <
+                                                                                                                                              b;
+                                                                                                                                  };
                     int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
                     int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
                     int colorA = colorForElement(atomA.element().element());
@@ -325,97 +334,39 @@ public record MoleculeTooltipComponent(
                         return d2a < d2b ? colorA : colorB;
                     };
                     List<Vector2i> allTargets = new ArrayList<>();
-                    plotLine(addX / 2, addY / 2, -addX / 2, -addY / 2, (_xt, _yt) -> true,
-                            (xp, yp) -> allTargets.add(new Vector2i(xp, yp)));
-                    final BiConsumer<Integer, Integer> drawHalved = (xt, yt) -> guiGraphics.fill(xt / 2, yt / 2,
-                            xt / 2 + 1, yt / 2 + 1, color.applyAsInt(xt / 2, yt / 2));
-                    switch (bond.type()) {
-                        case SINGLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
-                            break;
-                        case DOTTED:
-                            plotLine(start.x, start.y, end.x, end.y,
-                                    isCloseToAtomAndOnLine.apply(new Pair<>(2, 1)),
+                    plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2, (_xt, _yt) -> true, (xp, yp) -> {
+                        allTargets.add(new Vector2i(xp / 2, yp / 2));
+                        allTargets.add(new Vector2i((xp + 1) / 2, yp / 2));
+                        allTargets.add(new Vector2i(xp / 2, (yp + 1) / 2));
+                        allTargets.add(new Vector2i((xp + 1) / 2, (yp + 1) / 2));
+                    });
+                    final var thickness = bond.totalThickness();
+                    final var starting = bond.centered() ? (thickness - 1) / 2f : (float) ((thickness - 1) / 2);
+                    var done = bond.lines().length > 0 && bond.lines()[0].thick ? 1 : 0;
+                    for (var i = 0; i < bond.lines().length; done += bond.lines()[i].thick ? 3 : 1, i++) {
+                        final var delta = done - starting;
+                        final var sX = Mth.floor(delta) * addX + (int) (Mth.frac(delta) * 2) * addHX;
+                        final var sY = Mth.floor(delta) * addY + (int) (Mth.frac(delta) * 2) * addHY;
+                        switch (bond.lines()[i]) {
+                            case SOLID -> plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY, isCloseToAtom,
                                     color, guiGraphics);
-                            break;
-                        case DOUBLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
-                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
-                                    color, guiGraphics);
-                            break;
-                        case ONE_AND_HALF:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
-                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY,
-                                    isCloseToAtomAndOnLine.apply(new Pair<>(2, 1)),
-                                    color, guiGraphics);
-                            break;
-                        case DOUBLE_CENTERED:
-                            plotLine(start.x + addHX, start.y + addHY, end.x + addHX, end.y + addHY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x - addHX, start.y - addHY, end.x - addHX, end.y - addHY, isCloseToAtom,
-                                    color, guiGraphics);
-                            break;
-                        case TRIPLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
-                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, isCloseToAtom,
-                                    color, guiGraphics);
-                            break;
-                        case QUADRUPLE:
-                            plotLine(start.x, start.y, end.x, end.y, isCloseToAtom, color, guiGraphics);
-                            plotLine(start.x + addX, start.y + addY, end.x + addX, end.y + addY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x - addX, start.y - addY, end.x - addX, end.y - addY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x + 2 * addX, start.y + 2 * addY, end.x + 2 * addX, end.y + 2 * addY,
-                                    isCloseToAtom,
-                                    color, guiGraphics);
-                            break;
-                        case QUADRUPLE_CENTERED:
-                            plotLine(start.x + addHX, start.y + addHY, end.x + addHX, end.y + addHY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x - addHX, start.y - addHY, end.x - addHX, end.y - addHY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x + addX + addHX, start.y + addY + addHY, end.x + addX + addHX,
-                                    end.y + addY + addHY, isCloseToAtom,
-                                    color, guiGraphics);
-                            plotLine(start.x - addX - addHX, start.y - addY - addHY, end.x - addX - addHX,
-                                    end.y - addY - addHY, isCloseToAtom,
-                                    color, guiGraphics);
-                            break;
-                        case INWARD:
-                        case OUTWARD:
-                            for (final var pair : allTargets) {
-                                BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw = bond.type() ==
-                                        Bond.Type.INWARD ?
-                                                (xt, yt) -> isCloseToAtomAndOnLine.apply(new Pair<>(3, 1)).test(xt / 2,
-                                                        yt / 2) :
-                                                (xt, yt) -> isCloseToAtom.test(xt / 2, yt / 2);
-                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2, (end.y + pair.y) * 2,
-                                        shouldDraw, drawHalved);
-                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2 + 1, (end.y + pair.y) * 2,
-                                        shouldDraw, drawHalved);
-                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2, (end.y + pair.y) * 2 + 1,
-                                        shouldDraw, drawHalved);
-                                plotLine(start.x * 2, start.y * 2, (end.x + pair.x) * 2 + 1, (end.y + pair.y) * 2 + 1,
-                                        shouldDraw, drawHalved);
+                            case DOTTED -> plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                                    isCloseToAtomAndOnLine.apply(2, 1), color, guiGraphics);
+                            case INWARD, OUTWARD -> {
+                                BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw = bond.lines()[i] ==
+                                        Bond.Line.INWARD ? isCloseToAtomAndOnLine.apply(3, 1) : isCloseToAtom;
+                                for (final var pair : allTargets) {
+                                    plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX, end.y + pair.y + sY,
+                                            shouldDraw, color, guiGraphics);
+                                }
                             }
-                            break;
-                        case THICK:
-                            for (final var pair : allTargets) {
-                                BiPredicate<@NotNull Integer, @NotNull Integer> shouldDraw = (xt, yt) -> isCloseToAtom
-                                        .test(xt / 2, yt / 2);
-                                plotLine((start.x + pair.x) * 2, (start.y + pair.y) * 2, (end.x + pair.x) * 2,
-                                        (end.y + pair.y) * 2, shouldDraw, drawHalved);
-                                plotLine((start.x + pair.x) * 2 + 1, (start.y + pair.y) * 2, (end.x + pair.x) * 2 + 1,
-                                        (end.y + pair.y) * 2, shouldDraw, drawHalved);
-                                plotLine((start.x + pair.x) * 2, (start.y + pair.y) * 2 + 1, (end.x + pair.x) * 2,
-                                        (end.y + pair.y) * 2 + 1, shouldDraw, drawHalved);
-                                plotLine((start.x + pair.x) * 2 + 1, (start.y + pair.y) * 2 + 1,
-                                        (end.x + pair.x) * 2 + 1, (end.y + pair.y) * 2 + 1, shouldDraw, drawHalved);
+                            case THICK -> {
+                                for (final var pair : allTargets) {
+                                    plotLine(start.x + pair.x + sX, start.y + pair.y + sY, end.x + pair.x + sX,
+                                            end.y + pair.y + sY, isCloseToAtom, color, guiGraphics);
+                                }
                             }
-                            break;
+                        }
                     }
                 } else if (elem instanceof Parens pp) {
                     final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),

@@ -98,13 +98,17 @@ public class Molecule {
         return invAtom(new Vector2f(a, b));
     }
 
-    public Molecule bond(int a, int b, Bond.Type type) {
-        this.contents.add(new Bond(a, b, type));
+    public Molecule bond(int a, int b, boolean centered, Bond.Line... lines) {
+        this.contents.add(new Bond(a, b, centered, lines));
         return this;
     }
 
+    public Molecule bond(int a, int b, Bond.Line... lines) {
+        return bond(a, b, false, lines);
+    }
+
     public Molecule bond(int a, int b) {
-        return bond(a, b, Bond.Type.SINGLE);
+        return bond(a, b, Bond.Line.SOLID);
     }
 
     public List<MoleculeElement<?>> contents() {
@@ -194,8 +198,8 @@ public class Molecule {
                 .atom(front, (float) Math.cos(Math.toRadians(-60)), (float) Math.sin(Math.toRadians(-60)))
                 .atom(side, (float) Math.cos(Math.toRadians(-150)), (float) Math.sin(Math.toRadians(-150)))
                 .bond(0, 1)
-                .bond(0, 2, Bond.Type.INWARD)
-                .bond(0, 3, Bond.Type.OUTWARD)
+                .bond(0, 2, Bond.Line.INWARD)
+                .bond(0, 3, Bond.Line.OUTWARD)
                 .bond(0, 4);
     }
 
