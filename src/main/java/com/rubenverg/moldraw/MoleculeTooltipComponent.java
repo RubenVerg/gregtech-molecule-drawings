@@ -41,6 +41,7 @@ public record MoleculeTooltipComponent(
         private final boolean atomAtTopTop;
         private final boolean atomAtBotBot;
         private final boolean atomAtLefLef;
+        private final boolean parenAtLef;
         private final Map<Element.Counted, Integer> elementWidths = new HashMap<>();
 
         private UnaryOperator<Vector2f> toScaledFactory(int lineHeight) {
@@ -48,7 +49,7 @@ public record MoleculeTooltipComponent(
                 var result = new Vector2f();
                 xy.sub(xyStart, result);
                 result.mul(MolDrawConfig.INSTANCE.scale);
-                return new Vector2f(result.x + 8 + (atomAtLefLef ? 12 : 0),
+                return new Vector2f(result.x + 8 + (atomAtLefLef ? 12 : 0) + (parenAtLef ? 6 : 0),
                         -result.y + (atomAtTopTop ? lineHeight * 3 / 2f : atomAtTop ? lineHeight / 2f : 3));
             };
         }
@@ -56,38 +57,42 @@ public record MoleculeTooltipComponent(
         private Function<Atom, Pair<Vector2f, Vector2f>> sizeOfAtomFactory(int lineHeight) {
             return atom -> {
                 float x0 = 0, x1 = 0, y0 = 0, y1 = 0;
-                if (!atom.element().element().invisible) {
-                    x0 += elementWidths.get(atom.element()) / 2f;
-                    x1 += elementWidths.get(atom.element()) / 2f;
-                    y0 += lineHeight / 2f;
-                    y1 += lineHeight / 2f;
+                x0 += elementWidths.getOrDefault(atom.element(), 0) / 2f;
+                x1 += elementWidths.getOrDefault(atom.element(), 0) / 2f;
+                y0 += 1;
+                y1 += lineHeight + 1;
+                if (atom.right().isPresent()) {
+                    x1 += 1 + elementWidths.getOrDefault(atom.right().get(), 0);
                 }
-                if (atom.right().isPresent() && !atom.right().get().element().invisible) {
-                    x1 += 1 + elementWidths.get(atom.right().get());
+                if (atom.left().isPresent()) {
+                    x0 += 1 + elementWidths.getOrDefault(atom.left().get(), 0);
                 }
-                if (atom.left().isPresent() && !atom.left().get().element().invisible) {
-                    x0 += 1 + elementWidths.get(atom.left().get());
-                }
-                if (atom.above().isPresent() && !atom.above().get().element().invisible) {
+                if (atom.above().isPresent()) {
                     y0 += 1 + lineHeight;
-                    x0 = Math.max(x0, elementWidths.get(atom.above().get()) / 2f);
-                    x1 = Math.max(x1, elementWidths.get(atom.above().get()) / 2f);
+                    x0 = Math.max(x0, elementWidths.getOrDefault(atom.above().get(), 0) / 2f);
+                    x1 = Math.max(x1, elementWidths.getOrDefault(atom.above().get(), 0) / 2f);
                 }
-                if (atom.below().isPresent() && !atom.below().get().element().invisible) {
+                if (atom.below().isPresent()) {
                     y1 += 1 + lineHeight;
-                    x0 = Math.max(x0, elementWidths.get(atom.below().get()) / 2f);
-                    x1 = Math.max(x1, elementWidths.get(atom.below().get()) / 2f);
+                    x0 = Math.max(x0, elementWidths.getOrDefault(atom.below().get(), 0) / 2f);
+                    x1 = Math.max(x1, elementWidths.getOrDefault(atom.below().get(), 0) / 2f);
                 }
                 return new Pair<>(new Vector2f(x0, y0), new Vector2f(x1, y1));
             };
         }
 
-        private Vector2i toScreen(int lineHeight, Vector2f xy) {
-            var result = new Vector2f();
-            xy.sub(xyStart, result);
-            result.mul(MolDrawConfig.INSTANCE.scale);
-            return new Vector2i((int) result.x + 8 + (atomAtLefLef ? 12 : 0),
-                    -(int) result.y + (atomAtTopTop ? lineHeight * 3 / 2 : atomAtTop ? lineHeight / 2 : 3));
+        /*
+         * private Vector2i toScreen(int lineHeight, Vector2f xy) {
+         * var result = new Vector2f();
+         * xy.sub(xyStart, result);
+         * result.mul(MolDrawConfig.INSTANCE.scale);
+         * return new Vector2i((int) result.x + 8 + (atomAtLefLef ? 12 : 0),
+         * -(int) result.y + (atomAtTopTop ? lineHeight * 3 / 2 : atomAtTop ? lineHeight / 2 : 3));
+         * }
+         */
+
+        public Vector2i floored(Vector2fc vec) {
+            return new Vector2i((int) vec.x(), (int) vec.y());
         }
 
         public ClientMoleculeTooltipComponent(MoleculeTooltipComponent component) {
@@ -122,11 +127,17 @@ public record MoleculeTooltipComponent(
                 final var hasLef = atom.left().isPresent();
                 return distanceFromLef < 0.1 && !invisible && hasLef;
             });
+            this.parenAtLef = molecule.atoms().stream().anyMatch(atom -> {
+                final var distanceFromLef = Math.abs(bounds.getFirst().x - atom.position().x);
+                if (distanceFromLef > 0.1) return false;
+                return molecule.contents().stream().anyMatch(el -> el instanceof Parens parens &&
+                        Arrays.stream(parens.atoms()).anyMatch(d -> d == atom.index()));
+            });
         }
 
         @Override
         public int getWidth(Font font) {
-            return xySize.x + 32 + (atomAtLefLef ? 12 : 0);
+            return xySize.x + 32 + (atomAtLefLef ? 12 : 0) + (parenAtLef ? 6 : 0);
         }
 
         @Override
@@ -142,7 +153,7 @@ public record MoleculeTooltipComponent(
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Atom atom) {
-                    final var xyPosition = toScreen(font.lineHeight, atom.position());
+                    final var xyPosition = toScaledFactory(font.lineHeight).apply(atom.position());
                     final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
                     mat.translate(translation);
                     final var width = font.width(atom.element().toString());
@@ -208,14 +219,14 @@ public record MoleculeTooltipComponent(
                     final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),
                             sizeOfAtomFactory(font.lineHeight));
                     final var xySub = new Vector2i((int) bounds.getSecond().x, (int) bounds.getSecond().y);
-                    xySub.add(9, font.lineHeight - 4);
+                    xySub.add(7, -2);
                     final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
                     mat.translate(subTranslation);
                     font.drawInBatch(pp.sub(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
                             Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                     mat.translate(subTranslation.negate());
                     final var xySup = new Vector2i((int) bounds.getSecond().x, (int) bounds.getFirst().y);
-                    xySup.add(9, -4);
+                    xySup.add(7, -4);
                     final var supTranslation = new Vector3f(xySup.x, xySup.y, 0);
                     mat.translate(supTranslation);
                     font.drawInBatch(pp.sup(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
@@ -228,6 +239,7 @@ public record MoleculeTooltipComponent(
         @Override
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
             final var defaultColor = configColor(null);
+            final var ts = toScaledFactory(font.lineHeight);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Bond bond) {
                     if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
@@ -247,10 +259,10 @@ public record MoleculeTooltipComponent(
                     final var atomBBelow = atomB.below().map(elementWidths::get);
                     final var atomBLeft = atomB.left().map(elementWidths::get);
                     final var atomBInvisible = atomB.isInvisible();
-                    final var start = toScreen(font.lineHeight, atomA.position());
+                    final var start = floored(ts.apply(atomA.position()));
                     start.add(x, y);
                     start.add(0, font.lineHeight / 2);
-                    final var end = toScreen(font.lineHeight, atomB.position());
+                    final var end = floored(ts.apply(atomB.position()));
                     end.add(x, y);
                     end.add(0, font.lineHeight / 2);
                     final BiPredicate<@NotNull Integer, @NotNull Integer> isCloseToAtom = (xt, yt) -> {
@@ -408,12 +420,12 @@ public record MoleculeTooltipComponent(
                 } else if (elem instanceof Parens pp) {
                     final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),
                             sizeOfAtomFactory(font.lineHeight));
-                    final var xyMin = new Vector2i((int) bounds.getFirst().x, (int) bounds.getSecond().y);
+                    final var xyMin = floored(bounds.getFirst());
                     xyMin.add(x, y);
-                    xyMin.add(-3, font.lineHeight + 3);
-                    final var xyMax = new Vector2i((int) bounds.getSecond().x, (int) bounds.getFirst().y);
+                    xyMin.add(-2, -1);
+                    final var xyMax = floored(bounds.getSecond());
                     xyMax.add(x, y);
-                    xyMax.add(4, -1);
+                    xyMax.add(2, 1);
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, defaultColor);
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, defaultColor);
                     guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, defaultColor);
@@ -429,7 +441,8 @@ public record MoleculeTooltipComponent(
                         final var angle = (float) part / 64 * Mth.PI;
                         final var u = new Vector2f(Mth.cos(angle), Mth.sin(angle));
                         final var p = u.mul(ct.A()).add(centroid);
-                        final var r = toScreen(font.lineHeight, p).add(x, y + font.lineHeight / 2);
+                        final var r = floored(toScaledFactory(font.lineHeight).apply(p)).add(x,
+                                y + font.lineHeight / 2);
                         guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1, defaultColor);
                     }
                     // final var cc = toScreen(font.lineHeight, centroid).add(x, y + font.lineHeight / 2);
