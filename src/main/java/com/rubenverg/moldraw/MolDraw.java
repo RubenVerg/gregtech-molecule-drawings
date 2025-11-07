@@ -4,14 +4,18 @@ import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BucketItem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
@@ -40,9 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
@@ -168,11 +170,23 @@ public class MolDraw {
         return molecules.get(material);
     }
 
+    public static void tryColorizeFormula(Material material, OptionalInt idx,
+                                          List<Either<FormattedText, TooltipComponent>> tooltipElements) {
+        if (Objects.isNull(material.getMaterialComponents())) return;
+
+        if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
+            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
+            else tooltipElements.add(1, Either.left(coloredFormula));
+        }
+    }
+
     @SubscribeEvent
     public void tooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
         if (!MolDrawConfig.INSTANCE.enabled) return;
         // event.getTooltipElements().add(0, Either.right(new MoleculeTooltipComponent(new Molecule()
         // )));
+
         Material material;
         if (event.getItemStack().getItem() instanceof BucketItem bi) {
             material = ChemicalHelper.getMaterial(bi.getFluid());
@@ -184,18 +198,25 @@ public class MolDraw {
         if (material.isNull()) return;
         final var mol = getMolecule(material);
         final var tooltipElements = event.getTooltipElements();
+
         final var idx = IntStream.range(0, tooltipElements.size())
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
                 .findFirst();
-        if (!Objects.isNull(mol)) {
+
+        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
-        } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
-            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
-            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
-            else tooltipElements.add(1, Either.left(coloredFormula));
+        } else {
+            tryColorizeFormula(material, idx, tooltipElements);
+
+            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+                final int ttIndex = idx.orElse(1) + 1;
+
+                tooltipElements.add(ttIndex, Either
+                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+            }
         }
     }
 }

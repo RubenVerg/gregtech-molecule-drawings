@@ -2,9 +2,11 @@ package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.Fluid;
 
@@ -53,6 +55,8 @@ public class FluidEmiStackMixin {
         if (!MolDrawConfig.INSTANCE.enabled) return;
         final var material = ChemicalHelper.getMaterial(fluid);
         if (material.isNull()) return;
+        if (Objects.isNull(material.getMaterialComponents())) return;
+
         final var mol = MolDraw.getMolecule(material);
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
                 moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).equals(material.getChemicalFormula()))
@@ -61,19 +65,34 @@ public class FluidEmiStackMixin {
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
                         moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
                 .findFirst();
-        if (!Objects.isNull(mol)) {
+
+        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent())
                 list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
             else
                 list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
                         ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
-        } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
-            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
-            if (idx.isPresent())
-                list.set(idx.getAsInt(), ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
-            else
-                list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
-                        ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
+        } else {
+            if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
+                final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
+
+                if (idx.isPresent())
+                    list.set(idx.getAsInt(), ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
+                else
+                    list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
+                            ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
+            }
+
+            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+
+                if (idx.isPresent())
+                    list.set(idx.getAsInt() + 1, ClientTooltipComponent
+                            .create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
+                else
+                    list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(2),
+                            ClientTooltipComponent
+                                    .create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
+            }
         }
     }
 }
