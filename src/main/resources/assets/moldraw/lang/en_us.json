@@ -1,7 +1,7 @@
 {
   "tooltip.moldraw.shift_view": "§7Press Shift to view the structure",
 
-  "config.moldraw.option.enabled": "Enable Molecule Drawer",
+  "config.moldraw.option.enabled": "Enable Mod",
   "config.moldraw.option.debugMode": "Enable Debug Mode",
   "config.moldraw.option.coloredAtoms": "Color Each Atom",
   "config.moldraw.option.useMaterialColors": "Use Material Colors For Atoms",

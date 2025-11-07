@@ -170,8 +170,10 @@ public class MolDraw {
         return molecules.get(material);
     }
 
-    private void tryColorizeFormula(Material material, OptionalInt idx,
-                                    List<Either<FormattedText, TooltipComponent>> tooltipElements) {
+    public static void tryColorizeFormula(Material material, OptionalInt idx,
+                                          List<Either<FormattedText, TooltipComponent>> tooltipElements) {
+        if(Objects.isNull(material.getMaterialComponents())) return;
+
         if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
             final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
@@ -203,23 +205,18 @@ public class MolDraw {
                         .orElse(false))
                 .findFirst();
 
-        if (!Objects.isNull(mol)) {
-            if (MolDrawConfig.INSTANCE.onlyShowOnShift) {
-
-                tryColorizeFormula(material, idx, tooltipElements);
-
-                if (!GTUtil.isShiftDown()) {
-                    int ttIndex = 2;
-                    if (idx.isPresent()) ttIndex = idx.getAsInt() + 1;
-
-                    tooltipElements.add(ttIndex, Either
-                            .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
-
-                    return;
-                }
-            }
+        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
-        } else tryColorizeFormula(material, idx, tooltipElements);
+        } else {
+            tryColorizeFormula(material, idx, tooltipElements);
+
+            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+                int ttIndex = 2;
+                if (idx.isPresent()) ttIndex = idx.getAsInt() + 1;
+
+                tooltipElements.add(ttIndex, Either.left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+            }
+        }
     }
 }
