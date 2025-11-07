@@ -212,8 +212,7 @@ public class MolDraw {
             tryColorizeFormula(material, idx, tooltipElements);
 
             if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
-                int ttIndex = 2;
-                if (idx.isPresent()) ttIndex = idx.getAsInt() + 1;
+                final int ttIndex = idx.orElse(1) + 1;
 
                 tooltipElements.add(ttIndex, Either.left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
             }
