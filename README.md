@@ -76,16 +76,15 @@ interface AtomUV extends AtomCommon {
   v: number;
 }
 
-// A double bond has the first line like a single bond and the second line shifted rightwards from the starting atom; use double centered bonds if you want them to be both offset.
-// A one-and-a-half bond is laid out like a double bond but the second line is dotted.
 // Inward and outward bonds grow in size towards the second atom.
-type BondType = 'single' | 'double' | 'double_centered' | 'triple' | 'quadruple' | 'quadruple_centered' | 'inward' | 'outward' | 'thick' | 'dotted' | 'one_and_half';
+type Line = 'solid' | 'dotted' | 'inward' | 'outward' | 'thick';
 
 interface Bond {
   type: 'bond';
   a: number; // The first atom of the bond
   b: number; // The second atom of the bond
-  bond_type: BondType;
+  centered?: boolean // True if the lines can be offset by half an unit to center them
+  lines: Line[];
 }
 
 // Parens are square brackets around certain atoms that show subscripts and/or superscripts.
@@ -170,38 +169,35 @@ For example, this is the encoding of benzene:
     {
       "type": "bond",
       "a": 0,
-      "b": 1,
-      "bond_type": "single"
+      "b": 1
     },
     {
       "type": "bond",
       "a": 1,
       "b": 2,
-      "bond_type": "double"
+      "lines": ["solid", "solid"]
     },
     {
       "type": "bond",
       "a": 2,
-      "b": 3,
-      "bond_type": "single"
+      "b": 3
     },
     {
       "type": "bond",
       "a": 3,
       "b": 4,
-      "bond_type": "double"
+      "lines": ["solid", "solid"]
     },
     {
       "type": "bond",
-      "a": 4,
+      "a": 4
       "b": 5,
-      "bond_type": "single"
     },
     {
       "type": "bond",
       "a": 5,
       "b": 0,
-      "bond_type": "double"
+      "lines": ["solid", "solid"]
     }
   ]
 }

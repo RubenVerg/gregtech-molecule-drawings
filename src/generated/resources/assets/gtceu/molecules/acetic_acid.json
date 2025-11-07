@@ -32,19 +32,27 @@
     {
       "a": 0,
       "b": 1,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 1,
       "b": 2,
-      "bond_type": "double_centered",
+      "centered": true,
+      "lines": [
+        "solid",
+        "solid"
+      ],
       "type": "bond"
     },
     {
       "a": 1,
       "b": 3,
-      "bond_type": "single",
+      "lines": [
+        "solid"
+      ],
       "type": "bond"
     }
   ]

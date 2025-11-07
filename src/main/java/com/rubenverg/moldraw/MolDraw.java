@@ -77,7 +77,7 @@ public class MolDraw {
             .registerTypeAdapter(Element.Counted.class, Element.Counted.Json.INSTANCE)
             .registerTypeAdapter(Atom.class, Atom.Json.INSTANCE)
             .registerTypeAdapter(Bond.class, Bond.Json.INSTANCE)
-            .registerTypeAdapter(Bond.Type.class, Bond.Type.Json.INSTANCE)
+            .registerTypeAdapter(Bond.Line.class, Bond.Line.Json.INSTANCE)
             .registerTypeAdapter(Parens.class, Parens.Json.INSTANCE)
             .registerTypeAdapter(CircleTransformation.class, CircleTransformation.Json.INSTANCE)
             .setPrettyPrinting()
