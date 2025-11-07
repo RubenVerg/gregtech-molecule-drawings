@@ -30,6 +30,10 @@ MolDraw comes out of the box with support for not only most of the organic mater
 
 > Now I can appreciate how complex the polymers I'm building are.
 
+> This was already so cool and colors made it even better!
+
+> I should be allowed to give Michelin stars to Gregtech add-ons because Madeline is cooking things right.
+
 ## Adding your own molecules
 
 Molecules are stored in resource packs under `assets/<namespace>/molecules/<compound>.json`, corresponding to the GT material with ID `<namespace>:<compound>`.
