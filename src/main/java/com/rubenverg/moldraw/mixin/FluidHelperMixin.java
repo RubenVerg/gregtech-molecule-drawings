@@ -1,15 +1,16 @@
 package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
-import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.mojang.datafixers.util.Either;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
-import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
@@ -33,8 +34,10 @@ public class FluidHelperMixin {
                                              CallbackInfo ci) {
         if (!(tooltip instanceof JeiTooltip jeiTooltip)) return;
         if (!MolDrawConfig.INSTANCE.enabled) return;
+
         final var material = ChemicalHelper.getMaterial(ingredient.getFluid());
         if (material.isNull()) return;
+
         final var mol = MolDraw.getMolecule(material);
         final var tooltipElements = ((JeiTooltipMixin) jeiTooltip).getLines();
         final var idx = IntStream.range(0, tooltipElements.size())
@@ -42,13 +45,19 @@ public class FluidHelperMixin {
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
                 .findFirst();
-        if (!Objects.isNull(mol)) {
+
+        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
-        } else if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
-            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
-            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
-            else tooltipElements.add(1, Either.left(coloredFormula));
+        } else {
+            MolDraw.tryColorizeFormula(material, idx, tooltipElements);
+
+            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+                final int ttIndex = idx.orElse(1) + 1;
+
+                tooltipElements.add(ttIndex, Either
+                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+            }
         }
     }
 }
