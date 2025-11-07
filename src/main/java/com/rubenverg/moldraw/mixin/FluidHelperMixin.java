@@ -1,9 +1,8 @@
 package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
-import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
-
 import com.gregtechceu.gtceu.utils.GTUtil;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.TooltipFlag;
@@ -12,7 +11,6 @@ import net.minecraftforge.fluids.FluidStack;
 import com.mojang.datafixers.util.Either;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
-import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
@@ -57,10 +55,9 @@ public class FluidHelperMixin {
             if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
-                tooltipElements.add(ttIndex, Either.left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+                tooltipElements.add(ttIndex, Either
+                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
             }
         }
-
-
     }
 }

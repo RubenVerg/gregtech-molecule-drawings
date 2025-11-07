@@ -172,7 +172,7 @@ public class MolDraw {
 
     public static void tryColorizeFormula(Material material, OptionalInt idx,
                                           List<Either<FormattedText, TooltipComponent>> tooltipElements) {
-        if(Objects.isNull(material.getMaterialComponents())) return;
+        if (Objects.isNull(material.getMaterialComponents())) return;
 
         if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
             final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
@@ -214,7 +214,8 @@ public class MolDraw {
             if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
-                tooltipElements.add(ttIndex, Either.left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+                tooltipElements.add(ttIndex, Either
+                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
             }
         }
     }

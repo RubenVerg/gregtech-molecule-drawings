@@ -2,13 +2,11 @@ package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
-
 import com.gregtechceu.gtceu.utils.GTUtil;
-import com.mojang.datafixers.util.Either;
+
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.Fluid;
 
@@ -88,10 +86,12 @@ public class FluidEmiStackMixin {
             if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
 
                 if (idx.isPresent())
-                    list.set(idx.getAsInt() + 1, ClientTooltipComponent.create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
+                    list.set(idx.getAsInt() + 1, ClientTooltipComponent
+                            .create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
                 else
                     list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(2),
-                            ClientTooltipComponent.create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
+                            ClientTooltipComponent
+                                    .create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
             }
         }
     }
