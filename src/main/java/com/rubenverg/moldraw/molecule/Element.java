@@ -86,9 +86,9 @@ public class Element {
     }
 
     public static Element H = Element.createStandard("H", 0xffffff, GTMaterials.Hydrogen);
-    public static Element D = Element.createStandard("D", 0xffffc0, GTMaterials.Hydrogen);
-    public static Element T = Element.createStandard("T", 0xffffa0, GTMaterials.Hydrogen);
-    public static Element He = Element.createStandard("He", 0xd9ffff, GTMaterials.Helium);
+    public static Element D = Element.createStandard("D", 0xffffc0, GTMaterials.Deuterium);
+    public static Element T = Element.createStandard("T", 0xffffa0, GTMaterials.Tritium);
+    public static Element He = Element.createStandard("He", 0xd9ffff, GTMaterials.Helium, GTMaterials.Helium3);
     public static Element Li = Element.createStandard("Li", 0xcc80ff, GTMaterials.Lithium);
     public static Element Be = Element.createStandard("Be", 0xc2ff00, GTMaterials.Beryllium);
     public static Element B = Element.createStandard("B", 0xffb5b5, GTMaterials.Boron);

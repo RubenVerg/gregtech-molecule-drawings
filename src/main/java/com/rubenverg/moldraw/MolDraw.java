@@ -172,9 +172,8 @@ public class MolDraw {
 
     public static void tryColorizeFormula(Material material, OptionalInt idx,
                                           List<Either<FormattedText, TooltipComponent>> tooltipElements) {
-        if (Objects.isNull(material.getMaterialComponents())) return;
-
-        if (!material.getMaterialComponents().isEmpty() || material.isElement()) {
+        if (Objects.nonNull(material.getMaterialComponents()) && !material.getMaterialComponents().isEmpty() ||
+                material.isElement()) {
             final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.left(coloredFormula));
             else tooltipElements.add(1, Either.left(coloredFormula));
@@ -203,7 +202,7 @@ public class MolDraw {
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
-                .findFirst();
+                .reduce((a, b) -> b);
 
         if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
