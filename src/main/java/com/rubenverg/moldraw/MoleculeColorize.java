@@ -38,7 +38,13 @@ public class MoleculeColorize {
         }
     }
 
-    public static int colorForMaterial(Material material) {
+    public static double brightness(int color) {
+        final int red = FastColor.ARGB32.red(color), green = FastColor.ARGB32.green(color),
+                blue = FastColor.ARGB32.blue(color);
+        return 0.21 * red + 0.72 * green + 0.07 * blue;
+    }
+
+    private static int getColorForMaterial(Material material) {
         if (material.getMaterialARGB() == 0xffffffff && material.hasFluid() &&
                 material.getFluid() instanceof GTFluid gtFluid) {
             final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
@@ -64,10 +70,25 @@ public class MoleculeColorize {
 
             }
         }
+        if (material.getMaterialSecondaryARGB() != 0xffffffff) {
+            final int primary = material.getMaterialARGB(), secondary = material.getMaterialSecondaryARGB();
+            return brightness(primary) > brightness(secondary) ? primary : secondary;
+        }
         return material.getMaterialARGB();
     }
 
-    public static int colorForElement(Element element) {
+    public static int lightenColor(int color) {
+        final var arr = new float[3];
+        Color.RGBtoHSB(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color), arr);
+        arr[2] = Math.max(arr[2], MolDrawConfig.INSTANCE.minimumBrightness);
+        return Color.HSBtoRGB(arr[0], arr[1], arr[2]);
+    }
+
+    public static int colorForMaterial(Material material) {
+        return lightenColor(getColorForMaterial(material));
+    }
+
+    public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
         if (MolDrawConfig.INSTANCE.useMaterialColors && !element.material.isNull())
             return colorForMaterial(element.material);
@@ -76,6 +97,10 @@ public class MoleculeColorize {
         else if (element.color instanceof Element.Color.Optional optional)
             return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
         return defaultColor;
+    }
+
+    public static int colorForElement(Element element) {
+        return lightenColor(getColorForElement(element));
     }
 
     public static Component coloredFormula(MaterialStack stack, boolean topLevel) {

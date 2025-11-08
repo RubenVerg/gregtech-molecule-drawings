@@ -40,4 +40,8 @@ public class MolDrawConfig {
     @Configurable
     @Configurable.Range(min = 10, max = 50)
     public int scale = 20;
+
+    @Configurable
+    @Configurable.Range(min = 0, max = 1)
+    public float minimumBrightness = 0.5f;
 }
