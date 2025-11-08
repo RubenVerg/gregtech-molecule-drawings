@@ -87,7 +87,7 @@ public class MoleculeColorize {
                             FALLBACK_COLOR)));
         }
         final var components = stack.material().getMaterialComponents();
-        if (components.isEmpty()) return Component.literal(stack.toString());
+        if (Objects.isNull(components) || components.isEmpty()) return Component.literal(stack.toString());
         final var text = Component.empty();
         for (final var component : components) {
             text.append(coloredFormula(component, false));
