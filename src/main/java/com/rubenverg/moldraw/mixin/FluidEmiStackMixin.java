@@ -60,7 +60,7 @@ public class FluidEmiStackMixin {
         final var mol = MolDraw.getMolecule(material);
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
                 moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).equals(material.getChemicalFormula()))
-                .findFirst();
+                .reduce((a, b) -> b);
         final var quantityIdx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
                         moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
