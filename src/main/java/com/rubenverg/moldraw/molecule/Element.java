@@ -72,7 +72,7 @@ public class Element {
 
     public static Optional<Element> forMaterial(Material material) {
         for (final var e : elements.values())
-            if (e.material.equals(material) || e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
+            if (Objects.nonNull(e.material) && e.material.equals(material) || e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
                 return Optional.of(e);
         return Optional.empty();
     }
