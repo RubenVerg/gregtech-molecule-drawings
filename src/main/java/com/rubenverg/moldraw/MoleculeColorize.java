@@ -39,7 +39,7 @@ public class MoleculeColorize {
     }
 
     public static int colorForMaterial(Material material) {
-        if (material.getMaterialARGB() == 0xffffffff &&
+        if (material.getMaterialARGB() == 0xffffffff && material.hasFluid() &&
                 material.getFluid() instanceof GTFluid gtFluid) {
             final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
             try {
