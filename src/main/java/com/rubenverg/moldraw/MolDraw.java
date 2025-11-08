@@ -203,7 +203,7 @@ public class MolDraw {
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
-                .reduce((a, b) -> b);
+                .findFirst();
 
         if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));

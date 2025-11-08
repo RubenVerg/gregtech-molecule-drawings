@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FastColor;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 
 import com.mojang.blaze3d.platform.NativeImage;
@@ -79,15 +78,6 @@ public class MoleculeColorize {
         return defaultColor;
     }
 
-    public static String simpleGetText(FormattedCharSequence seq) {
-        final var builder = new StringBuilder();
-        seq.accept((_pos, _style, codepoint) -> {
-            builder.append(Character.toString(codepoint));
-            return true;
-        });
-        return builder.toString();
-    }
-
     public static Component coloredFormula(MaterialStack stack, boolean topLevel) {
         if (stack.material().isElement()) {
             final var element = Element.forMaterial(stack.material());
@@ -107,8 +97,6 @@ public class MoleculeColorize {
         countedText.append(text);
         if (!topLevel && components.size() > 1) countedText.append(")");
         if (stack.amount() > 1) countedText.append(FormattingUtil.toSmallDownNumbers(Long.toString(stack.amount())));
-        if (!simpleGetText(countedText.getVisualOrderText()).equals(stack.toString()))
-            return Component.literal(stack.toString());
         return countedText;
     }
 }

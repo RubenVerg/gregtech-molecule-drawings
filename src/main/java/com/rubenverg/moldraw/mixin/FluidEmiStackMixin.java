@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.Fluid;
 
 import com.llamalad7.mixinextras.sugar.Local;
@@ -18,6 +19,7 @@ import dev.emi.emi.api.stack.FluidEmiStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -33,6 +35,16 @@ public class FluidEmiStackMixin {
     @Final
     private Fluid fluid;
 
+    @Unique
+    private static String moldraw$simpleGetText(FormattedCharSequence seq) {
+        final var builder = new StringBuilder();
+        seq.accept((_pos, _style, codepoint) -> {
+            builder.append(Character.toString(codepoint));
+            return true;
+        });
+        return builder.toString();
+    }
+
     @Inject(method = "getTooltip",
             at = @At(value = "INVOKE",
                      target = "Ldev/emi/emi/api/render/EmiTooltipComponents;appendModName(Ljava/util/List;Ljava/lang/String;)V"),
@@ -47,12 +59,11 @@ public class FluidEmiStackMixin {
 
         final var mol = MolDraw.getMolecule(material);
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                MoleculeColorize.simpleGetText(((ClientTextTooltipMixin) ctt).getText())
-                        .equals(material.getChemicalFormula()))
-                .reduce((a, b) -> b);
+                moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).equals(material.getChemicalFormula()))
+                .findFirst();
         final var quantityIdx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                        MoleculeColorize.simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
+                        moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
                 .findFirst();
 
         if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
