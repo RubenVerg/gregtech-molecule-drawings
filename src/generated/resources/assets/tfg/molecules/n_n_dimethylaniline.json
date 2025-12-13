@@ -54,6 +54,7 @@
       "a": 1,
       "b": 2,
       "lines": [
+        "solid",
         "solid"
       ],
       "type": "bond"
@@ -70,6 +71,7 @@
       "a": 3,
       "b": 4,
       "lines": [
+        "solid",
         "solid"
       ],
       "type": "bond"
@@ -86,6 +88,7 @@
       "a": 5,
       "b": 0,
       "lines": [
+        "solid",
         "solid"
       ],
       "type": "bond"
@@ -99,18 +102,22 @@
     },
     {
       "index": 7,
-      "element": "O",
-      "left": "H",
+      "element": "",
       "x": 0.0,
+      "y": 2.0,
+      "type": "atom"
+    },
+    {
+      "index": 8,
+      "element": "",
+      "x": 1.7320508,
       "y": 2.0,
       "type": "atom"
     },
     {
       "a": 5,
       "b": 6,
-      "centered": true,
       "lines": [
-        "solid",
         "solid"
       ],
       "type": "bond"
@@ -118,6 +125,14 @@
     {
       "a": 6,
       "b": 7,
+      "lines": [
+        "solid"
+      ],
+      "type": "bond"
+    },
+    {
+      "a": 6,
+      "b": 8,
       "lines": [
         "solid"
       ],

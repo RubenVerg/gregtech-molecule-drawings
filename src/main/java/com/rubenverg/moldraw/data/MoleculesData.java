@@ -24,6 +24,10 @@ public class MoleculesData {
         return new ResourceLocation("gcyr", path);
     }
 
+    private static ResourceLocation tfg(String path) {
+        return new ResourceLocation("tfg", path);
+    }
+
     public static Map<ResourceLocation, Molecule> molecules() {
         final Map<ResourceLocation, Molecule> molecules = new HashMap<>();
         molecules.put(GTCEu.id("methane"), Molecule.tetragonal(Element.C, Element.H, Element.H, Element.H, Element.H));
@@ -1038,7 +1042,7 @@ public class MoleculesData {
                 .bond(5, 0)
                 .atom(Element.N, 2, -1)
                 .atom(Element.O.one(), null, null, null, Element.H.one(), 2, -2)
-                .bond(5, 6, Bond.DOUBLE)
+                .bond(5, 6, true, Bond.DOUBLE)
                 .bond(6, 7));
         molecules.put(GTCEu.id("butyraldehyde"), new Molecule()
                 .uv()
@@ -1137,11 +1141,15 @@ public class MoleculesData {
                 .atom(Element.Cl, 1, 1)
                 .bond(0, 1)
                 .bond(1, 2));
-        molecules.put(GTCEu.id("acetylene"), new Molecule()
-                .uv()
-                .invAtom(0, 0)
-                .invAtom(1, 0)
-                .bond(0, 1, Bond.TRIPLE));
+        {
+            final var acetylene = new Molecule()
+                    .uv()
+                    .invAtom(0, 0)
+                    .invAtom(1, 0)
+                    .bond(0, 1, Bond.TRIPLE);
+            molecules.put(GTCEu.id("acetylene"), acetylene);
+            molecules.put(tfg("acetylene"), acetylene);
+        }
         molecules.put(GTCEu.id("chloroacetate"), new Molecule()
                 .uv()
                 .atom(Element.Cl, 0, 0)
@@ -2110,14 +2118,18 @@ public class MoleculesData {
                 .bond(6, 7)
                 .bond(7, 8)
                 .bond(8, 9));
-        molecules.put(GTCEu.id("ethylene_oxide"), new Molecule()
-                .xy()
-                .invAtom(0, 0)
-                .invAtom(1, 0)
-                .atom(Element.O, 0.5f, MathUtils.COS30f)
-                .bond(0, 1)
-                .bond(1, 2)
-                .bond(2, 0));
+        {
+            final var eo = new Molecule()
+                    .xy()
+                    .invAtom(0, 0)
+                    .invAtom(1, 0)
+                    .atom(Element.O, 0.5f, MathUtils.COS30f)
+                    .bond(0, 1)
+                    .bond(1, 2)
+                    .bond(2, 0);
+            molecules.put(GTCEu.id("ethylene_oxide"), eo);
+            molecules.put(tfg("ethylene_oxide"), eo);
+        }
         molecules.put(GTCEu.id("12_crown_4"), new Molecule()
                 .xy()
                 .atom(Element.O, 1, 1)
@@ -2949,31 +2961,35 @@ public class MoleculesData {
                     .bond(3, 13)
                     .add(Parens.polymer(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18)));
         }
-        molecules.put(GTCEu.id("sorbitol"), new Molecule()
-                .uv()
-                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
-                .invAtom(1, 0)
-                .invAtom(1, 1)
-                .invAtom(2, 1)
-                .atom(Element.O.one(), null, Element.H.one(), null, null, 0, 2)
-                .invAtom(2, 2)
-                .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 0)
-                .invAtom(3, 2)
-                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 3)
-                .invAtom(3, 3)
-                .atom(Element.O.one(), null, Element.H.one(), null, null, 4, 1)
-                .atom(Element.O.one(), null, Element.H.one(), null, null, 4, 3)
-                .bond(0, 1)
-                .bond(1, 2)
-                .bond(2, 4)
-                .bond(2, 3)
-                .bond(3, 6)
-                .bond(3, 5)
-                .bond(5, 8)
-                .bond(5, 7)
-                .bond(7, 10)
-                .bond(7, 9)
-                .bond(9, 11));
+        {
+            final var sorbitol = new Molecule()
+                    .uv()
+                    .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
+                    .invAtom(1, 0)
+                    .invAtom(1, 1)
+                    .invAtom(2, 1)
+                    .atom(Element.O.one(), null, Element.H.one(), null, null, 0, 2)
+                    .invAtom(2, 2)
+                    .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 0)
+                    .invAtom(3, 2)
+                    .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 3)
+                    .invAtom(3, 3)
+                    .atom(Element.O.one(), null, Element.H.one(), null, null, 4, 1)
+                    .atom(Element.O.one(), null, Element.H.one(), null, null, 4, 3)
+                    .bond(0, 1)
+                    .bond(1, 2)
+                    .bond(2, 4)
+                    .bond(2, 3)
+                    .bond(3, 6)
+                    .bond(3, 5)
+                    .bond(5, 8)
+                    .bond(5, 7)
+                    .bond(7, 10)
+                    .bond(7, 9)
+                    .bond(9, 11);
+            molecules.put(GTCEu.id("sorbitol"), sorbitol);
+            molecules.put(tfg("sorbitol"), sorbitol);
+        }
         molecules.put(GTCEu.id("perfluoromethyl_vinyl_ether"), new Molecule()
                 .uv()
                 .atom(Element.C.one(), null, null, null, Element.F.count(3), 0, 0)
@@ -3153,22 +3169,26 @@ public class MoleculesData {
                 .bond(14, 15)
                 .bond(15, 10, Bond.DOUBLE)
                 .bond(13, 16));
-        molecules.put(GTCEu.id("aniline"), new Molecule()
-                .uv()
-                .invAtom(0, 0)
-                .invAtom(-1, 1)
-                .invAtom(-1, 2)
-                .invAtom(0, 2)
-                .invAtom(1, 1)
-                .invAtom(1, 0)
-                .atom(Element.N.one(), null, Element.H.count(2), null, null, 2, -1)
-                .bond(0, 1)
-                .bond(1, 2, Bond.DOUBLE)
-                .bond(2, 3)
-                .bond(3, 4, Bond.DOUBLE)
-                .bond(4, 5)
-                .bond(5, 0, Bond.DOUBLE)
-                .bond(5, 6));
+        {
+            final var aniline = new Molecule()
+                    .uv()
+                    .invAtom(0, 0)
+                    .invAtom(-1, 1)
+                    .invAtom(-1, 2)
+                    .invAtom(0, 2)
+                    .invAtom(1, 1)
+                    .invAtom(1, 0)
+                    .atom(Element.N.one(), null, Element.H.count(2), null, null, 2, -1)
+                    .bond(0, 1)
+                    .bond(1, 2, Bond.DOUBLE)
+                    .bond(2, 3)
+                    .bond(3, 4, Bond.DOUBLE)
+                    .bond(4, 5)
+                    .bond(5, 0, Bond.DOUBLE)
+                    .bond(5, 6);
+            molecules.put(GTCEu.id("aniline"), aniline);
+            molecules.put(tfg("aniline"), aniline);
+        }
         molecules.put(GTCEu.id("fluorinated_ethylene_propylene"), new Molecule()
                 .uv()
                 .invAtom(0, 0)
@@ -3532,6 +3552,281 @@ public class MoleculesData {
                 .atom(Element.Fe, 0.85f, 1.5f)
                 .bond(10, 12, Bond.Line.DOTTED)
                 .bond(11, 12, Bond.Line.DOTTED));
+        molecules.put(tfg("1_1_1_2_tetrafluoroethane"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.F, -1, 0)
+                .atom(Element.F, 0, -1)
+                .atom(Element.F, -1, 1)
+                .atom(Element.F, 1, 1)
+                .bond(0, 1)
+                .bond(0, 2)
+                .bond(0, 3)
+                .bond(0, 4)
+                .bond(1, 5));
+        molecules.put(tfg("14_sorbitan"), new Molecule()
+                .xy()
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
+                .invAtom(MathUtils.COS30f, 0.5f)
+                .invAtom(MathUtils.COS30f * 2, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, MathUtils.COS30f * 2, -1)
+                .invAtom(MathUtils.COS30f * 3, 0.5f)
+                .invAtom(MathUtils.COS30f * 4, 0)
+                .invAtom(MathUtils.COS30f * 4 + (float) Math.cos(Math.toRadians(42)),
+                        (float) Math.sin(Math.toRadians(42)))
+                .invAtom(
+                        MathUtils.COS30f * 4 + (float) Math.cos(Math.toRadians(42)) +
+                                (float) Math.cos(Math.toRadians(114)),
+                        (float) Math.sin(Math.toRadians(42)) + (float) Math.sin(Math.toRadians(114)))
+                .atom(Element.O,
+                        MathUtils.COS30f * 4 + (float) Math.cos(Math.toRadians(42)) +
+                                (float) Math.cos(Math.toRadians(114)) + (float) Math.cos(Math.toRadians(186)),
+                        (float) Math.sin(Math.toRadians(42)) + (float) Math.sin(Math.toRadians(114)) +
+                                (float) Math.sin(Math.toRadians(186)))
+                .atom(Element.O.one(), null, Element.H.one(), null, null,
+                        MathUtils.COS30f * 4 + (float) Math.cos(Math.toRadians(-84)),
+                        (float) Math.sin(Math.toRadians(-84)))
+                .atom(Element.O.one(), null, Element.H.one(), null, null,
+                        MathUtils.COS30f * 4 + (float) Math.cos(Math.toRadians(42)) +
+                                (float) Math.cos(Math.toRadians(-12)),
+                        (float) Math.sin(Math.toRadians(42)) + (float) Math.sin(Math.toRadians(-12)))
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, Bond.Line.INWARD)
+                .bond(2, 4)
+                .bond(4, 5)
+                .bond(5, 9, Bond.Line.OUTWARD)
+                .bond(5, 6)
+                .bond(6, 10, Bond.Line.INWARD)
+                .bond(6, 7)
+                .bond(7, 8, Bond.Line.OUTWARD)
+                .bond(4, 8, Bond.Line.OUTWARD));
+        molecules.put(tfg("butyric_acid"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 2)
+                .atom(Element.O, 3, 0)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(3, 5, true, Bond.DOUBLE));
+        molecules.put(tfg("chlorodifluoromethane"),
+                Molecule.tetragonal(Element.C, Element.H, Element.Cl, Element.F, Element.F));
+        molecules.put(tfg("citric_acid"), new Molecule()
+                .uv()
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, 2, -1)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .invAtom(3, 2)
+                .atom(Element.O, 4, 1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 3)
+                .invAtom(3, 0)
+                .atom(Element.O, 3, -1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 4, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 2)
+                .bond(0, 1)
+                .bond(1, 2, true, Bond.DOUBLE)
+                .bond(1, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 6)
+                .bond(6, 7, true, Bond.DOUBLE)
+                .bond(6, 8)
+                .bond(4, 9)
+                .bond(9, 10, true, Bond.DOUBLE)
+                .bond(9, 11)
+                .bond(4, 12));
+        molecules.put(tfg("cyclohexanone"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 0)
+                .atom(Element.O, 2, -1)
+                .bond(5, 6, true, Bond.DOUBLE));
+        molecules.put(tfg("dimethyl_carbonate"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .atom(Element.O, 0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 1, 2)
+                .invAtom(2, 2)
+                .atom(Element.O, 2, 0)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(2, 5, true, Bond.DOUBLE));
+        molecules.put(tfg("iodomethane"), Molecule.tetragonal(Element.C, Element.I, Element.H, Element.H, Element.H));
+        molecules.put(tfg("isobutane"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 0)
+                .invAtom(0, 1)
+                .invAtom(1, -1)
+                .bond(0, 1)
+                .bond(0, 2)
+                .bond(0, 3));
+        molecules.put(tfg("lauryl_alcohol"), new Molecule()
+                .uv()
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .invAtom(3, 2)
+                .invAtom(3, 3)
+                .invAtom(4, 3)
+                .invAtom(4, 4)
+                .invAtom(5, 4)
+                .invAtom(5, 5)
+                .invAtom(6, 5)
+                .invAtom(6, 6)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(7, 8)
+                .bond(8, 9)
+                .bond(9, 10)
+                .bond(10, 11)
+                .bond(11, 12));
+        molecules.put(tfg("methylene_diphenyl_diisocyanate"), new Molecule()
+                .uv()
+                .atom(Element.N, 0, 0) // 0
+                .invAtom(1, 0) // 1
+                .invAtom(1, 1) // 2
+                .invAtom(2, 1) // 3
+                .invAtom(3, 0) // 4
+                .invAtom(3, -1) // 5
+                .invAtom(2, -1) // 6
+                .bond(0, 1)
+                .bond(1, 2, Bond.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 6, Bond.DOUBLE)
+                .bond(6, 1)
+                .invAtom(4, 0) // 7
+                .skipAnAtom() // 8
+                .skipAnAtom() // 9
+                .bond(4, 7)
+                .invAtom(4, 1) // 10
+                .invAtom(3, 2) // 11
+                .invAtom(3, 3) // 12
+                .invAtom(4, 3) // 13
+                .invAtom(5, 2) // 14
+                .invAtom(5, 1) // 15
+                .atom(Element.N, 4, 4) // 16
+                .bond(7, 10)
+                .bond(10, 11)
+                .bond(11, 12, Bond.DOUBLE)
+                .bond(12, 13)
+                .bond(13, 14, Bond.DOUBLE)
+                .bond(14, 15)
+                .bond(15, 10, Bond.DOUBLE)
+                .bond(13, 16)
+                .atom(Element.C, 0, -1)
+                .atom(Element.O, 0, -2)
+                .bond(0, 17, true, Bond.DOUBLE)
+                .bond(17, 18, true, Bond.DOUBLE)
+                .atom(Element.C, 5, 4)
+                .atom(Element.O, 6, 4)
+                .bond(16, 19, true, Bond.DOUBLE)
+                .bond(19, 20, true, Bond.DOUBLE));
+        molecules.put(tfg("n_n_dimethylaniline"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(-1, 1)
+                .invAtom(-1, 2)
+                .invAtom(0, 2)
+                .invAtom(1, 1)
+                .invAtom(1, 0)
+                .bond(0, 1)
+                .bond(1, 2, Bond.DOUBLE)
+                .bond(2, 3)
+                .bond(3, 4, Bond.DOUBLE)
+                .bond(4, 5)
+                .bond(5, 0, Bond.DOUBLE)
+                .atom(Element.N, 2, -1)
+                .invAtom(2, -2)
+                .invAtom(3, -1)
+                .bond(5, 6)
+                .bond(6, 7)
+                .bond(6, 8));
+        molecules.put(tfg("tmos"), new Molecule()
+                .xy()
+                .atom(Element.Si, 0, 0)
+                .atom(Element.O, 1, 0)
+                .invAtom(1 + Mth.sqrt(0.5f), -Mth.sqrt(0.5f))
+                .atom(Element.O, 0, 1)
+                .invAtom(Mth.sqrt(0.5f), 1 + Mth.sqrt(0.5f))
+                .atom(Element.O, -1, 0)
+                .invAtom(-1 - Mth.sqrt(0.5f), Mth.sqrt(0.5f))
+                .atom(Element.O, 0, -1)
+                .invAtom(-Mth.sqrt(0.5f), -1 - Mth.sqrt(0.5f))
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(0, 3)
+                .bond(3, 4)
+                .bond(0, 5)
+                .bond(5, 6)
+                .bond(0, 7)
+                .bond(7, 8));
+        molecules.put(tfg("trideuteroiodomethane"),
+                Molecule.tetragonal(Element.C, Element.I, Element.D, Element.D, Element.D));
+        molecules.put(tfg("trimethyl_borate"), new Molecule()
+                .uv()
+                .atom(Element.B, 0, 0)
+                .atom(Element.O, 0, 1)
+                .invAtom(-1, 2)
+                .atom(Element.O, -1, 0)
+                .invAtom(-1, -1)
+                .atom(Element.O, 1, -1)
+                .invAtom(2, -1)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(0, 3)
+                .bond(3, 4)
+                .bond(0, 5)
+                .bond(5, 6));
+        molecules.put(tfg("trimethylamine"), new Molecule()
+                .uv()
+                .atom(Element.N, 0, 0)
+                .invAtom(-1, 0)
+                .invAtom(0, 1)
+                .invAtom(1, -1)
+                .bond(0, 1)
+                .bond(0, 2)
+                .bond(0, 3));
+        molecules.put(tfg("urea"), new Molecule()
+                .uv()
+                .atom(Element.N.one(), null, null, null, Element.H.count(2), 0, 0)
+                .invAtom(1, 0)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 1, 1)
+                .atom(Element.O, 2, -1)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(1, 3, true, Bond.DOUBLE));
         return molecules;
     }
 }
