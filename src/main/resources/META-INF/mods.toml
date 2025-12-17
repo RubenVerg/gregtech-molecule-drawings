@@ -38,7 +38,7 @@ This client-side only mod adds data-driven molecule drawings for GregTech chemic
     [[dependencies.${mod_id}]]
         modId = "gtceu"
         mandatory = true
-        versionRange = "[7,)"
+        versionRange = "[1,)"
         ordering = "AFTER"
         side = "CLIENT"
     [[dependencies.${mod_id}]]
