@@ -3,6 +3,7 @@ package com.rubenverg.moldraw;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+
 import net.minecraft.world.item.ItemStack;
 
 import java.lang.reflect.Method;
@@ -14,9 +15,9 @@ import java.util.Optional;
  * 自定义的 Material 查找器（避免在编译时直接调用 ChemicalHelper.getMaterialEntry(ItemLike)）。
  *
  * 策略（按优先级）：
- *   1) 尝试通过 GTCEuAPI.materialManager 上可能存在的直接方法（通过反射查找名含 "getMaterial"、接受 ItemStack/Item 的方法）；
- *   2) 尝试获取 materialManager 的所有 Material（通过反射），并比较每个 Material 的代表物品（代表 ItemStack）与目标 ItemStack；
- *   3) 若找到相同 Material，则用 new MaterialStack(material, 1) 返回（若构造器或签名不同会捕获异常并继续）。
+ * 1) 尝试通过 GTCEuAPI.materialManager 上可能存在的直接方法（通过反射查找名含 "getMaterial"、接受 ItemStack/Item 的方法）；
+ * 2) 尝试获取 materialManager 的所有 Material（通过反射），并比较每个 Material 的代表物品（代表 ItemStack）与目标 ItemStack；
+ * 3) 若找到相同 Material，则用 new MaterialStack(material, 1) 返回（若构造器或签名不同会捕获异常并继续）。
  *
  * 注意：本实现是兼容层，尽量稳健地处理反射失败并返回 Optional.empty()。
  */
@@ -62,8 +63,8 @@ public final class CustomMaterialLookup {
             for (Method method : managerMethods) {
                 String name = method.getName().toLowerCase();
                 Class<?> returnType = method.getReturnType();
-                if ((name.contains("getmaterials") || name.contains("getall") || name.contains("materiallist"))
-                        && (Collection.class.isAssignableFrom(returnType) || Map.class.isAssignableFrom(returnType))) {
+                if ((name.contains("getmaterials") || name.contains("getall") || name.contains("materiallist")) &&
+                        (Collection.class.isAssignableFrom(returnType) || Map.class.isAssignableFrom(returnType))) {
                     getAllMaterialsMethod = method;
                     break;
                 }
@@ -80,10 +81,10 @@ public final class CustomMaterialLookup {
 
                 if (iterable != null) {
                     String[] candidateNames = {
-                        "getrepresentativestack",
-                        "getrepresentativestackornull",
-                        "getrepresentative",
-                        "getrepresentativeitem"
+                            "getrepresentativestack",
+                            "getrepresentativestackornull",
+                            "getrepresentative",
+                            "getrepresentativeitem"
                     };
 
                     for (Object matObj : iterable) {
@@ -118,7 +119,8 @@ public final class CustomMaterialLookup {
                                         return Optional.of(new MaterialStack(mat, 1));
                                     } catch (Throwable t) {
                                         MolDraw.LOGGER.debug(
-                                                "CustomMaterialLookup: failed to construct MaterialStack for matched material", t);
+                                                "CustomMaterialLookup: failed to construct MaterialStack for matched material",
+                                                t);
                                     }
                                 }
                             } catch (Throwable ignored) {
