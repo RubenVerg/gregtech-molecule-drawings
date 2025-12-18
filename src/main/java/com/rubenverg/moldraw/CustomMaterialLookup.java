@@ -1,4 +1,3 @@
-```java name=CustomMaterialLookup.java
 package com.rubenverg.moldraw;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
@@ -157,4 +156,3 @@ public final class CustomMaterialLookup {
         return Optional.empty();
     }
 }
-```
