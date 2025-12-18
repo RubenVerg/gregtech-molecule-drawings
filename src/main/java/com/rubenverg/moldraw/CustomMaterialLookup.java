@@ -1,0 +1,127 @@
+package com.rubenverg.moldraw;
+
+import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+import net.minecraft.world.item.ItemStack;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * 自定义的 Material 查找器（避免在编译时直接调用 ChemicalHelper.getMaterialEntry(ItemLike)）。
+ *
+ * 策略（按优先级）：
+ *  1) 尝试通过 GTCEuAPI.materialManager 上可能存在的直接方法（通过反射查找名含 "getMaterial"、接受 ItemStack/Item 的方法）；
+ *  2) 尝试获取 materialManager 的所有 Material（通过反射），并比较每个 Material 的代表物品（代表 ItemStack）与目标 ItemStack；
+ *  3) 若找到相同 Material，则用 new MaterialStack(material, 1) 返回（若构造器或签名不同会捕获异常并继续）。
+ *
+ * 注意：本实现是兼容层，尽量稳健地处理反射失败并返回 Optional.empty()。
+ */
+public final class CustomMaterialLookup {
+    private static final Object MATERIAL_MANAGER = GTCEuAPI.materialManager;
+
+    private CustomMaterialLookup() {}
+
+    public static Optional<MaterialStack> getMaterialEntry(ItemStack stack) {
+        if (stack == null || stack.isEmpty() || MATERIAL_MANAGER == null) return Optional.empty();
+
+        // 1) 反射：尝试在 materialManager 上查找接受 ItemStack/Item 的 getMaterial* 方法
+        try {
+            Method[] methods = MATERIAL_MANAGER.getClass().getMethods();
+            for (Method m : methods) {
+                String name = m.getName().toLowerCase();
+                Class<?>[] params = m.getParameterTypes();
+                if (name.contains("getmaterial") && params.length == 1) {
+                    // 支持 ItemStack 或 Item 的参数
+                    if (params[0].isAssignableFrom(ItemStack.class)) {
+                        Object res = m.invoke(MATERIAL_MANAGER, stack);
+                        Optional<MaterialStack> converted = convertToMaterialStack(res);
+                        if (converted.isPresent()) return converted;
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            // 反射可能失败，记录一次性日志以便排查（避免重复刷屏）
+            MolDraw.LOGGER.debug("CustomMaterialLookup: direct manager method lookup failed", t);
+        }
+
+        // 2) 反射：尝试获取 materialManager 上的所有材料并逐个匹配代表物品
+        try {
+            Method[] mm = MATERIAL_MANAGER.getClass().getMethods();
+            Method getAllMaterials = null;
+            for (Method m : mm) {
+                String name = m.getName().toLowerCase();
+                if ((name.contains("getmaterials") || name.contains("getall") || name.contains("materiallist")) &&
+                        (Collection.class.isAssignableFrom(m.getReturnType()) || Map.class.isAssignableFrom(m.getReturnType()))) {
+                    getAllMaterials = m;
+                    break;
+                }
+            }
+            if (getAllMaterials != null) {
+                Object all = getAllMaterials.invoke(MATERIAL_MANAGER);
+                Iterable<?> iterable = null;
+                if (all instanceof Map) iterable = ((Map<?, ?>) all).values();
+                else if (all instanceof Iterable) iterable = (Iterable<?>) all;
+
+                if (iterable != null) {
+                    // 为取得 Material -> 代表物品（可能方法名为 getRepresentativeStack/getRepresentativeItem/getRepresentative）
+                    for (Object matObj : iterable) {
+                        if (!(matObj instanceof Material)) continue;
+                        Material mat = (Material) matObj;
+                        // 尝试通过常见方法名获取代表 ItemStack（反射）
+                        ItemStack rep = null;
+                        try {
+                            // 常见方法名
+                            String[] cand = {"getrepresentativestack", "getrepresentativestackornull", "getrepresentative", "getrepresentativeitem", "getrepresentativestack"};
+                            for (String nm : cand) {
+                                try {
+                                    Method repMethod = mat.getClass().getMethod(nm);
+                                    Object repObj = repMethod.invoke(mat);
+                                    if (repObj instanceof ItemStack) {
+                                        rep = (ItemStack) repObj;
+                                        break;
+                                    }
+                                } catch (NoSuchMethodException ignored) {
+                                }
+                            }
+                        } catch (Throwable ignored) {
+                        }
+
+                        // 若获得代表物品则比较
+                        if (rep != null) {
+                            // 比较 item 相等或相同条目/标签（尽量宽松）
+                            if (rep.getItem() == stack.getItem() || ItemStack.isSameItemSameTags(rep, stack)) {
+                                try {
+                                    return Optional.of(new MaterialStack(mat, 1));
+                                } catch (Throwable t) {
+                                    MolDraw.LOGGER.debug("CustomMaterialLookup: failed to construct MaterialStack for matched material", t);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            MolDraw.LOGGER.debug("CustomMaterialLookup: material iteration lookup failed", t);
+        }
+
+        // 3) 最终回退：无法找到
+        return Optional.empty();
+    }
+
+    private static Optional<MaterialStack> convertToMaterialStack(Object o) {
+        if (o == null) return Optional.empty();
+        try {
+            if (o instanceof MaterialStack) return Optional.of((MaterialStack) o);
+            // 可能返回 Optional<MaterialStack>
+            if (o instanceof Optional) {
+                Optional<?> oo = (Optional<?>) o;
+                if (oo.isPresent() && oo.get() instanceof MaterialStack) return Optional.of((MaterialStack) oo.get());
+            }
+        } catch (Throwable ignored) {}
+        return Optional.empty();
+    }
+}
