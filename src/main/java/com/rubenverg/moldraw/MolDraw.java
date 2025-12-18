@@ -188,11 +188,13 @@ public class MolDraw {
 
         Material material;
         if (event.getItemStack().getItem() instanceof BucketItem bi) {
+            // 保留对流体使用 ChemicalHelper.getMaterial(...)（仅避免 getMaterialEntry(ItemLike)）
             material = ChemicalHelper.getMaterial(bi.getFluid());
         } else {
-            final var materialStack = ChemicalHelper.getMaterialEntry(event.getItemStack().getItem());
-            if (materialStack.isEmpty()) return;
-            material = materialStack.material();
+            // 使用我们自己的查找器替代 ChemicalHelper.getMaterialEntry(ItemLike)
+            final var materialStackOpt = CustomMaterialLookup.getMaterialEntry(event.getItemStack());
+            if (materialStackOpt.isEmpty()) return;
+            material = materialStackOpt.get().material();
         }
         if (material.isNull()) return;
         final var mol = getMolecule(material);
