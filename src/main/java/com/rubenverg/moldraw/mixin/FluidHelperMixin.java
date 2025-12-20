@@ -3,6 +3,7 @@ package com.rubenverg.moldraw.mixin;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.TooltipFlag;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 @Mixin(value = FluidHelper.class, priority = 1000000) // for sure more than GregTech
