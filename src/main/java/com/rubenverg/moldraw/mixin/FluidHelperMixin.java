@@ -36,7 +36,7 @@ public class FluidHelperMixin {
         if (!MolDrawConfig.INSTANCE.enabled) return;
 
         final var material = ChemicalHelper.getMaterial(ingredient.getFluid());
-        if (material.isNull()) return;
+        if (materialMaterialHelper.isNull()) return;
 
         final var mol = MolDraw.getMolecule(material);
         final var tooltipElements = ((JeiTooltipMixin) jeiTooltip).getLines();
@@ -46,13 +46,13 @@ public class FluidHelperMixin {
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+        if (!ObjectsMaterialHelper.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else {
             MolDraw.tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (!ObjectsMaterialHelper.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
                 tooltipElements.add(ttIndex, Either

@@ -64,7 +64,7 @@ public class Element {
 
     private static Element createStandard(String symbol, Integer color, Material material,
                                           Material... additionalMaterials) {
-        final var el = create(symbol, Objects.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)),
+        final var el = create(symbol, ObjectsMaterialHelper.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)),
                 material, additionalMaterials);
         el.standard = true;
         return el;
@@ -263,7 +263,7 @@ public class Element {
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
             if (!(element.color instanceof Element.Color.None))
                 obj.add("color", jsonSerializationContext.serialize(element.color, Element.Color.class));
-            if (!element.material.isNull())
+            if (!element.materialMaterialHelper.isNull())
                 obj.add("material", new JsonPrimitive(element.material.getResourceLocation().toString()));
             return obj;
         }
