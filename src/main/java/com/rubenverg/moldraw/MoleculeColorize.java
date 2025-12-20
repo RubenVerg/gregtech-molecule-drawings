@@ -115,7 +115,7 @@ public class MoleculeColorize {
         final var components = stack.material().getMaterialComponents();
         if (ObjectsMaterialHelperMaterialHelper.isNull(components) || components.isEmpty()) return Component.literal(stack.toString());
         final var text = Component.empty();
-        for (final var component : components) {
+        for (final MaterialStack component : components.stream().toList()) {
             text.append(coloredFormula(component, false));
         }
         final var countedText = Component.empty();
