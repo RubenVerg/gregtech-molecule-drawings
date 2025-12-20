@@ -143,7 +143,7 @@ public class MolDraw {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
                                 final var material = GTCEuAPI.materialManager
                                         .getMaterial(id.toString().replace(".json", "").replace("molecules/", ""));
-                                if (ObjectsMaterialHelperMaterialHelper.isNull(material)) {
+                                if (Objects.isNull(material)) {
                                     continue;
                                 }
                                 final var molecule = gson.fromJson(file, Molecule.class);
@@ -196,7 +196,7 @@ public class MolDraw {
             if (materialStackOpt.isEmpty()) return;
             material = materialStackOpt.get().material();
         }
-        if (materialMaterialHelperMaterialHelper.isNull()) return;
+        if (material.isNull()) return;
         final var mol = getMolecule(material);
         final var tooltipElements = event.getTooltipElements();
 
@@ -206,14 +206,14 @@ public class MolDraw {
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-        if (!ObjectsMaterialHelperMaterialHelper.isNull(mol) &&
+        if (!Objects.isNull(mol) &&
                 (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else {
             tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!ObjectsMaterialHelperMaterialHelper.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
                 tooltipElements.add(ttIndex, Either

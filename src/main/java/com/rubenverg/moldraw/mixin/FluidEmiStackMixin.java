@@ -54,8 +54,8 @@ public class FluidEmiStackMixin {
                                          @Local(name = "list") List<ClientTooltipComponent> list) {
         if (!MolDrawConfig.INSTANCE.enabled) return;
         final var material = ChemicalHelper.getMaterial(fluid);
-        if (materialMaterialHelperMaterialHelperMaterialHelper.isNull()) return;
-        if (ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(material.getMaterialComponents())) return;
+        if (material.isNull()) return;
+        if (Objects.isNull(material.getMaterialComponents())) return;
 
         final var mol = MolDraw.getMolecule(material);
         final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
@@ -66,7 +66,7 @@ public class FluidEmiStackMixin {
                         moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
                 .findFirst();
 
-        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+        if (!Objects.isNull(mol) &&
                 (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent())
                 list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
@@ -85,7 +85,7 @@ public class FluidEmiStackMixin {
                             ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
             }
 
-            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+            if (!Objects.isNull(mol) &&
                     MolDrawConfig.INSTANCE.onlyShowOnShift) {
 
                 if (idx.isPresent())

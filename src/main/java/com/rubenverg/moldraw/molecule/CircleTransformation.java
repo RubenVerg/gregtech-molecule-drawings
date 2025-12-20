@@ -1,4 +1,5 @@
 package com.rubenverg.moldraw.molecule;
+import java.util.Objects;
 
 import com.google.gson.*;
 import org.joml.Matrix2f;
@@ -39,7 +40,7 @@ public record CircleTransformation(
             else if (obj.has("a00") && obj.has("a01") && obj.has("a10") && obj.has("a11"))
                 mat = new Matrix2f(obj.get("a00").getAsFloat(), obj.get("a01").getAsFloat(),
                         obj.get("a10").getAsFloat(), obj.get("a11").getAsFloat());
-            if (ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mat))
+            if (Objects.isNull(mat))
                 throw new JsonParseException("Circle transformation must have either x and y or a00, a01, a10, a11");
             return new CircleTransformation(
                     mat,

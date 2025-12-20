@@ -244,8 +244,8 @@ public record MoleculeTooltipComponent(
             final var ts = toScaledFactory(font.lineHeight);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Bond bond) {
-                    if (ObjectsMaterialHelperMaterialHelper.isNull(this.molecule.getAtom(bond.a())) ||
-                            ObjectsMaterialHelperMaterialHelper.isNull(this.molecule.getAtom(bond.b())))
+                    if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
+                            Objects.isNull(this.molecule.getAtom(bond.b())))
                         continue;
                     final var atomA = this.molecule.getAtom(bond.a()).orElseThrow();
                     final var atomAWidth = elementWidths.get(atomA.element());
