@@ -1,5 +1,4 @@
 package com.rubenverg.moldraw.mixin;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -21,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 @Mixin(value = FluidHelper.class, priority = 1000000) // for sure more than GregTech
@@ -47,13 +45,15 @@ public class FluidHelperMixin {
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+                (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else {
             MolDraw.tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+                    MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
                 tooltipElements.add(ttIndex, Either
