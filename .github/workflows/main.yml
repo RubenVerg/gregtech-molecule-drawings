@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI with Format and Build
 
 on:
   push:
@@ -7,29 +7,66 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  spotless:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
+    outputs:
+      commit_sha: ${{ steps.get-commit.outputs.sha }}
+    
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
+    - name: Checkout 代码
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # 获取完整历史
+    
+    - name: 设置 Java
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+    
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
+    
+    - name: 修复代码格式
+      run: ./gradlew spotlessApply
+    
+    - name: 自动提交修复
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -m "🔧 自动修复代码格式 [spotless]" || echo "没有需要提交的更改"
+        git push origin HEAD:${GITHUB_REF#refs/heads/}
+    
+    - name: 获取提交哈希
+      id: get-commit
+      run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-    - name: Build with Gradle Wrapper
+  build:
+    needs: spotless  # 依赖 spotless 作业
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出最新代码（包含格式修复）
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.spotless.outputs.commit_sha || github.sha }}
+    
+    - name: 设置 Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
+    
+    - name: 使用 Gradle Wrapper 构建
       run: ./gradlew build
-
-    - name: Upload artifact
+    
+    - name: 上传构建产物
       uses: actions/upload-artifact@v4
       with:
         name: 'gtmoldraw'
