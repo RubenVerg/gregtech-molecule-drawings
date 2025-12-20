@@ -1,5 +1,4 @@
 package com.rubenverg.moldraw;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
