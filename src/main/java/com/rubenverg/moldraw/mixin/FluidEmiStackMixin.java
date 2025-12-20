@@ -1,21 +1,17 @@
 package com.rubenverg.moldraw.mixin;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.Fluid;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
-import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import org.spongepowered.asm.mixin.Final;
@@ -64,7 +60,8 @@ public class FluidEmiStackMixin {
         final var mol = MolDraw.getMolecule(material);
         final OptionalInt idx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                        moldraw$simpleGetText(((ClientTextTooltip) ctt).getText()).equals(material.getChemicalFormula()))
+                        moldraw$simpleGetText(((ClientTextTooltip) ctt).getText())
+                                .equals(material.getChemicalFormula()))
                 .reduce((a, b) -> b);
         final OptionalInt quantityIdx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&

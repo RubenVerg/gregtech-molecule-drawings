@@ -1,5 +1,4 @@
 package com.rubenverg.moldraw.molecule;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.google.gson.*;
 import org.joml.Matrix2f;
