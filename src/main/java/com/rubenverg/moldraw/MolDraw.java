@@ -1,5 +1,4 @@
 package com.rubenverg.moldraw;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
@@ -207,13 +206,15 @@ public class MolDraw {
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+                (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else {
             tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+                    MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
                 tooltipElements.add(ttIndex, Either

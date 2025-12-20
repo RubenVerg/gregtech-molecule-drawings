@@ -1,5 +1,4 @@
 package com.rubenverg.moldraw.molecule;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
@@ -65,7 +64,9 @@ public class Element {
 
     private static Element createStandard(String symbol, Integer color, Material material,
                                           Material... additionalMaterials) {
-        final var el = create(symbol, ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)),
+        final var el = create(symbol,
+                ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(color) ? Color.NONE :
+                        new Color.Optional(color | (0xff << 24)),
                 material, additionalMaterials);
         el.standard = true;
         return el;

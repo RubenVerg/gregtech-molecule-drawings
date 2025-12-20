@@ -1,5 +1,4 @@
 package com.rubenverg.moldraw.mixin;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
@@ -67,7 +66,8 @@ public class FluidEmiStackMixin {
                         moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
                 .findFirst();
 
-        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+        if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+                (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent())
                 list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
             else
@@ -85,7 +85,8 @@ public class FluidEmiStackMixin {
                             ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
             }
 
-            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (!ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(mol) &&
+                    MolDrawConfig.INSTANCE.onlyShowOnShift) {
 
                 if (idx.isPresent())
                     list.set(idx.getAsInt() + 1, ClientTooltipComponent
