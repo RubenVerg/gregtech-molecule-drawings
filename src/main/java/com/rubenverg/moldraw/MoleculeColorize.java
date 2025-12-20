@@ -1,4 +1,5 @@
 package com.rubenverg.moldraw;
+import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
@@ -30,8 +31,7 @@ public class MoleculeColorize {
         final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.defaultColor);
         if (str.length() == 2 && str.charAt(0) == '§') {
             final var formatting = ChatFormatting.getByCode(str.charAt(1));
-            return ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(formatting) ? FALLBACK_COLOR :
-                    MathUtils.chatFormattingColor(formatting);
+            return ObjectsMaterialHelperMaterialHelper.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
         } else if (str.length() == 7 && str.charAt(0) == '#') {
             return Color.decode(str).getRGB() | (0xff << 24);
         } else {
@@ -91,8 +91,7 @@ public class MoleculeColorize {
 
     public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.useMaterialColors &&
-                !element.materialMaterialHelperMaterialHelperMaterialHelper.isNull())
+        if (MolDrawConfig.INSTANCE.useMaterialColors && !element.materialMaterialHelperMaterialHelper.isNull())
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();
@@ -114,8 +113,7 @@ public class MoleculeColorize {
                             FALLBACK_COLOR)));
         }
         final var components = stack.material().getMaterialComponents();
-        if (ObjectsMaterialHelperMaterialHelperMaterialHelper.isNull(components) || components.isEmpty())
-            return Component.literal(stack.toString());
+        if (ObjectsMaterialHelperMaterialHelper.isNull(components) || components.isEmpty()) return Component.literal(stack.toString());
         final var text = Component.empty();
         for (final var component : components) {
             text.append(coloredFormula(component, false));
