@@ -1,6 +1,4 @@
 package com.rubenverg.moldraw.mixin;
-import com.adsioho.gtm.compat.MaterialHelper;
-import java.util.Objects;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.utils.GTUtil;
