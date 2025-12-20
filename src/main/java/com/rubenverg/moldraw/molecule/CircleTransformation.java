@@ -1,11 +1,12 @@
 package com.rubenverg.moldraw.molecule;
-import java.util.Objects;
+import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.google.gson.*;
 import org.joml.Matrix2f;
 import org.joml.Matrix2fc;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 public record CircleTransformation(
                                    Matrix2fc A,
@@ -26,7 +27,7 @@ public record CircleTransformation(
 
         private Json() {}
 
-        public static CircleTransformation.Json INSTANCE = new CircleTransformation.Json();
+        public static final CircleTransformation.Json INSTANCE = new CircleTransformation.Json();
 
         @Override
         public CircleTransformation deserialize(JsonElement jsonElement, Type type,

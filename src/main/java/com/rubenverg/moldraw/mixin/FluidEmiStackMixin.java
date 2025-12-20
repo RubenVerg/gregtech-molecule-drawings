@@ -1,6 +1,8 @@
 package com.rubenverg.moldraw.mixin;
+import com.adsioho.gtm.compat.MaterialHelper;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
+import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -26,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 @Mixin(value = FluidEmiStack.class, remap = false)
@@ -53,48 +56,28 @@ public class FluidEmiStackMixin {
     private void moldraw$addFluidTooltip(CallbackInfoReturnable<List<ClientTooltipComponent>> cir,
                                          @Local(name = "list") List<ClientTooltipComponent> list) {
         if (!MolDrawConfig.INSTANCE.enabled) return;
-        final var material = ChemicalHelper.getMaterial(fluid);
-        if (material.isNull()) return;
+
+        final Material material = ChemicalHelper.getMaterial(fluid);
+        if (Objects.isNull(material)) return;
         if (Objects.isNull(material.getMaterialComponents())) return;
 
         final var mol = MolDraw.getMolecule(material);
-        final var idx = IntStream.range(0, list.size()).filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).equals(material.getChemicalFormula()))
-                .reduce((a, b) -> b);
-        final var quantityIdx = IntStream.range(0, list.size())
+        final OptionalInt idx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                        moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB"))
+                        moldraw$simpleGetText(((ClientTextTooltip) ctt).getText()).equals(material.getChemicalFormula()))
+                .reduce((a, b) -> b);
+        final OptionalInt quantityIdx = IntStream.range(0, list.size())
+                .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
+                        moldraw$simpleGetText(((ClientTextTooltip) ctt).getText()).endsWith("mB"))
                 .findFirst();
 
-        if (!Objects.isNull(mol) &&
-                (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
-            if (idx.isPresent())
-                list.set(idx.getAsInt(), ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
-            else
-                list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
-                        ClientTooltipComponent.create(new MoleculeTooltipComponent(mol)));
-        } else {
-            if (Objects.nonNull(material.getMaterialComponents()) && !material.getMaterialComponents().isEmpty() ||
-                    material.isElement()) {
-                final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
-
-                if (idx.isPresent())
-                    list.set(idx.getAsInt(), ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
-                else
-                    list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
-                            ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
-            }
-
-            if (!Objects.isNull(mol) &&
-                    MolDrawConfig.INSTANCE.onlyShowOnShift) {
-
-                if (idx.isPresent())
-                    list.set(idx.getAsInt() + 1, ClientTooltipComponent
-                            .create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
-                else
-                    list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(2),
-                            ClientTooltipComponent
-                                    .create(Component.translatable("tooltip.moldraw.shift_view").getVisualOrderText()));
+        if (mol != null && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+            final ClientTooltipComponent comp = ClientTooltipComponent.create(new MoleculeTooltipComponent(mol));
+            if (idx.isPresent()) {
+                list.set(idx.getAsInt(), comp);
+            } else {
+                final int insertIdx = quantityIdx.isPresent() ? quantityIdx.getAsInt() + 1 : 1;
+                list.add(Math.min(insertIdx, list.size()), comp);
             }
         }
     }
