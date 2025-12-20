@@ -34,7 +34,7 @@ public final class MaterialHelper {
 
             // 1) 数量/大小类检查（若存在且 <= 0 则视为空）
             String[] numericMethods = {
-                "getAmount", "getStackSize", "getSize", "getSizeInUnits", "getQuantity", "getQty", "getCount"
+                    "getAmount", "getStackSize", "getSize", "getSizeInUnits", "getQuantity", "getQty", "getCount"
             };
             for (String methodName : numericMethods) {
                 try {
@@ -43,9 +43,7 @@ public final class MaterialHelper {
                     if (val instanceof Number) {
                         if (((Number) val).longValue() <= 0L) return true;
                     }
-                } catch (NoSuchMethodException ignored) {
-                } catch (Throwable ignored) {
-                }
+                } catch (NoSuchMethodException ignored) {} catch (Throwable ignored) {}
             }
 
             // 1b) 也尝试查找常见字段（如 amount, stackSize, qty）
@@ -58,14 +56,12 @@ public final class MaterialHelper {
                     if (val instanceof Number) {
                         if (((Number) val).longValue() <= 0L) return true;
                     }
-                } catch (NoSuchFieldException ignored) {
-                } catch (Throwable ignored) {
-                }
+                } catch (NoSuchFieldException ignored) {} catch (Throwable ignored) {}
             }
 
             // 2) 名称类检查（若名称为 null / 空 / "null" / "air" / "unknown" 则视为空）
             String[] nameMethods = {
-                "getName", "getUnlocalizedName", "getLocalizedName", "getDisplayName", "name", "getId"
+                    "getName", "getUnlocalizedName", "getLocalizedName", "getDisplayName", "name", "getId"
             };
             for (String methodName : nameMethods) {
                 try {
@@ -75,12 +71,11 @@ public final class MaterialHelper {
                     String s = val.toString().trim();
                     if (s.isEmpty()) return true;
                     String lower = s.toLowerCase();
-                    if (lower.equals("null") || lower.equals("air") || lower.equals("unknown") || lower.equals("empty")) {
+                    if (lower.equals("null") || lower.equals("air") || lower.equals("unknown") ||
+                            lower.equals("empty")) {
                         return true;
                     }
-                } catch (NoSuchMethodException ignored) {
-                } catch (Throwable ignored) {
-                }
+                } catch (NoSuchMethodException ignored) {} catch (Throwable ignored) {}
             }
 
             // 2b) 字段名称检查
@@ -94,12 +89,11 @@ public final class MaterialHelper {
                     String s = val.toString().trim();
                     if (s.isEmpty()) return true;
                     String lower = s.toLowerCase();
-                    if (lower.equals("null") || lower.equals("air") || lower.equals("unknown") || lower.equals("empty")) {
+                    if (lower.equals("null") || lower.equals("air") || lower.equals("unknown") ||
+                            lower.equals("empty")) {
                         return true;
                     }
-                } catch (NoSuchFieldException ignored) {
-                } catch (Throwable ignored) {
-                }
+                } catch (NoSuchFieldException ignored) {} catch (Throwable ignored) {}
             }
 
         } catch (Throwable t) {
