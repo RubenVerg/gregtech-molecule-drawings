@@ -30,7 +30,8 @@ public class MoleculeColorize {
         final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.defaultColor);
         if (str.length() == 2 && str.charAt(0) == '§') {
             final var formatting = ChatFormatting.getByCode(str.charAt(1));
-            return Objects.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
+            return Objects.isNull(formatting) ? FALLBACK_COLOR :
+                    MathUtils.chatFormattingColor(formatting);
         } else if (str.length() == 7 && str.charAt(0) == '#') {
             return Color.decode(str).getRGB() | (0xff << 24);
         } else {
@@ -112,9 +113,10 @@ public class MoleculeColorize {
                             FALLBACK_COLOR)));
         }
         final var components = stack.material().getMaterialComponents();
-        if (Objects.isNull(components) || components.isEmpty()) return Component.literal(stack.toString());
+        if (Objects.isNull(components) || components.isEmpty())
+            return Component.literal(stack.toString());
         final var text = Component.empty();
-        for (final var component : components) {
+        for (final MaterialStack component : components.stream().toList()) {
             text.append(coloredFormula(component, false));
         }
         final var countedText = Component.empty();

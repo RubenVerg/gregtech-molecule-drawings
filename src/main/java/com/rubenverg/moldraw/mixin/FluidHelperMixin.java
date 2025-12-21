@@ -46,13 +46,15 @@ public class FluidHelperMixin {
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+        if (!Objects.isNull(mol) &&
+                (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
             else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
         } else {
             MolDraw.tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (!Objects.isNull(mol) &&
+                    MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
                 tooltipElements.add(ttIndex, Either

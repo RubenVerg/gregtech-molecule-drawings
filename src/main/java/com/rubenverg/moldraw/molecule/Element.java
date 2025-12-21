@@ -64,7 +64,9 @@ public class Element {
 
     private static Element createStandard(String symbol, Integer color, Material material,
                                           Material... additionalMaterials) {
-        final var el = create(symbol, Objects.isNull(color) ? Color.NONE : new Color.Optional(color | (0xff << 24)),
+        final var el = create(symbol,
+                Objects.isNull(color) ? Color.NONE :
+                        new Color.Optional(color | (0xff << 24)),
                 material, additionalMaterials);
         el.standard = true;
         return el;

@@ -26,7 +26,7 @@ public record CircleTransformation(
 
         private Json() {}
 
-        public static CircleTransformation.Json INSTANCE = new CircleTransformation.Json();
+        public static final CircleTransformation.Json INSTANCE = new CircleTransformation.Json();
 
         @Override
         public CircleTransformation deserialize(JsonElement jsonElement, Type type,
