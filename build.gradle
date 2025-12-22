@@ -152,7 +152,7 @@ dependencies {
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
     modImplementation("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
     modRuntimeOnly("curse.maven:jade-324717:5390389")
-    modImplementation("dev.emi:emi-forge:${emi_version}+${minecraft_version}")
+    modImplementation("dev.emi:emi-forge:${emi_version}+${minecraft_version}+${forge}")
 
     // GregTech and dependencies
     modImplementation("com.gregtechceu.gtceu:gtceu-${minecraft_version}:${gtceu_version}:slim") { transitive = false }
