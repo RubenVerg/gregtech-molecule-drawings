@@ -259,12 +259,12 @@ public class Element {
         public JsonElement serialize(Element element, Type type,
                                      JsonSerializationContext jsonSerializationContext) {
              if (element.standard) return new JsonPrimitive(element.symbol);
-            if (element.color instanceof Null && !element.invisible)
+            if (element.color == null && !element.invisible)
             return new JsonPrimitive(element.symbol);
             final var obj = new JsonObject();
             obj.add("symbol", new JsonPrimitive(element.symbol));
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
-            if (!(element.color instanceof Element.Color.Null))
+            if (element.color != null)
                 obj.add("color", jsonSerializationContext.serialize(element.color, Element.Color.class));
             if (!MaterialHelper.isNull(element.material)) // <-- 改用 MaterialHelper
                 obj.add("material", new JsonPrimitive(element.material.getResourceLocation().toString()));
