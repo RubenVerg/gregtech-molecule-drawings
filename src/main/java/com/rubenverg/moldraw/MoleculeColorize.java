@@ -12,12 +12,11 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FastColor;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 
+import com.adsioho.gtm.compat.MaterialHelper;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.rubenverg.moldraw.molecule.Element;
 import com.rubenverg.moldraw.molecule.MathUtils;
 import org.jetbrains.annotations.Nullable;
-
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import java.awt.*;
 import java.io.IOException;
@@ -93,7 +92,8 @@ public class MoleculeColorize {
 
     public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.useMaterialColors && !MaterialHelper.isNull(element.material)) // <-- 改用 MaterialHelper
+        if (MolDrawConfig.INSTANCE.useMaterialColors && !MaterialHelper.isNull(element.material)) // <-- 改用
+                                                                                                  // MaterialHelper
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.Null) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();

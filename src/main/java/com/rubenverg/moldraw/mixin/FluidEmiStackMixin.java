@@ -65,7 +65,8 @@ public class FluidEmiStackMixin {
                 .reduce((a, b) -> b);
         final OptionalInt quantityIdx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                        moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB")) // <-- 使用 mixin 访问器
+                        moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB")) // <-- 使用 mixin
+                                                                                                        // 访问器
                 .findFirst();
 
         if (mol != null && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
