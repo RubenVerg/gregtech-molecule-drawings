@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
+import com.adsioho.gtm.compat.MaterialHelper;
 import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,8 +14,6 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
-
-import com.adsioho.gtm.compat.MaterialHelper;
 
 public class Element {
 
@@ -259,9 +258,9 @@ public class Element {
         @Override
         public JsonElement serialize(Element element, Type type,
                                      JsonSerializationContext jsonSerializationContext) {
-             if (element.standard) return new JsonPrimitive(element.symbol);
+            if (element.standard) return new JsonPrimitive(element.symbol);
             if (element.color instanceof None && !element.invisible)
-            return new JsonPrimitive(element.symbol);
+                return new JsonPrimitive(element.symbol);
             final var obj = new JsonObject();
             obj.add("symbol", new JsonPrimitive(element.symbol));
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));

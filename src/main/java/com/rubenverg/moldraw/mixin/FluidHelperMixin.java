@@ -2,13 +2,13 @@ package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.utils.GTUtil;
-import com.adsioho.gtm.compat.MaterialHelper;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.adsioho.gtm.compat.MaterialHelper;
 import com.mojang.datafixers.util.Either;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
