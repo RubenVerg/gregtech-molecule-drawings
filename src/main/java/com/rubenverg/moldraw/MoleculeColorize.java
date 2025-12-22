@@ -95,7 +95,7 @@ public class MoleculeColorize {
         final var defaultColor = configColor(null);
         if (MolDrawConfig.INSTANCE.useMaterialColors && !MaterialHelper.isNull(element.material)) // <-- 改用 MaterialHelper
             return colorForMaterial(element.material);
-        else if (element.color instanceof Element.Color.None) return defaultColor;
+        else if (element.color instanceof Element.Color.Null) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();
         else if (element.color instanceof Element.Color.Optional optional)
             return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;

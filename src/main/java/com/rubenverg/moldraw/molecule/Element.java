@@ -30,7 +30,7 @@ public class Element {
     protected Element(String symbol, boolean invisible) {
         this.symbol = symbol;
         this.invisible = invisible;
-        this.color = Color.NONE;
+        this.color = Color.NULL;
         this.standard = false;
         this.material = GTMaterials.NULL;
         this.additionalMaterials = new ArrayList<>();
@@ -67,7 +67,7 @@ public class Element {
     private static Element createStandard(String symbol, Integer color, Material material,
                                           Material... additionalMaterials) {
         final var el = create(symbol,
-                Objects.isNull(color) ? Color.NONE :
+                Objects.isNull(color) ? Color.NULL :
                         new Color.Optional(color | (0xff << 24)),
                 material, additionalMaterials);
         el.standard = true;
@@ -260,12 +260,12 @@ public class Element {
         public JsonElement serialize(Element element, Type type,
                                      JsonSerializationContext jsonSerializationContext) {
              if (element.standard) return new JsonPrimitive(element.symbol);
-            if (element.color instanceof None && !element.invisible)
+            if (element.color instanceof Null && !element.invisible)
             return new JsonPrimitive(element.symbol);
             final var obj = new JsonObject();
             obj.add("symbol", new JsonPrimitive(element.symbol));
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
-            if (!(element.color instanceof Element.Color.None))
+            if (!(element.color instanceof Element.Color.Null))
                 obj.add("color", jsonSerializationContext.serialize(element.color, Element.Color.class));
             if (!MaterialHelper.isNull(element.material)) // <-- 改用 MaterialHelper
                 obj.add("material", new JsonPrimitive(element.material.getResourceLocation().toString()));
@@ -275,9 +275,9 @@ public class Element {
 
     public sealed interface Color {
 
-        Color NONE = new None();
+        Color NULL = new Null();
 
-        record None() implements Color {}
+        record Null() implements Color {}
 
         record Always(int color) implements Color {}
 
@@ -292,7 +292,7 @@ public class Element {
             @Override
             public Color deserialize(JsonElement jsonElement, Type type,
                                      JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                if (jsonElement.isJsonNull()) return NONE;
+                if (jsonElement.isJsonNull()) return NULL;
                 if (jsonElement.isJsonPrimitive()) {
                     final var prim = jsonElement.getAsJsonPrimitive();
                     if (prim.isString())
@@ -313,7 +313,7 @@ public class Element {
             @Override
             public JsonElement serialize(Color color, Type type,
                                          JsonSerializationContext jsonSerializationContext) {
-                if (color instanceof None) return JsonNull.INSTANCE;
+                if (color instanceof Null) return JsonNull.INSTANCE;
                 if (color instanceof Always always) return new JsonPrimitive(always.color);
                 if (color instanceof Optional optional) {
                     final var obj = new JsonObject();
