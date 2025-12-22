@@ -258,9 +258,9 @@ public class Element {
         @Override
         public JsonElement serialize(Element element, Type type,
                                      JsonSerializationContext jsonSerializationContext) {
-             if (element.standard) return new JsonPrimitive(element.symbol);
+            if (element.standard) return new JsonPrimitive(element.symbol);
             if (element.color == null && !element.invisible)
-            return new JsonPrimitive(element.symbol);
+                return new JsonPrimitive(element.symbol);
             final var obj = new JsonObject();
             obj.add("symbol", new JsonPrimitive(element.symbol));
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
