@@ -17,6 +17,8 @@ import com.rubenverg.moldraw.molecule.Element;
 import com.rubenverg.moldraw.molecule.MathUtils;
 import org.jetbrains.annotations.Nullable;
 
+import com.adsioho.gtm.compat.MaterialHelper;
+
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -91,7 +93,7 @@ public class MoleculeColorize {
 
     public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.useMaterialColors && !element.material.isNull())
+        if (MolDrawConfig.INSTANCE.useMaterialColors && !MaterialHelper.isNull(element.material)) // <-- 改用 MaterialHelper
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();

@@ -42,6 +42,8 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.adsioho.gtm.compat.MaterialHelper;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -196,7 +198,7 @@ public class MolDraw {
             if (materialStackOpt.isEmpty()) return;
             material = materialStackOpt.get().material();
         }
-        if (material.isNull()) return;
+        if (MaterialHelper.isNull(material)) return; // <-- 使用 MaterialHelper 判空
         final var mol = getMolecule(material);
         final var tooltipElements = event.getTooltipElements();
 
@@ -222,3 +224,4 @@ public class MolDraw {
         }
     }
 }
+

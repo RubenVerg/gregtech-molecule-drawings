@@ -2,6 +2,7 @@ package com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.utils.GTUtil;
+import com.adsioho.gtm.compat.MaterialHelper;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -36,7 +37,7 @@ public class FluidHelperMixin {
         if (!MolDrawConfig.INSTANCE.enabled) return;
 
         final var material = ChemicalHelper.getMaterial(ingredient.getFluid());
-        if (material.isNull()) return;
+        if (MaterialHelper.isNull(material)) return; // <-- 使用 MaterialHelper 判空
 
         final var mol = MolDraw.getMolecule(material);
         final var tooltipElements = ((JeiTooltipMixin) jeiTooltip).getLines();
