@@ -32,7 +32,7 @@ public class MolDrawConfig {
     public boolean useMaterialColors = false;
 
     @Configurable
-    public boolean onlyShowOnShift = false;
+    public boolean onlyShowOnShift = true;
 
     @Configurable
     public String defaultColor = "§e";
