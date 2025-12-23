@@ -1,6 +1,7 @@
 # GregTech Molecule Drawings
 
 This clientside only mod adds molecule drawings for organic molecules from GregTech CEu and its addons and modpacks in tooltips.
+GregTechModern 1.x 特供版，去除了对高版本(gtm7+)的一些依赖，计划更新gtl/gto的化学品分子结构图，由gtl/gto群u赞助构建！
 
 ## Examples
 
@@ -21,6 +22,8 @@ MolDraw comes out of the box with support for not only most of the organic mater
 * Star Technology
 * Cosmic Frontiers
 * Phoenix Forge Technologies
+* GregTech Leisure(Work in Progress)
+* GregTech Odyssey(Work in Progress)
 
 ## What people say about this mod
 
