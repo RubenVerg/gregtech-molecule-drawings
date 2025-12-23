@@ -1,0 +1,12 @@
+{
+  "tooltip.moldraw.shift_view": "§7按下 Shift 键以查看结构",
+
+  "config.moldraw.option.enabled": "启用模组",
+  "config.moldraw.option.debugMode": "Debug 模式",
+  "config.moldraw.option.coloredAtoms": "彩色元素",
+  "config.moldraw.option.useMaterialColors": "使用材料颜色",
+  "config.moldraw.option.onlyShowOnShift": "仅在按下 Shift 时显示分子",
+  "config.moldraw.option.defaultColor": "默认元素颜色",
+  "config.moldraw.option.scale": "分子缩放",
+  "config.moldraw.option.minimumBrightness": "彩色元素的最小亮度"
+}
