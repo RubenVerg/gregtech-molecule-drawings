@@ -32,7 +32,7 @@ jobs:
           -Djavax.net.ssl.trustStorePassword=changeit
           -Dcom.sun.net.ssl.checkRevocation=false
           -Dcom.sun.security.enableAIAcaIssuers=true
-          -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2,TLSv1.3
+          -Dhttps.protocols=TLSv1.3
       run: ./gradlew build
     
     - name: 上传构建产物
