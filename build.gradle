@@ -37,7 +37,7 @@ repositories {
         url "https://maven.firstdarkdev.xyz/snapshots/"
     }
     maven { // Registrate
-        url = "https://maven.tterrag.com/"
+        url = "http://maven.tterrag.com/"
         content {
             // need to be specific here due to version overlaps
             includeGroup("com.tterrag.registrate")
