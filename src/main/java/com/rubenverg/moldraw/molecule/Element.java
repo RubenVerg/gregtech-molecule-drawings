@@ -210,9 +210,6 @@ public class Element {
     public static Element Ts = Element.createStandard("Ts", null, GTMaterials.Tennessine);
     public static Element Og = Element.createStandard("Og", null, GTMaterials.Oganesson);
    
-    //GTL Elements
-    //public static Element Ma = Element.createStandard("Ma", 0xab5cf2, GTMaterials.Magicium);
-
     public static Element INVISIBLE = elements.computeIfAbsent("", s -> new Element(s, true));
     public static Element BULLET = Element.create("•");
 
