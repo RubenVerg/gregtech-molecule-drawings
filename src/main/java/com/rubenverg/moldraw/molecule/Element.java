@@ -209,6 +209,9 @@ public class Element {
     public static Element Lv = Element.createStandard("Lv", null, GTMaterials.Livermorium);
     public static Element Ts = Element.createStandard("Ts", null, GTMaterials.Tennessine);
     public static Element Og = Element.createStandard("Og", null, GTMaterials.Oganesson);
+   
+    //GTL Elements
+    public static Element Ma = Element.createStandard("Ma", 0xab5cf2, GTMaterials.Magicium);
 
     public static Element INVISIBLE = elements.computeIfAbsent("", s -> new Element(s, true));
     public static Element BULLET = Element.create("•");
@@ -218,7 +221,7 @@ public class Element {
     public static Element Ke = Element.createStandard("Ke", null, GTMaterials.Trinium);
     public static Element Tr = Element.createStandard("Tr", null, GTMaterials.Tritanium);
     public static Element Dr = Element.createStandard("Dr", null, GTMaterials.Duranium);
-    public static Element Nt = Element.createStandard("Nt", null, GTMaterials.Neutronium);
+    public static Element Nt = Element.createStandard("Nt", 0x, GTMaterials.Neutronium);
 
     static {
         INVISIBLE.standard = true;
