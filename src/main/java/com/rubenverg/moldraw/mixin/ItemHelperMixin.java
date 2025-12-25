@@ -7,7 +7,6 @@ import com.rubenverg.moldraw.CustomMaterialLookup;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
-import com.rubenverg.moldraw.MaterialHelper;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
 import mezz.jei.forge.platform.helpers.item.ItemHelper;
