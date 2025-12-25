@@ -11,6 +11,7 @@ import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
 import mezz.jei.forge.platform.lookup.item.ItemStackHelper;
 import mezz.jei.forge.platform.JeiTooltipMixin;
+import mezz.jei.forge.platform.ItemStackHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
