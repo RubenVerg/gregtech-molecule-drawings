@@ -221,7 +221,7 @@ public class Element {
     public static Element Ke = Element.createStandard("Ke", null, GTMaterials.Trinium);
     public static Element Tr = Element.createStandard("Tr", null, GTMaterials.Tritanium);
     public static Element Dr = Element.createStandard("Dr", null, GTMaterials.Duranium);
-    public static Element Nt = Element.createStandard("Nt", 0x, GTMaterials.Neutronium);
+    public static Element Nt = Element.createStandard("Nt", null, GTMaterials.Neutronium);
 
     static {
         INVISIBLE.standard = true;
