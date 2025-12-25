@@ -9,8 +9,6 @@ import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
-import mezz.jei.forge.platform.lookup.item.ItemStackHelper;
-import mezz.jei.forge.platform.JeiTooltipMixin;
 import mezz.jei.forge.platform.ItemStackHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -31,8 +29,8 @@ import java.util.stream.IntStream;
 /**
  * 把 moldraw 加到 JEI 的 Item tooltip（与 FluidHelperMixin 对称）
  */
-@Mixin(value = ItemHelper.class, priority = 1000000)
-public class ItemHelperMixin {
+@Mixin(value = ItemStackHelper.class, priority = 1000000)
+public class ItemStackHelperMixin {
 
     @Inject(method = "getTooltip(Lmezz/jei/api/gui/builder/ITooltipBuilder;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/TooltipFlag;)V",
             at = @At("TAIL"),
