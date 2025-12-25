@@ -8,7 +8,7 @@ import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.emi.emi.api.stack.ItemEmiStack;
