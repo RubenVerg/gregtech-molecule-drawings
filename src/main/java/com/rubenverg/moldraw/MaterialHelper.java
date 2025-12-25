@@ -12,8 +12,7 @@ import java.lang.reflect.Method;
  * - 通过反射寻找常见的名称方法（getName, getUnlocalizedName, getDisplayName 等），若返回 null/空串/"null"/"air"/"unknown" -> true
  *
  * 设计原则：尽量保守，不抛出异常，若无法判定则返回 false（即认为非空）。
- *
- * 请在替换仓库中所有 Material.isNull(...) 的调用为 MaterialHelper.isNull(...)（可使用提供的替换脚本）。
+ * 适用于多种 mod 定义的 Material 类或类似类型。
  */
 public final class MaterialHelper {
 
