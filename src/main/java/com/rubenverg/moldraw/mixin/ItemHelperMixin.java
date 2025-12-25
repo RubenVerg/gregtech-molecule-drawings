@@ -1,4 +1,4 @@
-package com.rubenverg.moldraw.mixin;
+package main.java.com.rubenverg.moldraw.mixin;
 
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.utils.GTUtil;
