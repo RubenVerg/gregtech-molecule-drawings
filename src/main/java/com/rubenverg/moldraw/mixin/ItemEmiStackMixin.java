@@ -60,7 +60,7 @@ public class ItemEmiStackMixin {
 
         final OptionalInt idx = IntStream.range(0, list.size())
                 .filter(i -> list.get(i) instanceof ClientTextTooltip ctt &&
-                        moldraw$simpleGetText(((ClientTextTooltip) ctt).getText()).equals(material.getChemicalFormula()))
+                        moldraw$simpleGetText(ctt.getText()).equals(material.getChemicalFormula()))
                 .findFirst();
 
         if (mol != null && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {

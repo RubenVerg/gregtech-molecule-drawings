@@ -10,7 +10,7 @@ import com.rubenverg.moldraw.MoleculeTooltipComponent;
 import com.rubenverg.moldraw.MaterialHelper;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
-import mezz.jei.forge.platform.ItemHelper;
+import mezz.jei.forge.platform.helpers.item.ItemHelper;
 import mezz.jei.forge.platform.JeiTooltipMixin;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
