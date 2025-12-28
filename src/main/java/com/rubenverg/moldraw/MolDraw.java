@@ -184,21 +184,37 @@ public class MolDraw {
     @SubscribeEvent
     public void tooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
         if (!MolDrawConfig.INSTANCE.enabled) return;
-        // event.getTooltipElements().add(0, Either.right(new MoleculeTooltipComponent(new Molecule()
-        // )));
 
         Material material;
         if (event.getItemStack().getItem() instanceof BucketItem bi) {
-            // 保留对流体使用 ChemicalHelper.getMaterial(...)（仅避免 getMaterialEntry(ItemLike)）
+            // 对于流体桶，使用 ChemicalHelper.getMaterial(Fluid)
             material = ChemicalHelper.getMaterial(bi.getFluid());
+            MolDraw.LOGGER.debug("Fluid bucket material lookup: {}", material);
         } else {
-            // 使用我们自己的查找器替代 ChemicalHelper.getMaterialEntry(ItemLike)
-            final var materialStackOpt = CustomMaterialLookup.getMaterialEntry(event.getItemStack());
-            if (materialStackOpt.isEmpty()) return;
-            material = materialStackOpt.get().material();
+            // 直接使用优化后的查找器
+            MolDraw.LOGGER.debug("ItemStack lookup: {}, NBT: {}", 
+                event.getItemStack().getItem().getDescriptionId(),
+                event.getItemStack().getTag());
+            
+            // 使用新的 getMaterial 方法，直接获取 Material
+            Optional<Material> materialOpt = CustomMaterialLookup.getMaterial(event.getItemStack());
+            
+            if (materialOpt.isPresent()) {
+                material = materialOpt.get();
+                MolDraw.LOGGER.debug("Found material: {}, Formula: {}", 
+                    material.getName(), material.getChemicalFormula());
+            } else {
+                MolDraw.LOGGER.debug("No material found for item");
+                return;
+            }
         }
-        if (MaterialHelper.isNull(material)) return; // <-- 使用 MaterialHelper 判空
-        final var mol = getMolecule(material);
+        
+        if (MaterialHelper.isNull(material)) {
+            MolDraw.LOGGER.debug("Material is null or empty: {}", material);
+            return;
+        }
+        }
+    final var mol = getMolecule(material);
         final var tooltipElements = event.getTooltipElements();
 
         final var idx = IntStream.range(0, tooltipElements.size())
@@ -222,4 +238,4 @@ public class MolDraw {
             }
         }
     }
-}
+

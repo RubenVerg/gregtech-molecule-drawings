@@ -7,12 +7,15 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  format-and-build:
     runs-on: ubuntu-latest
     
     steps:
     - name: 检出最新代码
       uses: actions/checkout@v4
+      with:
+        # 拉取所有历史记录，以便 Spotless 可以正确格式化
+        fetch-depth: 0
     
     - name: 设置 Java
       uses: actions/setup-java@v3
@@ -20,14 +23,56 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     
-    - name: Ensure Gradle Wrapper is used
-      run: echo "Using Gradle Wrapper (./gradlew) to build"
-    
-    - name: Build with Gradle
+    - name: 检查代码格式
+      id: spotless-check
       env:
         GRADLE_OPTS: >
-                      -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true 
-                      -Dcom.sun.net.ssl.checkRevocation=false
+          -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true 
+          -Dcom.sun.net.ssl.checkRevocation=false
+      run: |
+        # 首先尝试运行 spotlessCheck,检查代码格式
+        ./gradlew spotlessCheck || true
+        
+        # 如果存在格式化问题，运行 spotlessApply 自动修复
+        echo "运行 Spotless 自动格式化..."
+        ./gradlew spotlessApply
+        
+        # 检查是否有文件被修改
+        if git diff --quiet; then
+          echo "代码格式已经正确，无需修改"
+          echo "needs_commit=false" >> $GITHUB_OUTPUT
+        else
+          echo "代码格式已自动修复"
+          echo "needs_commit=true" >> $GITHUB_OUTPUT
+          
+          # 显示被修改的文件
+          echo "被修改的文件："
+          git diff --name-only
+        fi
+
+    - name: 提交格式化的代码(push)
+      if: steps.spotless-check.outputs.needs_commit == 'true' && github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "style: 自动格式化代码 [skip ci]"
+        git push
+    
+    - name: 提交格式化的代码(PR)
+      if: steps.spotless-check.outputs.needs_commit == 'true' && github.event_name == 'pull_request'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "style: 自动格式化代码"
+        echo "代码已格式化,请检查并更新PR分支"
+    
+    - name: Build
+      env:
+        GRADLE_OPTS: >
+          -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true 
+          -Dcom.sun.net.ssl.checkRevocation=false
       run: ./gradlew build
     
     - name: 上传构建产物
