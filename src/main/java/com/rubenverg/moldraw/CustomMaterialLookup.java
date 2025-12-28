@@ -9,8 +9,8 @@ import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 自定义的 Material 查找器，直接使用 ChemicalHelper 的公共方法。
