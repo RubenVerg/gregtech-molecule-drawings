@@ -28,6 +28,14 @@ public class MoleculesData {
         return new ResourceLocation("tfg", path);
     }
 
+    private static ResourceLocation gtleisure(String path) {
+        return new ResourceLocation("gtleisure", path);
+    }
+
+    private static ResourceLocation gtodyssey(String path) {
+        return new ResourceLocation("gtodyssey", path);
+    }
+
     public static Map<ResourceLocation, Molecule> molecules() {
         final Map<ResourceLocation, Molecule> molecules = new HashMap<>();
         molecules.put(GTCEu.id("methane"), Molecule.tetragonal(Element.C, Element.H, Element.H, Element.H, Element.H));
