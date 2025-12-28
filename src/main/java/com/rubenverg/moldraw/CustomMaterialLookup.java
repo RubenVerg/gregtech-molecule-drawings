@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.UnificationEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
@@ -65,7 +64,7 @@ public final class CustomMaterialLookup {
             var field = ChemicalHelper.class.getDeclaredField("ITEM_MATERIAL_INFO");
             field.setAccessible(true);
             var itemMaterialInfoMap = field.get(null);
-            
+
             if (itemMaterialInfoMap instanceof Map) {
                 @SuppressWarnings("unchecked")
                 var info = ((Map<ItemLike, Object>) itemMaterialInfoMap).get(stack.getItem());
