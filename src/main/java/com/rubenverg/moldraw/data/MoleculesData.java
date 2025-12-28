@@ -3899,7 +3899,7 @@ public class MoleculesData {
                 .bond(17, 28)
                 .bond(24, 27)
                 .bond(25, 26)
-                .bond(28, 29));  
+                .bond(28, 29));
         return molecules;
     }
 }
