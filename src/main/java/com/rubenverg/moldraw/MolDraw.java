@@ -213,30 +213,31 @@ public class MolDraw {
             MolDraw.LOGGER.debug("Material is null or empty: {}", material);
             return;
         }
-    }
 
-    final var mol = getMolecule(material);
-    final var tooltipElements = event.getTooltipElements();
+        final var mol = getMolecule(material);
+        final var tooltipElements = event.getTooltipElements();
 
-    final var idx = IntStream.range(0, tooltipElements.size())
+        final var idx = IntStream.range(0, tooltipElements.size())
                 .filter(i -> tooltipElements.get(i).left()
                         .map(tt -> tt.getString().equals(material.getChemicalFormula()))
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-    if(!Objects.isNull(mol)&&(!MolDrawConfig.INSTANCE.onlyShowOnShift||GTUtil.isShiftDown()))
-    {
-        if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
-        else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
-    }else
-    {
-        tryColorizeFormula(material, idx, tooltipElements);
+        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
+            if (idx.isPresent()) {
+                tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
+            } else {
+                tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+            }
+        } else {
+            tryColorizeFormula(material, idx, tooltipElements);
 
-        if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
-            final int ttIndex = idx.orElse(1) + 1;
+            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+                final int ttIndex = idx.orElse(1) + 1;
 
-            tooltipElements.add(ttIndex, Either
-                    .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+                tooltipElements.add(ttIndex, Either
+                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+            }
         }
     }
 }
