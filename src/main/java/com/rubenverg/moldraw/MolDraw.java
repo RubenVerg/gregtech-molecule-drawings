@@ -214,7 +214,7 @@ public class MolDraw {
             return;
         }
         }
-    final var mol = getMolecule(material);
+  final var mol = getMolecule(material);
         final var tooltipElements = event.getTooltipElements();
 
         final var idx = IntStream.range(0, tooltipElements.size())
