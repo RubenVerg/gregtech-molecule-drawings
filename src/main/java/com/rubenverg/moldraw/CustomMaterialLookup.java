@@ -87,26 +87,40 @@ public final class CustomMaterialLookup {
 
     /**
      * 直接获取 Material 对象（不包装 MaterialStack）
+     * 添加TagPrefix验证：只有有TagPrefix的物品才是直接材料物品
      */
     public static Optional<Material> getMaterial(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return Optional.empty();
         }
 
-        // 尝试直接获取 Material
+        // 关键修复：使用 UnificationEntry 获取 Material，并验证 TagPrefix
         try {
-            // 使用 ChemicalHelper.getUnificationEntry 获取 Material
             UnificationEntry entry = ChemicalHelper.getUnificationEntry(stack.getItem());
             if (entry != null && entry.material != null) {
-                return Optional.of(entry.material);
+                // 关键验证：必须有 TagPrefix 才认为是直接材料物品
+                if (entry.tagPrefix != null) {
+                    return Optional.of(entry.material);
+                }
             }
         } catch (Throwable t) {
             MolDraw.LOGGER.debug("CustomMaterialLookup: getMaterial via UnificationEntry failed", t);
         }
 
-        // 通过 MaterialStack 获取
-        Optional<MaterialStack> materialStack = getMaterialEntry(stack);
-        return materialStack.map(MaterialStack::material);
+        // 如果通过UnificationEntry找不到，尝试通过MaterialStack获取
+        // 但同样需要验证是否有TagPrefix
+        try {
+            TagPrefix prefix = ChemicalHelper.getPrefix(stack.getItem());
+            if (prefix != null) {
+                // 有TagPrefix，尝试获取Material
+                Optional<MaterialStack> materialStack = getMaterialEntry(stack);
+                return materialStack.map(MaterialStack::material);
+            }
+        } catch (Throwable t) {
+            MolDraw.LOGGER.debug("CustomMaterialLookup: TagPrefix verification failed", t);
+        }
+
+        return Optional.empty();
     }
 
     /**
