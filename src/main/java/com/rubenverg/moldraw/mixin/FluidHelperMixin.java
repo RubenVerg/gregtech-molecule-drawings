@@ -9,6 +9,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.mojang.datafixers.util.Either;
+import com.rubenverg.moldraw.AlloyTooltipComponent;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeTooltipComponent;
@@ -39,6 +40,7 @@ public class FluidHelperMixin {
         if (material.isNull()) return;
 
         final var mol = MolDraw.getMolecule(material);
+        final var alloy = MolDraw.getAlloy(material);
         final var tooltipElements = ((JeiTooltipMixin) jeiTooltip).getLines();
         final var idx = IntStream.range(0, tooltipElements.size())
                 .filter(i -> tooltipElements.get(i).left()
@@ -46,17 +48,36 @@ public class FluidHelperMixin {
                         .orElse(false))
                 .reduce((a, b) -> b);
 
-        if (!Objects.isNull(mol) && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
-            if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
-            else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+        if (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown()) {
+            if (!Objects.isNull(mol)) {
+                if (idx.isPresent())
+                    tooltipElements.set(idx.getAsInt(), Either.right(new MoleculeTooltipComponent(mol)));
+                else tooltipElements.add(1, Either.right(new MoleculeTooltipComponent(mol)));
+            } else if (!Objects.isNull(alloy)) {
+                if (idx.isPresent())
+                    tooltipElements.set(idx.getAsInt(), Either.right(new AlloyTooltipComponent(alloy)));
+                else tooltipElements.add(1, Either.right(new AlloyTooltipComponent(alloy)));
+                // } else if (material.getResourceLocation().getNamespace().equals(MolDraw.MOD_ID)) {
+                // if (idx.isPresent()) tooltipElements.set(idx.getAsInt(), Either.right(new
+                // AlloyTooltipComponent(AlloyTooltipComponent.deriveComponents(material))));
+                // else tooltipElements.add(1, Either.right(new
+                // AlloyTooltipComponent(AlloyTooltipComponent.deriveComponents(material))));
+            } else {
+                MolDraw.tryColorizeFormula(material, idx, tooltipElements);
+            }
         } else {
             MolDraw.tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
-                tooltipElements.add(ttIndex, Either
-                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+                if (Objects.nonNull(mol)) {
+                    tooltipElements.add(ttIndex, Either.left(FormattedText
+                            .of(Component.translatable("tooltip.moldraw.shift_view_molecule").getString())));
+                } else if (Objects.nonNull(alloy)) {
+                    tooltipElements.add(ttIndex, Either.left(
+                            FormattedText.of(Component.translatable("tooltip.moldraw.shift_view_alloy").getString())));
+                }
             }
         }
     }

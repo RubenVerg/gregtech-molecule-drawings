@@ -1,5 +1,6 @@
 {
-  "tooltip.moldraw.shift_view": "§7Press Shift to view the structure",
+  "tooltip.moldraw.shift_view_molecule": "§7Press Shift to view the structure",
+  "tooltip.moldraw.shift_view_alloy": "§7Press Shift to view the composition",
 
   "config.moldraw.option.enabled": "Enable mod",
   "config.moldraw.option.debugMode": "Debug mode",
@@ -8,5 +9,7 @@
   "config.moldraw.option.onlyShowOnShift": "Only show molecule When pressing Shift",
   "config.moldraw.option.defaultColor": "Default element color",
   "config.moldraw.option.scale": "Molecule scale",
-  "config.moldraw.option.minimumBrightness": "Minimum brightness for colored elements"
+  "config.moldraw.option.minimumBrightness": "Minimum brightness for colored elements",
+  "config.moldraw.option.recursiveAlloys": "Recursively decompose alloys into their constituent elements",
+  "config.moldraw.option.alloyPartsByMass": "Show percentages of alloy components by mass"
 }

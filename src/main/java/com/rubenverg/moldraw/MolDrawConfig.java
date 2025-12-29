@@ -44,4 +44,10 @@ public class MolDrawConfig {
     @Configurable
     @Configurable.Range(min = 0, max = 1)
     public float minimumBrightness = 0.5f;
+
+    @Configurable
+    public boolean recursiveAlloys = true;
+
+    @Configurable
+    public boolean alloyPartsByMass = true;
 }
