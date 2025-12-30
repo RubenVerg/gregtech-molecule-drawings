@@ -79,10 +79,31 @@ public class AlloysData {
         alloys.put(GTCEu.id("titanium_carbide"), Optional.empty());
         alloys.put(GTCEu.id("titanium_tungsten_carbide"), Optional.empty());
         alloys.put(GTCEu.id("hastelloy_c_276"), Optional.empty());
-
         alloys.put(GTCEu.id("steel"), Optional.of(List.of(
                 new Pair<>(GTMaterials.Iron.getResourceLocation(), 39L),
                 new Pair<>(GTMaterials.Carbon.getResourceLocation(), 5L))));
+				alloys.put(GTCEu.id("conductive_alloy"), Optional.empty());
+				alloys.put(GTCEu.id("sodium_lead_alloy"), Optional.empty());
+				alloys.put(GTCEu.id("neptunium_palladium_aluminium"), Optional.empty());
+				alloys.put(GTCEu.id("lanthanum_gold_cadmium_curium_sulfate"), Optional.empty());
+				alloys.put(GTCEu.id("dark_soularium"), Optional.empty());
+				alloys.put(GTCEu.id("microversium"), Optional.empty());
+				alloys.put(GTCEu.id("trinaquadalloy"), Optional.empty());
+				alloys.put(GTCEu.id("end_steel"), Optional.empty());
+				alloys.put(GTCEu.id("lumium"), Optional.empty());
+				alloys.put(GTCEu.id("darconite"), Optional.empty());
+				alloys.put(GTCEu.id("electrum_flux"), Optional.empty());
+				alloys.put(GTCEu.id("electrum_flux"), Optional.empty());
+				alloys.put(GTCEu.id("manyullyn"), Optional.empty());
+				alloys.put(GTCEu.id("advanced_soldering_alloy"), Optional.empty());
+				alloys.put(GTCEu.id("signalum"), Optional.empty());
+				alloys.put(GTCEu.id("signalum"), Optional.empty());
+				alloys.put(GTCEu.id("energetic_alloy"), Optional.empty());
+				alloys.put(GTCEu.id("mythril"), Optional.empty());
+				alloys.put(GTCEu.id("vibrant_alloy"), Optional.empty());
+				alloys.put(GTCEu.id("enderium"), Optional.empty());
+				alloys.put(GTCEu.id("dark_steel"), Optional.empty());
+				alloys.put(GTCEu.id("electrical_steel"), Optional.empty());
 
         return alloys;
     }
