@@ -67,6 +67,10 @@ public class MolDrawConfig {
         public boolean showAlloys = true;
 
         @Configurable
+        @Configurable.Range(min = 25, max = 50)
+        public int pieChartRadius = 32;
+
+        @Configurable
         @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
         public boolean recursive = true;
 

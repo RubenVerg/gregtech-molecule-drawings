@@ -89,9 +89,8 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
     @MethodsReturnNonnullByDefault
     public static class ClientAlloyTooltipComponent implements ClientTooltipComponent {
 
-        public static final int BASE_HEIGHT = 90;
+        public final int baseHeight;
         public static final int BASE_WIDTH = 200;
-        public static final int RADIUS = 32;
 
         public final List<Pair<Material, Long>> rawComponents;
         public final List<Pair<Material, Long>> components;
@@ -105,6 +104,8 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
 
         @SuppressWarnings("UnstableApiUsage")
         public ClientAlloyTooltipComponent(AlloyTooltipComponent component) {
+            baseHeight = MolDrawConfig.INSTANCE.alloy.pieChartRadius * 5 / 2;
+
             rawComponents = component.rawComponents;
             components = maybeMultiplyByMass(rawComponents);
             total = components.stream().mapToLong(Pair::getB).reduce(0, Long::sum);
@@ -135,9 +136,9 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final var count = components.get(i).getB();
                 final var material = components.get(i).getA();
                 final var center = centers.get(i).getA();
-                final int cy = (int) (-Math.cos(center) * 0.9 * RADIUS);
+                final int cy = (int) (-Math.cos(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
                 final var left = center > Math.PI;
-                final var ex = (left ? -1 : 1) * (RADIUS + 10);
+                final var ex = (left ? -1 : 1) * (MolDrawConfig.INSTANCE.alloy.pieChartRadius + 10);
                 final var percentage = count * 100d / total;
                 final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
                 final var text = Component.literal(percentageString + " ")
@@ -157,15 +158,15 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 }
             }
             textStarts = ts;
-            addTop = Math.max(0, -atMostY - BASE_HEIGHT / 2);
-            addBottom = Math.max(0, atLeastY - BASE_HEIGHT / 2);
-            addLeft = Math.max(0, al + RADIUS + 20 - BASE_WIDTH / 2);
-            addRight = Math.max(0, ar + RADIUS + 20 - BASE_WIDTH / 2);
+            addTop = Math.max(0, -atMostY - baseHeight / 2);
+            addBottom = Math.max(0, atLeastY - baseHeight / 2);
+            addLeft = Math.max(0, al + MolDrawConfig.INSTANCE.alloy.pieChartRadius + 20 - BASE_WIDTH / 2);
+            addRight = Math.max(0, ar + MolDrawConfig.INSTANCE.alloy.pieChartRadius + 20 - BASE_WIDTH / 2);
         }
 
         @Override
         public int getHeight() {
-            return BASE_HEIGHT + addBottom + addTop;
+            return baseHeight + addBottom + addTop;
         }
 
         @Override
@@ -175,7 +176,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
 
         @Override
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-            final int xm = BASE_WIDTH / 2 + addLeft + x, ym = BASE_HEIGHT / 2 + addTop + y;
+            final int xm = BASE_WIDTH / 2 + addLeft + x, ym = baseHeight / 2 + addTop + y;
 
             final TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> sd = (_x, _y, _c) -> true;
             final IntBinaryOperator sc = (xp, yp) -> {
@@ -183,13 +184,14 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final double ng = Math.atan2(rx, -ry);
                 final double angle = ng < 0 ? ng + 2 * Math.PI : ng;
                 for (int si = 1; si <= stops.size(); si++) {
-                    if (angle < stops.get(si % stops.size()).getA())
+                    if (angle <= stops.get(si % stops.size()).getA())
                         return MoleculeColorize.colorForMaterial(stops.get(si - 1).getB());
                 }
                 return MoleculeColorize.colorForMaterial(stops.get(stops.size() - 1).getB());
             };
 
-            int x0 = 0, y0 = RADIUS, d = 3 - 2 * RADIUS;
+            int x0 = 0, y0 = MolDrawConfig.INSTANCE.alloy.pieChartRadius,
+                    d = 3 - 2 * MolDrawConfig.INSTANCE.alloy.pieChartRadius;
             while (y0 >= x0) {
                 MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(xm - y0, ym - x0, xm + y0, ym - x0, sd,
                         sc, guiGraphics);
@@ -217,10 +219,10 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final var topY = ym + textStart.y;
                 final var centerY = topY + font.lineHeight / 2;
                 final var startX = xm + textStart.x;
-                final int cx = xm + (int) (Math.sin(center) * 0.9 * RADIUS),
-                        cy = ym - (int) (Math.cos(center) * 0.9 * RADIUS);
+                final var cx = xm + (int) (Math.sin(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
+                final var cy = ym - (int) (Math.cos(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
                 final var left = center > Math.PI;
-                final var ex = xm + (left ? -1 : 1) * (RADIUS + 10);
+                final var ex = xm + (left ? -1 : 1) * (MolDrawConfig.INSTANCE.alloy.pieChartRadius + 10);
                 final var percentage = count * 100d / total;
                 final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
                 final var text = Component.literal(percentageString + " ")

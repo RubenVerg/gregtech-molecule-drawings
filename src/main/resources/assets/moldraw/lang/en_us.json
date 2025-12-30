@@ -18,6 +18,7 @@
 
   "config.moldraw.option.alloy": "Alloys",
   "config.moldraw.option.showAlloys": "Show alloy composition charts",
+  "config.moldraw.option.pieChartRadius": "Radius of the alloy composition pie chart",
   "config.moldraw.option.recursive": "Recursively decompose alloys into their constituent elements",
   "config.moldraw.option.partsByMass": "Show percentages of alloy components by mass"
 }
