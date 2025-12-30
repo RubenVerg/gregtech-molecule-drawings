@@ -90,9 +90,9 @@ public class AlloysData {
     public static Optional<List<Pair<ResourceLocation, Long>>> read(JsonElement json) {
         final var obj = json.getAsJsonObject();
         if (obj.has("derive") && obj.getAsJsonPrimitive("derive").getAsBoolean()) return Optional.empty();
-        if (obj.has("components") && obj.get("rawComponents").isJsonArray()) {
+        if (obj.has("components") && obj.get("components").isJsonArray()) {
             final List<Pair<ResourceLocation, Long>> list = new ArrayList<>();
-            for (final var e : obj.getAsJsonArray("rawComponents").asList()) {
+            for (final var e : obj.getAsJsonArray("components").asList()) {
                 if (e.isJsonPrimitive()) list.add(new Pair<>(ResourceLocation.parse(e.getAsString()), 1L));
                 else if (e.isJsonArray()) {
                     final var arr = e.getAsJsonArray().asList();
