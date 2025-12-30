@@ -20,6 +20,10 @@ public class AlloysData {
         return new ResourceLocation("tfg", path);
     }
 
+    private static ResourceLocation cosmiccore(String path) {
+        return new ResourceLocation("cosmiccore", path);
+    }
+
     public static Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys() {
         final Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys = new HashMap<>();
         alloys.put(GTCEu.id("battery_alloy"), Optional.empty());
@@ -117,6 +121,14 @@ public class AlloysData {
         alloys.put(GTCEu.id("aluminium_silicate"), Optional.empty());
         alloys.put(tfg("zirconium_diboride"), Optional.empty());
         alloys.put(tfg("tungsten_bismuth_oxide_composite"), Optional.empty());
+        alloys.put(GTCEu.id("manasteel"), Optional.empty());
+        alloys.put(GTCEu.id("annealed_manasteel"), Optional.empty());
+        alloys.put(GTCEu.id("galvanized_ethersteel"), Optional.empty());
+        alloys.put(cosmiccore("trinium_naqide"), Optional.empty());
+        alloys.put(cosmiccore("prismatic_tungstensteel"), Optional.empty());
+        alloys.put(cosmiccore("resonant_virtue_meld"), Optional.empty());
+        alloys.put(cosmiccore("naquadric_superalloy"), Optional.empty());
+        alloys.put(cosmiccore("naquadric_superalloy"), Optional.empty());
 
         return alloys;
     }
