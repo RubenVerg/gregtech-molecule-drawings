@@ -41,7 +41,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
         return new Pair<>(frac.getA() / gcd, frac.getB() / gcd);
     }
 
-    public static List<Pair<Material, Long>> deriveComponents(Material material) {
+    public static List<Pair<Material, Long>> doDeriveComponents(Material material) {
         final var materialComponents = material.getMaterialComponents();
         if (Objects.isNull(materialComponents) || materialComponents.isEmpty())
             return List.of(new Pair<>(material, 1L));
@@ -69,6 +69,20 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 .sorted(Comparator.comparingLong((Pair<Material, Long> x) -> -maybeMultiplyByMass(x.getA(), x.getB()))
                         .thenComparing(x -> x.getA().getChemicalFormula()))
                 .toList();
+    }
+
+    private static final Map<Material, List<Pair<Material, Long>>> COMPONENTS_CACHE = new HashMap<>();
+
+    public static void invalidateComponentsCache() {
+        COMPONENTS_CACHE.clear();
+    }
+
+    public static List<Pair<Material, Long>> deriveComponents(Material material) {
+        // Intentionally not using `computeIfAbsent` since the recursive calls will cause concurrent modification
+        if (!COMPONENTS_CACHE.containsKey(material)) {
+            COMPONENTS_CACHE.put(material, doDeriveComponents(material));
+        }
+        return COMPONENTS_CACHE.get(material);
     }
 
     @ParametersAreNonnullByDefault

@@ -1,6 +1,7 @@
 package com.rubenverg.moldraw;
 
 import dev.toma.configuration.Configuration;
+import dev.toma.configuration.client.IValidationHandler;
 import dev.toma.configuration.config.Config;
 import dev.toma.configuration.config.Configurable;
 import dev.toma.configuration.config.format.ConfigFormats;
@@ -46,8 +47,15 @@ public class MolDrawConfig {
     public float minimumBrightness = 0.1f;
 
     @Configurable
+    @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
     public boolean recursiveAlloys = true;
 
     @Configurable
+    @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
     public boolean alloyPartsByMass = true;
+
+    @SuppressWarnings("unused")
+    private void invalidateAlloyCache(boolean value, IValidationHandler handler) {
+        AlloyTooltipComponent.invalidateComponentsCache();
+    }
 }
