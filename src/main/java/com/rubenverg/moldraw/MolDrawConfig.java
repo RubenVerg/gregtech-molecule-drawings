@@ -43,7 +43,7 @@ public class MolDrawConfig {
 
     @Configurable
     @Configurable.Range(min = 0, max = 1)
-    public float minimumBrightness = 0.5f;
+    public float minimumBrightness = 0.1f;
 
     @Configurable
     public boolean recursiveAlloys = true;
