@@ -13,7 +13,12 @@ import oshi.util.tuples.Pair;
 
 import java.util.*;
 
+@SuppressWarnings("removal")
 public class AlloysData {
+
+    private static ResourceLocation tfg(String path) {
+        return new ResourceLocation("tfg", path);
+    }
 
     public static Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys() {
         final Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys = new HashMap<>();
@@ -104,6 +109,14 @@ public class AlloysData {
         alloys.put(GTCEu.id("enderium"), Optional.empty());
         alloys.put(GTCEu.id("dark_steel"), Optional.empty());
         alloys.put(GTCEu.id("electrical_steel"), Optional.empty());
+        alloys.put(GTCEu.id("desh"), Optional.empty());
+        alloys.put(GTCEu.id("ostrum"), Optional.empty());
+        alloys.put(GTCEu.id("rocket_alloy_t1"), Optional.empty());
+        alloys.put(GTCEu.id("ostrum_iodide"), Optional.empty());
+        alloys.put(GTCEu.id("rocket_alloy_t2"), Optional.empty());
+        alloys.put(GTCEu.id("aluminium_silicate"), Optional.empty());
+        alloys.put(tfg("zirconium_diboride"), Optional.empty());
+        alloys.put(tfg("tungsten_bismuth_oxide_composite"), Optional.empty());
 
         return alloys;
     }
