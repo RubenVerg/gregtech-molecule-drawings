@@ -13,6 +13,8 @@ import net.minecraft.world.level.material.Fluid;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rubenverg.moldraw.*;
+import com.rubenverg.moldraw.component.AlloyTooltipComponent;
+import com.rubenverg.moldraw.component.MoleculeTooltipComponent;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

@@ -9,10 +9,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.mojang.datafixers.util.Either;
-import com.rubenverg.moldraw.AlloyTooltipComponent;
 import com.rubenverg.moldraw.MolDraw;
 import com.rubenverg.moldraw.MolDrawConfig;
-import com.rubenverg.moldraw.MoleculeTooltipComponent;
+import com.rubenverg.moldraw.component.AlloyTooltipComponent;
+import com.rubenverg.moldraw.component.MoleculeTooltipComponent;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.common.gui.JeiTooltip;
 import mezz.jei.forge.platform.FluidHelper;

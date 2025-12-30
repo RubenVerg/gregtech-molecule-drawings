@@ -1,4 +1,4 @@
-package com.rubenverg.moldraw;
+package com.rubenverg.moldraw.component;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraftforge.common.util.TriPredicate;
 
 import com.mojang.datafixers.util.Pair;
+import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.molecule.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
@@ -353,7 +354,8 @@ public record MoleculeTooltipComponent(
                         return d2a < d2b ? colorA : colorB;
                     };
                     List<Vector2i> allTargets = new ArrayList<>();
-                    plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2, (_xt, _yt, _c) -> true,
+                    GraphicalUtils.plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2,
+                            (_xt, _yt, _c) -> true,
                             (xp, yp) -> {
                                 allTargets.add(new Vector2i(xp / 2, yp / 2));
                                 allTargets.add(new Vector2i((xp + 1) / 2, yp / 2));
@@ -368,21 +370,24 @@ public record MoleculeTooltipComponent(
                         final var sX = Mth.floor(delta) * addX + (int) (Mth.frac(delta) * 2) * addHX;
                         final var sY = Mth.floor(delta) * addY + (int) (Mth.frac(delta) * 2) * addHY;
                         switch (bond.lines()[i]) {
-                            case SOLID -> plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY, notCloseToAtom,
+                            case SOLID -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                                    notCloseToAtom,
                                     color, guiGraphics);
-                            case DOTTED -> plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                            case DOTTED -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
                                     notCloseToAtomAndDot.apply(2, 1), color, guiGraphics);
                             case INWARD, OUTWARD -> {
                                 final var shouldDraw = bond.lines()[i] == Bond.Line.INWARD ?
                                         notCloseToAtomAndBands.apply(3, 1) : notCloseToAtom;
                                 for (final var pair : allTargets) {
-                                    plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX, end.y + pair.y + sY,
+                                    GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX,
+                                            end.y + pair.y + sY,
                                             shouldDraw, color, guiGraphics);
                                 }
                             }
                             case THICK -> {
                                 for (final var pair : allTargets) {
-                                    plotLine(start.x + pair.x + sX, start.y + pair.y + sY, end.x + pair.x + sX,
+                                    GraphicalUtils.plotLine(start.x + pair.x + sX, start.y + pair.y + sY,
+                                            end.x + pair.x + sX,
                                             end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
                                 }
                             }
@@ -420,38 +425,6 @@ public record MoleculeTooltipComponent(
                     // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
                 }
             }
-        }
-
-        public static void plotLine(int x0, int y0, int x1, int y1,
-                                    TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> shouldDraw,
-                                    BiConsumer<Integer, Integer> doDraw) {
-            final int dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
-            final int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
-            int error = dx + dy;
-            int count = 0;
-            while (true) {
-                // This is horribly unoptimized
-                if (shouldDraw.test(x0, y0, count++)) doDraw.accept(x0, y0);
-                final int e2 = 2 * error;
-                if (e2 >= dy) {
-                    if (x0 == x1) break;
-                    error += dy;
-                    x0 += sx;
-                }
-                if (e2 <= dx) {
-                    if (y0 == y1) break;
-                    error += dx;
-                    y0 += sy;
-                }
-            }
-        }
-
-        public static void plotLine(int x0, int y0, int x1, int y1,
-                                    TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> shouldDraw,
-                                    IntBinaryOperator color,
-                                    GuiGraphics graphics) {
-            plotLine(x0, y0, x1, y1, shouldDraw,
-                    (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
         }
     }
 }

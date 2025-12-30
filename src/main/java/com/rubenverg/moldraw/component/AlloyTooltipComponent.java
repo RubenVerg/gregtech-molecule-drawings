@@ -1,4 +1,4 @@
-package com.rubenverg.moldraw;
+package com.rubenverg.moldraw.component;
 
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
@@ -11,11 +11,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraftforge.common.util.TriPredicate;
 
 import com.google.common.collect.Streams;
 import com.google.common.math.LongMath;
-import org.jetbrains.annotations.NotNull;
+import com.rubenverg.moldraw.MolDrawConfig;
+import com.rubenverg.moldraw.MoleculeColorize;
 import org.joml.Vector2i;
 import oshi.util.tuples.Pair;
 
@@ -178,7 +178,6 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
             final int xm = BASE_WIDTH / 2 + addLeft + x, ym = baseHeight / 2 + addTop + y;
 
-            final TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> sd = (_x, _y, _c) -> true;
             final IntBinaryOperator sc = (xp, yp) -> {
                 final int rx = xp - xm, ry = yp - ym;
                 final double ng = Math.atan2(rx, -ry);
@@ -190,24 +189,8 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 return MoleculeColorize.colorForMaterial(stops.get(stops.size() - 1).getB());
             };
 
-            int x0 = 0, y0 = MolDrawConfig.INSTANCE.alloy.pieChartRadius,
-                    d = 3 - 2 * MolDrawConfig.INSTANCE.alloy.pieChartRadius;
-            while (y0 >= x0) {
-                MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(xm - y0, ym - x0, xm + y0, ym - x0, sd,
-                        sc, guiGraphics);
-                if (x0 > 0) MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(xm - y0, ym + x0, xm + y0,
-                        ym + x0, sd, sc, guiGraphics);
-                if (d < 0) d += 4 * x0++ + 6;
-                else {
-                    if (x0 != y0) {
-                        MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(xm - x0, ym - y0, xm + x0,
-                                ym - y0, sd, sc, guiGraphics);
-                        MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(xm - x0, ym + y0, xm + x0,
-                                ym + y0, sd, sc, guiGraphics);
-                    }
-                    d += 4 * (x0++ - y0--) + 10;
-                }
-            }
+            GraphicalUtils.plotCircle(xm, ym, MolDrawConfig.INSTANCE.alloy.pieChartRadius, GraphicalUtils::alwaysDraw,
+                    sc, guiGraphics);
 
             final IntBinaryOperator white = (_xp, _yp) -> 0xffffffff;
 
@@ -228,10 +211,8 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final var text = Component.literal(percentageString + " ")
                         .append(MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true));
 
-                MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(cx, cy, cx, centerY, sd, white,
-                        guiGraphics);
-                MoleculeTooltipComponent.ClientMoleculeTooltipComponent.plotLine(cx, centerY, ex, centerY, sd, white,
-                        guiGraphics);
+                GraphicalUtils.plotLine(cx, cy, cx, centerY, GraphicalUtils::alwaysDraw, white, guiGraphics);
+                GraphicalUtils.plotLine(cx, centerY, ex, centerY, GraphicalUtils::alwaysDraw, white, guiGraphics);
                 guiGraphics.drawString(font, text, startX, topY, 0xffffffff);
             }
         }

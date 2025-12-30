@@ -1,5 +1,6 @@
 package com.rubenverg.moldraw;
 
+import com.rubenverg.moldraw.component.AlloyTooltipComponent;
 import dev.toma.configuration.Configuration;
 import dev.toma.configuration.client.IValidationHandler;
 import dev.toma.configuration.config.Config;

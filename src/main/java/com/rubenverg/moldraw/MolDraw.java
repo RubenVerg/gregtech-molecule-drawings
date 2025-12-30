@@ -36,6 +36,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
+import com.rubenverg.moldraw.component.AlloyTooltipComponent;
+import com.rubenverg.moldraw.component.MoleculeTooltipComponent;
 import com.rubenverg.moldraw.data.AlloysData;
 import com.rubenverg.moldraw.data.MoleculesData;
 import com.rubenverg.moldraw.molecule.*;
