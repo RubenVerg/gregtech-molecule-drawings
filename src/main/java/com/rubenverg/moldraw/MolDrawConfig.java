@@ -51,14 +51,20 @@ public class MolDrawConfig {
     public static class MoleculeConfig {
 
         @Configurable
+        public boolean showMolecules = true;
+
+        @Configurable
         @Configurable.Range(min = 10, max = 50)
-        public int scale = 20;
+        public int moleculeScale = 20;
     }
 
     @Configurable
     public AlloyConfig alloy = new AlloyConfig();
 
     public static class AlloyConfig {
+
+        @Configurable
+        public boolean showAlloys = true;
 
         @Configurable
         @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
