@@ -9,12 +9,10 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraftforge.common.util.TriPredicate;
 
 import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.molecule.*;
-import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 
 import java.lang.Math;
@@ -268,8 +266,7 @@ public record MoleculeTooltipComponent(
                     final var end = floored(ts.apply(atomB.position()));
                     end.add(x, y);
                     end.add(0, font.lineHeight / 2);
-                    final TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> notCloseToAtom = (xt, yt,
-                                                                                                               _c) -> {
+                    final GraphicalUtils.PixelPredicate notCloseToAtom = (xt, yt, _c) -> {
                         if (atomAInvisible && atomBInvisible)
                             return true;
                         Vector2ic t = new Vector2i(xt, yt);
@@ -314,13 +311,13 @@ public record MoleculeTooltipComponent(
                     };
                     final var startEnd = new Vector2f(end).sub(new Vector2f(start));
                     final float dy = startEnd.y, dx = startEnd.x, length = startEnd.length();
-                    final BiFunction<Integer, Integer, TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer>> notCloseToAtomAndDot = (m,
-                                                                                                                                                   b) -> notCloseToAtom
-                                                                                                                                                           .and((xt,
-                                                                                                                                                                 yt,
-                                                                                                                                                                 count) -> count %
-                                                                                                                                                                         m <
-                                                                                                                                                                         b);
+                    final BiFunction<Integer, Integer, GraphicalUtils.PixelPredicate> notCloseToAtomAndDot = (m,
+                                                                                                              b) -> notCloseToAtom
+                                                                                                                      .and((xt,
+                                                                                                                            yt,
+                                                                                                                            count) -> count %
+                                                                                                                                    m <
+                                                                                                                                    b);
                     int addX = Math.round(dy / length * 2), addY = -Math.round(dx / length * 2);
                     int addHX = Math.round(dy / length), addHY = -Math.round(dx / length);
                     int colorA = colorForElement(atomA.element().element());
@@ -353,8 +350,7 @@ public record MoleculeTooltipComponent(
                         final var sY = Mth.floor(delta) * addY + (int) (Mth.frac(delta) * 2) * addHY;
                         switch (bond.lines()[i]) {
                             case SOLID -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
-                                    notCloseToAtom,
-                                    color, guiGraphics);
+                                    notCloseToAtom, color, guiGraphics);
                             case DOTTED -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
                                     notCloseToAtomAndDot.apply(2, 1), color, guiGraphics);
                             case INWARD -> {
