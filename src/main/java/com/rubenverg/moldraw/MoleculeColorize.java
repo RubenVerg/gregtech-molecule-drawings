@@ -27,7 +27,7 @@ public class MoleculeColorize {
     public static int FALLBACK_COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
 
     public static int configColor(@Nullable String config) {
-        final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.defaultColor);
+        final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.color.defaultColor);
         if (str.length() == 2 && str.charAt(0) == '§') {
             final var formatting = ChatFormatting.getByCode(str.charAt(1));
             return Objects.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
@@ -80,7 +80,7 @@ public class MoleculeColorize {
     public static int lightenColor(int color) {
         final var arr = new float[3];
         Color.RGBtoHSB(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color), arr);
-        arr[2] = Math.max(arr[2], MolDrawConfig.INSTANCE.minimumBrightness);
+        arr[2] = Math.max(arr[2], MolDrawConfig.INSTANCE.color.minimumBrightness);
         return Color.HSBtoRGB(arr[0], arr[1], arr[2]);
     }
 
@@ -90,12 +90,12 @@ public class MoleculeColorize {
 
     public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.useMaterialColors && !element.material.isNull())
+        if (MolDrawConfig.INSTANCE.color.useMaterialColors && !element.material.isNull())
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();
         else if (element.color instanceof Element.Color.Optional optional)
-            return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
+            return MolDrawConfig.INSTANCE.color.colors ? optional.color() : defaultColor;
         return defaultColor;
     }
 
@@ -108,7 +108,7 @@ public class MoleculeColorize {
             final var element = Element.forMaterial(stack.material());
             return Component.literal(stack.toString()).withStyle(Style.EMPTY.withColor(element
                     .map(MoleculeColorize::colorForElement)
-                    .orElse(MolDrawConfig.INSTANCE.coloredAtoms ? colorForMaterial(stack.material()) :
+                    .orElse(MolDrawConfig.INSTANCE.color.colors ? colorForMaterial(stack.material()) :
                             FALLBACK_COLOR)));
         }
         final var components = stack.material().getMaterialComponents();

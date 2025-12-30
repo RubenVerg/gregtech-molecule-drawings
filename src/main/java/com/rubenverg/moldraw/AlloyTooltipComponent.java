@@ -27,7 +27,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) implements TooltipComponent {
 
     private static long maybeMultiplyByMass(Material material, long count) {
-        if (MolDrawConfig.INSTANCE.alloyPartsByMass) return count * material.getMass();
+        if (MolDrawConfig.INSTANCE.alloy.partsByMass) return count * material.getMass();
         return count;
     }
 
@@ -47,7 +47,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
             return List.of(new Pair<>(material, 1L));
         final Map<Material, Pair<Long, Long>> collectedComponents = new HashMap<>();
         for (final var c : materialComponents) {
-            if (MolDrawConfig.INSTANCE.recursiveAlloys) {
+            if (MolDrawConfig.INSTANCE.alloy.recursive) {
                 final var innerComponents = deriveComponents(c.material());
                 final var innerTotal = innerComponents.stream().map(Pair::getB).reduce(0L, Long::sum);
                 for (final var inner : innerComponents) {

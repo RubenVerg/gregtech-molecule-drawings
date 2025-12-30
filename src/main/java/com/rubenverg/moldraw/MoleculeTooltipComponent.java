@@ -49,7 +49,7 @@ public record MoleculeTooltipComponent(
             return xy -> {
                 var result = new Vector2f();
                 xy.sub(xyStart, result);
-                result.mul(MolDrawConfig.INSTANCE.scale);
+                result.mul(MolDrawConfig.INSTANCE.molecule.scale);
                 return new Vector2f(result.x + 8 + (atomAtLefLef ? 12 : 0) + (parenAtLef ? 6 : 0),
                         -result.y + (atomAtTopTop ? lineHeight * 3 / 2f : atomAtTop ? lineHeight / 2f : 3));
             };
@@ -101,7 +101,7 @@ public record MoleculeTooltipComponent(
             final var bounds = molecule.bounds();
             final Vector2f diff = new Vector2f();
             bounds.getSecond().sub(bounds.getFirst(), diff);
-            diff.mul(MolDrawConfig.INSTANCE.scale);
+            diff.mul(MolDrawConfig.INSTANCE.molecule.scale);
             diff.ceil();
             this.xySize = new Vector2i((int) diff.x, (int) diff.y);
             this.xyStart = new Vector2f(bounds.getFirst().x, bounds.getSecond().y);

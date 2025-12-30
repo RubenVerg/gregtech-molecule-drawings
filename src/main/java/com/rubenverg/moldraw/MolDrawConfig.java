@@ -24,38 +24,56 @@ public class MolDrawConfig {
     public boolean enabled = true;
 
     @Configurable
-    public boolean debugMode = false;
-
-    @Configurable
-    public boolean coloredAtoms = true;
-
-    @Configurable
-    public boolean useMaterialColors = false;
-
-    @Configurable
     public boolean onlyShowOnShift = false;
 
     @Configurable
-    public String defaultColor = "§e";
+    public ColorConfig color = new ColorConfig();
 
-    @Configurable
-    @Configurable.Range(min = 10, max = 50)
-    public int scale = 20;
+    public static class ColorConfig {
 
-    @Configurable
-    @Configurable.Range(min = 0, max = 1)
-    public float minimumBrightness = 0.1f;
+        @Configurable
+        public boolean colors = true;
 
-    @Configurable
-    @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
-    public boolean recursiveAlloys = true;
+        @Configurable
+        public boolean useMaterialColors = true;
 
-    @Configurable
-    @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
-    public boolean alloyPartsByMass = true;
+        @Configurable
+        public String defaultColor = "§e";
 
-    @SuppressWarnings("unused")
-    private void invalidateAlloyCache(boolean value, IValidationHandler handler) {
-        AlloyTooltipComponent.invalidateComponentsCache();
+        @Configurable
+        @Configurable.Range(min = 0, max = 1)
+        public float minimumBrightness = 0.1f;
     }
+
+    @Configurable
+    public MoleculeConfig molecule = new MoleculeConfig();
+
+    public static class MoleculeConfig {
+
+        @Configurable
+        @Configurable.Range(min = 10, max = 50)
+        public int scale = 20;
+    }
+
+    @Configurable
+    public AlloyConfig alloy = new AlloyConfig();
+
+    public static class AlloyConfig {
+
+        @Configurable
+        @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
+        public boolean recursive = true;
+
+        @Configurable
+        @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
+        public boolean partsByMass = true;
+
+        @SuppressWarnings("unused")
+        private void invalidateAlloyCache(boolean value, IValidationHandler handler) {
+            AlloyTooltipComponent.invalidateComponentsCache();
+        }
+    }
+
+    @Configurable
+    public boolean debugMode = false;
 }
