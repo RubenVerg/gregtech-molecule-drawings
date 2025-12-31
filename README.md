@@ -14,13 +14,14 @@ This clientside only mod adds molecule drawings for organic molecules from GregT
 
 MolDraw comes out of the box with support for not only most of the organic materials from base GTCEu, but also a bunch of addons and modpacks. The currently supported extensions are:
 
-* GT--
-* GregTech Community Additions
-* Gregicality Rocketry
 * Monifactory
 * Star Technology
 * Cosmic Frontiers
 * Phoenix Forge Technologies
+* TerraFirmaGreg
+* GT--
+* GregTech Community Additions
+* Gregicality Rocketry
 
 ## What people say about this mod
 
