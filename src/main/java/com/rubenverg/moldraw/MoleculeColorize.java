@@ -27,7 +27,7 @@ public class MoleculeColorize {
     public static int FALLBACK_COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
 
     public static int configColor(@Nullable String config) {
-        final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.defaultColor);
+        final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.color.defaultColor);
         if (str.length() == 2 && str.charAt(0) == '§') {
             final var formatting = ChatFormatting.getByCode(str.charAt(1));
             return Objects.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
@@ -38,7 +38,13 @@ public class MoleculeColorize {
         }
     }
 
-    public static int colorForMaterial(Material material) {
+    public static double brightness(int color) {
+        final int red = FastColor.ARGB32.red(color), green = FastColor.ARGB32.green(color),
+                blue = FastColor.ARGB32.blue(color);
+        return 0.21 * red + 0.72 * green + 0.07 * blue;
+    }
+
+    private static int getColorForMaterial(Material material) {
         if (material.getMaterialARGB() == 0xffffffff && material.hasFluid() &&
                 material.getFluid() instanceof GTFluid gtFluid) {
             final var texturePath = IClientFluidTypeExtensions.of(gtFluid.getFluidType()).getStillTexture();
@@ -64,18 +70,37 @@ public class MoleculeColorize {
 
             }
         }
+        if (material.getMaterialSecondaryARGB() != 0xffffffff) {
+            final int primary = material.getMaterialARGB(), secondary = material.getMaterialSecondaryARGB();
+            return brightness(primary) > brightness(secondary) ? primary : secondary;
+        }
         return material.getMaterialARGB();
     }
 
-    public static int colorForElement(Element element) {
+    public static int lightenColor(int color) {
+        final var arr = new float[3];
+        Color.RGBtoHSB(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color), arr);
+        arr[2] = Math.max(arr[2], MolDrawConfig.INSTANCE.color.minimumBrightness);
+        return Color.HSBtoRGB(arr[0], arr[1], arr[2]);
+    }
+
+    public static int colorForMaterial(Material material) {
+        return lightenColor(getColorForMaterial(material));
+    }
+
+    public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.useMaterialColors && !Objects.isNull(element.material))
+        if (MolDrawConfig.INSTANCE.color.useMaterialColors && !Objects.isNull(element.material))
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();
         else if (element.color instanceof Element.Color.Optional optional)
-            return MolDrawConfig.INSTANCE.coloredAtoms ? optional.color() : defaultColor;
+            return MolDrawConfig.INSTANCE.color.colors ? optional.color() : defaultColor;
         return defaultColor;
+    }
+
+    public static int colorForElement(Element element) {
+        return lightenColor(getColorForElement(element));
     }
 
     public static Component coloredFormula(MaterialStack stack, boolean topLevel) {
@@ -83,7 +108,7 @@ public class MoleculeColorize {
             final var element = Element.forMaterial(stack.material());
             return Component.literal(stack.toString()).withStyle(Style.EMPTY.withColor(element
                     .map(MoleculeColorize::colorForElement)
-                    .orElse(MolDrawConfig.INSTANCE.coloredAtoms ? colorForMaterial(stack.material()) :
+                    .orElse(MolDrawConfig.INSTANCE.color.colors ? colorForMaterial(stack.material()) :
                             FALLBACK_COLOR)));
         }
         final var components = stack.material().getMaterialComponents();
@@ -93,9 +118,9 @@ public class MoleculeColorize {
             text.append(coloredFormula(component, false));
         }
         final var countedText = Component.empty();
-        if (components.size() > 1) countedText.append("(");
+        if (!topLevel && components.size() > 1) countedText.append("(");
         countedText.append(text);
-        if (components.size() > 1) countedText.append(")");
+        if (!topLevel && components.size() > 1) countedText.append(")");
         if (stack.amount() > 1) countedText.append(FormattingUtil.toSmallDownNumbers(Long.toString(stack.amount())));
         return countedText;
     }

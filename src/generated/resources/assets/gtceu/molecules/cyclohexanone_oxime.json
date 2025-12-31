@@ -108,6 +108,7 @@
     {
       "a": 5,
       "b": 6,
+      "centered": true,
       "lines": [
         "solid",
         "solid"

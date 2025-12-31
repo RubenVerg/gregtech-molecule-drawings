@@ -16,13 +16,14 @@ This clientside only mod adds molecule drawings for organic molecules from GregT
 
 MolDraw comes out of the box with support for not only most of the organic materials from base GTCEu, but also a bunch of addons and modpacks. The currently supported extensions are:
 
-* GT--
-* GregTech Community Additions
-* Gregicality Rocketry
 * Monifactory
 * Star Technology
 * Cosmic Frontiers
 * Phoenix Forge Technologies
+* TerraFirmaGreg
+* GT--
+* GregTech Community Additions
+* Gregicality Rocketry
 
 ## What people say about this mod
 
@@ -208,5 +209,30 @@ For example, this is the encoding of benzene:
       "lines": ["solid", "solid"]
     }
   ]
+}
+```
+
+
+## Adding your own alloys
+
+Similarly, alloys are stored in resource packs under `assets/<namespace>/alloys/<compound>.json`, corresponding to the GT material with ID `<namespace>:<compound>`.
+
+In the simplest case, a material just needs to be marked as being an alloy, and then its composition can be computed automatically via GregTech's material composition system. In that case, just put the following file in the correct place:
+
+```json
+{
+  "derive": true
+}
+```
+
+If you want to specify components manually, such as to indicate impurities not present in the material composition, alloys follow this simple schema:
+
+```ts
+// A material ID and an integer amount, which defaults to 1
+type Datum = string | [string, number];
+
+// An alloy JSON file is of type Alloy
+interface Alloy {
+  components: Datum[];
 }
 ```
