@@ -28,6 +28,10 @@ public class AlloysData {
         return new ResourceLocation("gtca", path);
     }
 
+    private static ResourceLocation gcyr(String path) {
+        return new ResourceLocation("gcyr", path);
+    }
+
     public static Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys() {
         final Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys = new HashMap<>();
         alloys.put(GTCEu.id("battery_alloy"), Optional.empty());
@@ -178,6 +182,81 @@ public class AlloysData {
         alloys.put(gtca("eglin_steel"), Optional.empty());
         alloys.put(gtca("incoloy_903"), Optional.empty());
         alloys.put(gtca("duranium_x"), Optional.empty());
+        alloys.put(gcyr("trinaquadalloy"), Optional.empty());
+        alloys.put(gcyr("bisalloy_400"), Optional.empty());
+        alloys.put(GTCEu.id("shellite"), Optional.empty());
+        alloys.put(GTCEu.id("twinite"), Optional.empty());
+        alloys.put(GTCEu.id("dragonsteel"), Optional.empty());
+        alloys.put(GTCEu.id("prismalium"), Optional.empty());
+        alloys.put(GTCEu.id("melodium"), Optional.empty());
+        alloys.put(GTCEu.id("stellarium"), Optional.empty());
+        alloys.put(GTCEu.id("ancient_runicalium"), Optional.empty());
+        alloys.put(GTCEu.id("austenitic_stainless_steel_304"), Optional.empty());
+        alloys.put(GTCEu.id("weapon_grade_naquadah"), Optional.empty());
+        alloys.put(GTCEu.id("void"), Optional.empty());
+        alloys.put(GTCEu.id("zalloy"), Optional.empty());
+        alloys.put(GTCEu.id("zirconium_selenide_diiodide"), Optional.empty());
+        alloys.put(GTCEu.id("zircalloy_4"), Optional.empty());
+        alloys.put(GTCEu.id("indium_tin_lead_cadmium_soldering_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("naquated_soldering_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("thorium_plut_duranide_241"), Optional.empty());
+        alloys.put(GTCEu.id("sky_steel"), Optional.empty());
+        alloys.put(GTCEu.id("gold_skystone_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("diamond_skystone_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("certus_quartz_skystone_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("fluix_steel"), Optional.empty());
+        alloys.put(GTCEu.id("netherite_gold_skystone_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("netherite_certus_quartz_skystone_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("birmabright"), Optional.empty());
+        alloys.put(GTCEu.id("duralumin"), Optional.empty());
+        alloys.put(GTCEu.id("hydronalium"), Optional.empty());
+        alloys.put(GTCEu.id("beryllium_aluminium_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("elgiloy"), Optional.empty());
+        alloys.put(GTCEu.id("beryllium_bronze"), Optional.empty());
+        alloys.put(GTCEu.id("silicon_bronze"), Optional.empty());
+        alloys.put(GTCEu.id("kovar"), Optional.empty());
+        alloys.put(GTCEu.id("zamak"), Optional.empty());
+        alloys.put(GTCEu.id("tumbaga"), Optional.empty());
+        alloys.put(GTCEu.id("astrenaloy_nx"), Optional.empty());
+        alloys.put(GTCEu.id("thacoloy_nq_42x"), Optional.empty());
+        alloys.put(GTCEu.id("titan_steel"), Optional.empty());
+        alloys.put(GTCEu.id("lepton_coalescing_superalloy"), Optional.empty());
+        alloys.put(GTCEu.id("neutronium_silicon_carbide"), Optional.empty());
+        alloys.put(GTCEu.id("cerium_tritelluride"), Optional.empty());
+        alloys.put(GTCEu.id("magmada_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("mythrolic_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("nyanium"), Optional.empty());
+        alloys.put(GTCEu.id("starium_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("seaborgium_palladium_enriched_estalt_flevorium_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("astatium_bioselex_carbonite"), Optional.empty());
+        alloys.put(GTCEu.id("astatine_bis_tritelluride_cobo_selenium"), Optional.empty());
+        alloys.put(GTCEu.id("iron_titanium_oxide"), Optional.empty());
+        alloys.put(GTCEu.id("astatine_bis_tritelluride_cobo_selenium_over_iron_titanium_oxide"), Optional.empty());
+        alloys.put(GTCEu.id("polonium_bismide"), Optional.empty());
+        alloys.put(GTCEu.id("bismuth_iridate"), Optional.empty());
+        alloys.put(GTCEu.id("hafnide_ceramic_base"), Optional.empty());
+        alloys.put(GTCEu.id("hafnide_ito_ceramic"), Optional.empty());
+        alloys.put(GTCEu.id("polonium_flux"), Optional.empty());
+        alloys.put(GTCEu.id("rhenium_super_composite_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("abyssal_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("chaotixic_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("chaotixic_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("ohmderblux_alloy"), Optional.empty());
+        alloys.put(GTCEu.id("draconyallium"), Optional.empty());
+        alloys.put(GTCEu.id("draco_abyssal"), Optional.empty());
+        alloys.put(GTCEu.id("expeditalloy_d_17"), Optional.empty());
+        alloys.put(GTCEu.id("rhenate_w"), Optional.empty());
+        alloys.put(GTCEu.id("borealic_steel"), Optional.empty());
+        alloys.put(GTCEu.id("hvga_steel"), Optional.empty());
+        alloys.put(GTCEu.id("melastrium_mox"), Optional.empty());
+        alloys.put(GTCEu.id("trikoductive_neutro_steel"), Optional.empty());
+        alloys.put(GTCEu.id("soul_ascendant_cuperite"), Optional.empty());
+        alloys.put(GTCEu.id("mythrotight_carbide_steel"), Optional.empty());
+        alloys.put(GTCEu.id("aerorelient_steel"), Optional.empty());
+        alloys.put(GTCEu.id("vastaqalloy_cr_4200x"), Optional.empty());
+        alloys.put(GTCEu.id("ultispestalloy_cmsh"), Optional.empty());
+        alloys.put(GTCEu.id("zerodic_trinate_steel"), Optional.empty());
+        alloys.put(GTCEu.id("cast_iron"), Optional.empty());
 
         return alloys;
     }
