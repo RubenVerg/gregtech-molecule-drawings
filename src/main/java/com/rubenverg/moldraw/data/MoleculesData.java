@@ -28,12 +28,12 @@ public class MoleculesData {
         return new ResourceLocation("tfg", path);
     }
 
-    private static ResourceLocation gtleisure(String path) {
-        return new ResourceLocation("gtleisure", path);
+    private static ResourceLocation gtl(String path) {
+        return new ResourceLocation("gtl", path);
     }
 
-    private static ResourceLocation gtodyssey(String path) {
-        return new ResourceLocation("gtodyssey", path);
+    private static ResourceLocation gto(String path) {
+        return new ResourceLocation("gto", path);
     }
 
     public static Map<ResourceLocation, Molecule> molecules() {
@@ -3835,71 +3835,6 @@ public class MoleculesData {
                 .bond(0, 1)
                 .bond(1, 2)
                 .bond(1, 3, true, Bond.DOUBLE));
-        molecules.put(gtleisure("hexanitrohexaazaisowurtzitane"), new Molecule()
-                .xy()
-                .atom(Element.O, -1.7968934011990356f, -5.854132233102507f) // 0
-                .atom(Element.O, 1.7968934011990376f, 5.854132233102506f) // 1
-                .atom(Element.O, 1.796893401199164f, -5.854132233102467f) // 2
-                .atom(Element.O, -1.7968934011991649f, 5.854132233102469f) // 3
-                .atom(Element.O, -3.4932252518840547f, -5.8032922812759145f) // 4
-                .atom(Element.O, 6.984554659173727f, 4.427966703347759f) // 5
-                .atom(Element.O, -6.98455465917373f, -4.427966703347758f) // 6
-                .atom(Element.O, 3.4932252518840508f, 5.8032922812759145f) // 7
-                .atom(Element.O, 6.984554659173822f, -4.427966703347611f) // 8
-                .atom(Element.O, -6.984554659173822f, 4.427966703347611f) // 9
-                .atom(Element.O, 3.493225251884176f, -5.803292281275841f) // 10
-                .atom(Element.O, -3.4932252518841738f, 5.803292281275839f) // 11
-                .atom(Element.N, 2.5557334026871102e-14f, -2.250000000000001f) // 12
-                .atom(Element.N, -2.423616862756717e-14f, 2.249999999999999f) // 13
-                .atom(Element.N, -4.088434320179063f, -1.820288237343675f) // 14
-                .atom(Element.N, 4.088434320179063f, 1.820288237343675f) // 15
-                .atom(Element.N, 4.088434320179101f, -1.8202882373435878f) // 16
-                .atom(Element.N, -4.088434320179101f, 1.8202882373435876f) // 17
-                .atom(Element.N, 5.095368571517155e-14f, -4.500000000000002f) // 18
-                .atom(Element.N, -4.8799853047398763e-14f, 4.499999999999998f) // 19
-                .atom(Element.N, -4.783722557522672f, -3.9601653990077774f) // 20
-                .atom(Element.N, 4.783722557522671f, 3.960165399007778f) // 21
-                .atom(Element.N, 4.783722557522755f, -3.9601653990076757f) // 22
-                .atom(Element.N, -4.783722557522754f, 3.960165399007675f) // 23
-                .invAtom(-1.9485571585149755f, -1.1250000000000209f) // 24
-                .invAtom(1.9485571585149755f, 1.1250000000000204f) // 25
-                .invAtom(1.9485571585149997f, -1.1249999999999796f) // 26
-                .invAtom(-1.9485571585149994f, 1.1249999999999787f) // 27
-                .invAtom(-5.410951137837147f, -5.729305918578121e-14f) // 28
-                .invAtom(5.410951137837147f, 5.761502386292249e-14f) // 29
-                .bond(0, 18)
-                .bond(1, 19)
-                .bond(2, 18, Bond.DOUBLE)
-                .bond(3, 19, Bond.DOUBLE)
-                .bond(4, 20)
-                .bond(5, 21)
-                .bond(6, 20, Bond.DOUBLE)
-                .bond(7, 21, Bond.DOUBLE)
-                .bond(8, 22)
-                .bond(9, 23)
-                .bond(10, 22, Bond.DOUBLE)
-                .bond(11, 23, Bond.DOUBLE)
-                .bond(12, 18)
-                .bond(12, 24)
-                .bond(12, 26)
-                .bond(13, 19)
-                .bond(13, 25)
-                .bond(13, 27)
-                .bond(14, 20)
-                .bond(14, 24)
-                .bond(14, 28)
-                .bond(15, 21)
-                .bond(15, 25)
-                .bond(15, 29)
-                .bond(16, 22)
-                .bond(16, 26)
-                .bond(16, 29)
-                .bond(17, 23)
-                .bond(17, 27)
-                .bond(17, 28)
-                .bond(24, 27)
-                .bond(25, 26)
-                .bond(28, 29));
         return molecules;
     }
 }
