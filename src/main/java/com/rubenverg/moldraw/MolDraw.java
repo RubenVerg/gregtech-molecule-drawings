@@ -34,14 +34,19 @@ import com.adsioho.gtm.compat.MaterialHelper;
 import com.google.common.hash.HashCode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
+import com.rubenverg.moldraw.component.AlloyTooltipComponent;
+import com.rubenverg.moldraw.component.MoleculeTooltipComponent;
+import com.rubenverg.moldraw.data.AlloysData;
 import com.rubenverg.moldraw.data.MoleculesData;
 import com.rubenverg.moldraw.molecule.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import oshi.util.tuples.Pair;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -95,7 +100,9 @@ public class MolDraw {
 
             @Override
             public @NotNull DataProvider create(@NotNull PackOutput output) {
-                final var pathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "molecules");
+                final var moleculesPathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK,
+                        "molecules");
+                final var alloysPathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "alloys");
                 return new DataProvider() {
 
                     @Override
@@ -103,7 +110,16 @@ public class MolDraw {
                         for (final var entry : MoleculesData.molecules().entrySet()) {
                             final var json = gson.toJson(entry.getValue(), Molecule.class);
                             try {
-                                cachedOutput.writeIfNeeded(pathProvider.json(entry.getKey()),
+                                cachedOutput.writeIfNeeded(moleculesPathProvider.json(entry.getKey()),
+                                        json.getBytes(StandardCharsets.UTF_8), HashCode.fromInt(json.hashCode()));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        for (final var entry : AlloysData.alloys().entrySet()) {
+                            final var json = gson.toJson(AlloysData.write(entry.getValue()));
+                            try {
+                                cachedOutput.writeIfNeeded(alloysPathProvider.json(entry.getKey()),
                                         json.getBytes(StandardCharsets.UTF_8), HashCode.fromInt(json.hashCode()));
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
@@ -123,9 +139,11 @@ public class MolDraw {
 
     public void registerClientTooltipComponents(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(MoleculeTooltipComponent.class, MoleculeTooltipComponent.ClientMoleculeTooltipComponent::new);
+        event.register(AlloyTooltipComponent.class, AlloyTooltipComponent.ClientAlloyTooltipComponent::new);
     }
 
     private static final Map<Material, Molecule> molecules = new HashMap<>();
+    private static final Map<Material, Optional<List<Pair<Material, Long>>>> alloys = new HashMap<>();
 
     public void registerClientReloadListeners(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(
@@ -165,12 +183,63 @@ public class MolDraw {
                         molecules.putAll(prepareResult);
                     }
                 });
+        event.registerReloadListener(
+                new SimplePreparableReloadListener<Map<Material, Optional<List<Pair<Material, Long>>>>>() {
+
+                    @MethodsReturnNonnullByDefault
+                    @ParametersAreNonnullByDefault
+                    @Override
+                    protected Map<Material, Optional<List<Pair<Material, Long>>>> prepare(ResourceManager resourceManager,
+                                                                                          ProfilerFiller profilerFiller) {
+                        final Map<Material, Optional<List<Pair<Material, Long>>>> alloys = new HashMap<>();
+                        for (final var id : resourceManager
+                                .listResources("alloys", path -> path.toString().endsWith(".json")).keySet()) {
+                            try (final var stream = resourceManager.open(id)) {
+                                final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+                                final var material = GTCEuAPI.materialManager
+                                        .getMaterial(id.toString().replace(".json", "").replace("alloys/", ""));
+                                if (Objects.isNull(material)) {
+                                    continue;
+                                }
+                                final var alloy = AlloysData.read(gson.fromJson(file, JsonElement.class));
+                                if (alloy.isEmpty()) {
+                                    alloys.put(material, Optional.empty());
+                                } else {
+                                    alloys.put(material, Optional.of(alloy.get().stream().map(pair -> {
+                                        final var subMat = GTCEuAPI.materialManager.getMaterial(pair.getA().toString());
+                                        if (Objects.isNull(subMat) || subMat.isNull()) throw new RuntimeException(
+                                                "Alloy JSON contains a material that doesn't exist");
+                                        return new Pair<>(subMat, pair.getB());
+                                    }).toList()));
+                                }
+                            } catch (IOException | JsonSyntaxException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        return alloys;
+                    }
+
+                    @MethodsReturnNonnullByDefault
+                    @ParametersAreNonnullByDefault
+                    @Override
+                    protected void apply(Map<Material, Optional<List<Pair<Material, Long>>>> prepareResult,
+                                         ResourceManager resourceManager, ProfilerFiller profilerFiller) {
+                        alloys.clear();
+                        alloys.putAll(prepareResult);
+                    }
+                });
     }
 
     public static @Nullable Molecule getMolecule(Material material) {
         return molecules.get(material);
     }
 
+    public static @Nullable List<Pair<Material, Long>> getAlloy(Material material) {
+        return Optional.ofNullable(alloys.get(material))
+                .map(opt -> opt.orElseGet(() -> AlloyTooltipComponent.deriveComponents(material))).orElse(null);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static void tryColorizeFormula(Material material, OptionalInt idx,
                                           List<Either<FormattedText, TooltipComponent>> tooltipElements) {
         if (Objects.nonNull(material.getMaterialComponents()) && !material.getMaterialComponents().isEmpty() ||
@@ -215,6 +284,7 @@ public class MolDraw {
         }
 
         final var mol = getMolecule(material);
+        final var alloy = getAlloy(material);
         final var tooltipElements = event.getTooltipElements();
 
         final var idx = IntStream.range(0, tooltipElements.size())
@@ -232,11 +302,16 @@ public class MolDraw {
         } else {
             tryColorizeFormula(material, idx, tooltipElements);
 
-            if (!Objects.isNull(mol) && MolDrawConfig.INSTANCE.onlyShowOnShift) {
+            if (MolDrawConfig.INSTANCE.onlyShowOnShift) {
                 final int ttIndex = idx.orElse(1) + 1;
 
-                tooltipElements.add(ttIndex, Either
-                        .left(FormattedText.of(Component.translatable("tooltip.moldraw.shift_view").getString())));
+                if (Objects.nonNull(mol) && MolDrawConfig.INSTANCE.molecule.showMolecules) {
+                    tooltipElements.add(ttIndex, Either.left(FormattedText
+                            .of(Component.translatable("tooltip.moldraw.shift_view_molecule").getString())));
+                } else if (Objects.nonNull(alloy) && MolDrawConfig.INSTANCE.alloy.showAlloys) {
+                    tooltipElements.add(ttIndex, Either.left(
+                            FormattedText.of(Component.translatable("tooltip.moldraw.shift_view_alloy").getString())));
+                }
             }
         }
     }

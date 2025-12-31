@@ -44,6 +44,22 @@ public class FluidEmiStackMixin {
         return builder.toString();
     }
 
+    @Unique
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static void moldraw$tryColorizeFormula(List<ClientTooltipComponent> list, Material material,
+                                                   OptionalInt idx, OptionalInt quantityIdx) {
+        if (Objects.nonNull(material.getMaterialComponents()) && !material.getMaterialComponents().isEmpty() ||
+                material.isElement()) {
+            final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);
+
+            if (idx.isPresent())
+                list.set(idx.getAsInt(), ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
+            else
+                list.add(quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1),
+                        ClientTooltipComponent.create(coloredFormula.getVisualOrderText()));
+        }
+    }
+
     @Inject(method = "getTooltip",
             at = @At(value = "INVOKE",
                      target = "Ldev/emi/emi/api/render/EmiTooltipComponents;appendModName(Ljava/util/List;Ljava/lang/String;)V"),
@@ -68,6 +84,7 @@ public class FluidEmiStackMixin {
                         moldraw$simpleGetText(((ClientTextTooltipMixin) ctt).getText()).endsWith("mB")) // <-- 使用 mixin
                                                                                                         // 访问器
                 .findFirst();
+        final var insertAt = quantityIdx.stream().map(i -> i + 1).findFirst().orElse(1);
 
         if (mol != null && (!MolDrawConfig.INSTANCE.onlyShowOnShift || GTUtil.isShiftDown())) {
             final ClientTooltipComponent comp = ClientTooltipComponent.create(new MoleculeTooltipComponent(mol));

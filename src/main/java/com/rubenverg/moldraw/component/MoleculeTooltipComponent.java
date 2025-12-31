@@ -1,4 +1,4 @@
-package com.rubenverg.moldraw;
+package com.rubenverg.moldraw.component;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -9,11 +9,10 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraftforge.common.util.TriPredicate;
 
 import com.mojang.datafixers.util.Pair;
+import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.molecule.*;
-import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 
 import java.lang.Math;
@@ -49,7 +48,7 @@ public record MoleculeTooltipComponent(
             return xy -> {
                 var result = new Vector2f();
                 xy.sub(xyStart, result);
-                result.mul(MolDrawConfig.INSTANCE.scale);
+                result.mul(MolDrawConfig.INSTANCE.molecule.moleculeScale);
                 return new Vector2f(result.x + 8 + (atomAtLefLef ? 12 : 0) + (parenAtLef ? 6 : 0),
                         -result.y + (atomAtTopTop ? lineHeight * 3 / 2f : atomAtTop ? lineHeight / 2f : 3));
             };
@@ -101,7 +100,7 @@ public record MoleculeTooltipComponent(
             final var bounds = molecule.bounds();
             final Vector2f diff = new Vector2f();
             bounds.getSecond().sub(bounds.getFirst(), diff);
-            diff.mul(MolDrawConfig.INSTANCE.scale);
+            diff.mul(MolDrawConfig.INSTANCE.molecule.moleculeScale);
             diff.ceil();
             this.xySize = new Vector2i((int) diff.x, (int) diff.y);
             this.xyStart = new Vector2f(bounds.getFirst().x, bounds.getSecond().y);
@@ -267,8 +266,7 @@ public record MoleculeTooltipComponent(
                     final var end = floored(ts.apply(atomB.position()));
                     end.add(x, y);
                     end.add(0, font.lineHeight / 2);
-                    final TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> notCloseToAtom = (xt, yt,
-                                                                                                               _c) -> {
+                    final GraphicalUtils.PixelPredicate notCloseToAtom = (xt, yt, _c) -> {
                         if (atomAInvisible && atomBInvisible)
                             return true;
                         Vector2ic t = new Vector2i(xt, yt);
@@ -311,40 +309,17 @@ public record MoleculeTooltipComponent(
                             return false;
                         return true;
                     };
-                    double dy = end.y - start.y, dx = end.x - start.x;
-                    double length = Math.hypot(dx, dy);
-                    final BiFunction<Integer, Integer, TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer>> notCloseToAtomAndBands = (m,
-                                                                                                                                                     b) -> (xt,
-                                                                                                                                                            yt,
-                                                                                                                                                            count) -> {
-                                                                                                                                                         if (!notCloseToAtom
-                                                                                                                                                                 .test(xt,
-                                                                                                                                                                         yt,
-                                                                                                                                                                         count))
-                                                                                                                                                             return false;
-                                                                                                                                                         return Math
-                                                                                                                                                                 .hypot(start.x -
-                                                                                                                                                                         xt,
-                                                                                                                                                                         start.y -
-                                                                                                                                                                                 yt) %
-                                                                                                                                                                 m <
-                                                                                                                                                                 b;
-                                                                                                                                                     };
-                    final BiFunction<Integer, Integer, TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer>> notCloseToAtomAndDot = (m,
-                                                                                                                                                   b) -> (xt,
-                                                                                                                                                          yt,
-                                                                                                                                                          count) -> {
-                                                                                                                                                       if (!notCloseToAtom
-                                                                                                                                                               .test(xt,
-                                                                                                                                                                       yt,
-                                                                                                                                                                       count))
-                                                                                                                                                           return false;
-                                                                                                                                                       return count %
-                                                                                                                                                               m <
-                                                                                                                                                               b;
-                                                                                                                                                   };
-                    int addX = (int) Math.round(dy / length * 2), addY = (int) -Math.round(dx / length * 2);
-                    int addHX = (int) Math.round(dy / length), addHY = (int) -Math.round(dx / length);
+                    final var startEnd = new Vector2f(end).sub(new Vector2f(start));
+                    final float dy = startEnd.y, dx = startEnd.x, length = startEnd.length();
+                    final BiFunction<Integer, Integer, GraphicalUtils.PixelPredicate> notCloseToAtomAndDot = (m,
+                                                                                                              b) -> notCloseToAtom
+                                                                                                                      .and((xt,
+                                                                                                                            yt,
+                                                                                                                            count) -> count %
+                                                                                                                                    m <
+                                                                                                                                    b);
+                    int addX = Math.round(dy / length * 2), addY = -Math.round(dx / length * 2);
+                    int addHX = Math.round(dy / length), addHY = -Math.round(dx / length);
                     int colorA = colorForElement(atomA.element().element());
                     int colorB = colorForElement(atomB.element().element());
                     IntBinaryOperator color = (xp, yp) -> {
@@ -353,13 +328,19 @@ public record MoleculeTooltipComponent(
                         return d2a < d2b ? colorA : colorB;
                     };
                     List<Vector2i> allTargets = new ArrayList<>();
-                    plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2, (_xt, _yt, _c) -> true,
+                    GraphicalUtils.plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2,
+                            GraphicalUtils::alwaysDraw,
                             (xp, yp) -> {
                                 allTargets.add(new Vector2i(xp / 2, yp / 2));
                                 allTargets.add(new Vector2i((xp + 1) / 2, yp / 2));
                                 allTargets.add(new Vector2i(xp / 2, (yp + 1) / 2));
                                 allTargets.add(new Vector2i((xp + 1) / 2, (yp + 1) / 2));
                             });
+                    final var aboveEnd = new Vector2f(end).sub(new Vector2f(start)).perpendicular().normalize(2)
+                            .add(new Vector2f(end));
+                    List<Vector2i> above = new ArrayList<>();
+                    GraphicalUtils.plotLine(start.x, start.y, Math.round(aboveEnd.x), Math.round(aboveEnd.y),
+                            GraphicalUtils::alwaysDraw, (xp, yp) -> above.add(new Vector2i(xp, yp)));
                     final var thickness = bond.totalThickness();
                     final var starting = bond.centered() ? (thickness - 1) / 2f : (float) ((thickness - 1) / 2);
                     var done = bond.lines().length > 0 && bond.lines()[0].thick ? 1 : 0;
@@ -368,21 +349,35 @@ public record MoleculeTooltipComponent(
                         final var sX = Mth.floor(delta) * addX + (int) (Mth.frac(delta) * 2) * addHX;
                         final var sY = Mth.floor(delta) * addY + (int) (Mth.frac(delta) * 2) * addHY;
                         switch (bond.lines()[i]) {
-                            case SOLID -> plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY, notCloseToAtom,
-                                    color, guiGraphics);
-                            case DOTTED -> plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                            case SOLID -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                                    notCloseToAtom, color, guiGraphics);
+                            case DOTTED -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
                                     notCloseToAtomAndDot.apply(2, 1), color, guiGraphics);
-                            case INWARD, OUTWARD -> {
-                                final var shouldDraw = bond.lines()[i] == Bond.Line.INWARD ?
-                                        notCloseToAtomAndBands.apply(3, 1) : notCloseToAtom;
+                            case INWARD -> {
+                                for (int j = 0;; j++) {
+                                    if (j >= above.size()) break;
+                                    if (j % 3 != 0) continue;
+                                    final var abovePoint = above.get(j);
+                                    final var a = new Vector2f(abovePoint);
+                                    final var startA = new Vector2f(a).sub(new Vector2f(start));
+                                    final var b = new Vector2f(start).add(
+                                            new Vector2f(startEnd).mul(startEnd.dot(startA) / startEnd.dot(startEnd)))
+                                            .mul(2).sub(a);
+                                    final var belowPoint = new Vector2i(Math.round(b.x), Math.round(b.y));
+                                    GraphicalUtils.plotLine(abovePoint.x + sX, abovePoint.y + sY, belowPoint.x + sX,
+                                            belowPoint.y + sY, notCloseToAtom, color, guiGraphics);
+                                }
+                            }
+                            case OUTWARD -> {
                                 for (final var pair : allTargets) {
-                                    plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX, end.y + pair.y + sY,
-                                            shouldDraw, color, guiGraphics);
+                                    GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX,
+                                            end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
                                 }
                             }
                             case THICK -> {
                                 for (final var pair : allTargets) {
-                                    plotLine(start.x + pair.x + sX, start.y + pair.y + sY, end.x + pair.x + sX,
+                                    GraphicalUtils.plotLine(start.x + pair.x + sX, start.y + pair.y + sY,
+                                            end.x + pair.x + sX,
                                             end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
                                 }
                             }
@@ -420,38 +415,6 @@ public record MoleculeTooltipComponent(
                     // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
                 }
             }
-        }
-
-        public static void plotLine(int x0, int y0, int x1, int y1,
-                                    TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> shouldDraw,
-                                    BiConsumer<Integer, Integer> doDraw) {
-            final int dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
-            final int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
-            int error = dx + dy;
-            int count = 0;
-            while (true) {
-                // This is horribly unoptimized
-                if (shouldDraw.test(x0, y0, count++)) doDraw.accept(x0, y0);
-                final int e2 = 2 * error;
-                if (e2 >= dy) {
-                    if (x0 == x1) break;
-                    error += dy;
-                    x0 += sx;
-                }
-                if (e2 <= dx) {
-                    if (y0 == y1) break;
-                    error += dx;
-                    y0 += sy;
-                }
-            }
-        }
-
-        public static void plotLine(int x0, int y0, int x1, int y1,
-                                    TriPredicate<@NotNull Integer, @NotNull Integer, @NotNull Integer> shouldDraw,
-                                    IntBinaryOperator color,
-                                    GuiGraphics graphics) {
-            plotLine(x0, y0, x1, y1, shouldDraw,
-                    (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
         }
     }
 }
