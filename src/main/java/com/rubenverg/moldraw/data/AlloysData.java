@@ -24,6 +24,10 @@ public class AlloysData {
         return new ResourceLocation("cosmiccore", path);
     }
 
+    private static ResourceLocation gtca(String path) {
+        return new ResourceLocation("gtca", path);
+    }
+
     public static Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys() {
         final Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys = new HashMap<>();
         alloys.put(GTCEu.id("battery_alloy"), Optional.empty());
@@ -128,7 +132,52 @@ public class AlloysData {
         alloys.put(cosmiccore("prismatic_tungstensteel"), Optional.empty());
         alloys.put(cosmiccore("resonant_virtue_meld"), Optional.empty());
         alloys.put(cosmiccore("naquadric_superalloy"), Optional.empty());
-        alloys.put(cosmiccore("naquadric_superalloy"), Optional.empty());
+        alloys.put(GTCEu.id("mar_m_200_steel"), Optional.empty());
+        alloys.put(GTCEu.id("black_matter"), Optional.empty());
+        alloys.put(gtca("artherium_sn"), Optional.empty());
+        alloys.put(gtca("hg_1223"), Optional.empty());
+        alloys.put(gtca("nimonic_80_a"), Optional.empty());
+        alloys.put(gtca("mar_ce_m_200"), Optional.empty());
+        alloys.put(gtca("cinobite_a_241"), Optional.empty());
+        alloys.put(gtca("adamantium_alloy"), Optional.empty());
+        alloys.put(gtca("inconel_792"), Optional.empty());
+        alloys.put(gtca("dural"), Optional.empty());
+        alloys.put(gtca("berwollium"), Optional.empty());
+        alloys.put(gtca("dark_steel"), Optional.empty());
+        alloys.put(gtca("incoloy_846"), Optional.empty());
+        alloys.put(gtca("melodic_alloy"), Optional.empty());
+        alloys.put(gtca("quantum_alloy"), Optional.empty());
+        alloys.put(gtca("pikyonium_64_y"), Optional.empty());
+        alloys.put(gtca("incoloy_020"), Optional.empty());
+        alloys.put(gtca("vitallium"), Optional.empty());
+        alloys.put(gtca("inconel_718"), Optional.empty());
+        alloys.put(gtca("tm_20_mn_alloy"), Optional.empty());
+        alloys.put(gtca("incoloy_ds"), Optional.empty());
+        alloys.put(gtca("zirconium_carbide"), Optional.empty());
+        alloys.put(gtca("nitinol_60"), Optional.empty());
+        alloys.put(gtca("inconel_690"), Optional.empty());
+        alloys.put(gtca("neutronex"), Optional.empty());
+        alloys.put(gtca("end_steel"), Optional.empty());
+        alloys.put(gtca("moltech"), Optional.empty());
+        alloys.put(gtca("tantalloy_60"), Optional.empty());
+        alloys.put(gtca("incoloy_ma_323"), Optional.empty());
+        alloys.put(gtca("hastelloy_n"), Optional.empty());
+        alloys.put(gtca("enriched_holmium"), Optional.empty());
+        alloys.put(gtca("trinium_naquadah_carbonite"), Optional.empty());
+        alloys.put(gtca("stellar_alloy"), Optional.empty());
+        alloys.put(gtca("inconel_625"), Optional.empty());
+        alloys.put(gtca("electrical_steel"), Optional.empty());
+        alloys.put(gtca("silicon_carbide"), Optional.empty());
+        alloys.put(gtca("c_n_f_alloy"), Optional.empty());
+        alloys.put(gtca("lafium_compound"), Optional.empty());
+        alloys.put(gtca("zeron_182"), Optional.empty());
+        alloys.put(gtca("mar_m_200"), Optional.empty());
+        alloys.put(gtca("trinium_naquadah"), Optional.empty());
+        alloys.put(gtca("tantalloy_61"), Optional.empty());
+        alloys.put(gtca("stellite_79"), Optional.empty());
+        alloys.put(gtca("eglin_steel"), Optional.empty());
+        alloys.put(gtca("incoloy_903"), Optional.empty());
+        alloys.put(gtca("duranium_x"), Optional.empty());
 
         return alloys;
     }
