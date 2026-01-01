@@ -1,0 +1,24 @@
+{
+  "tooltip.moldraw.shift_view_molecule": "§7按下Shift键以显示结构",
+  "tooltip.moldraw.shift_view_alloy": "§7按下Shift键以显示成分",
+
+  "config.moldraw.option.enabled": "启用模组",
+  "config.moldraw.option.onlyShowOnShift": "仅在按下Shift时显示结构",
+  "config.moldraw.option.debugMode": "调试模式",
+
+  "config.moldraw.option.color": "颜色",
+  "config.moldraw.option.colors": "彩色元素符号",
+  "config.moldraw.option.useMaterialColors": "使用材料颜色",
+  "config.moldraw.option.defaultColor": "默认元素颜色",
+  "config.moldraw.option.minimumBrightness": "彩色元素的最小亮度",
+  
+  "config.moldraw.option.molecule": "分子",
+  "config.moldraw.option.showMolecules": "显示分子结构图",
+  "config.moldraw.option.moleculeScale": "分子缩放比例",
+
+  "config.moldraw.option.alloy": "合金",
+  "config.moldraw.option.showAlloys": "显示合金成分图表",
+  "config.moldraw.option.pieChartRadius": "合金成分饼图的半径",
+  "config.moldraw.option.recursive": "递归分解合金为其组成元素",
+  "config.moldraw.option.partsByMass": "按质量显示合金成分百分比"
+}
