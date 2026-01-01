@@ -6,15 +6,23 @@ This clientside only mod adds molecule drawings for organic molecules from GregT
 
 ## Examples
 
-| Color    |Polyethylene| Polybenzimidazole                                                                                                                                                     | Chloroform                                                                                                                                              |
-|----------|---|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| None     |![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png)| ![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole.png)          | ![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform.png)          |
-| CPK      |![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png)| ![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole_color.png)    | ![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform_color.png)    |
-| Material |![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png)| ![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole_matcolor.png) | ![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform_matcolor.png) |
+| Color    | Polyethylene                                                                                                                                       | Polybenzimidazole                                                                                                                                                     | Chloroform                                                                                                                                              |
+|----------|----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| None     | ![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png) | ![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole.png)          | ![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform.png)          |
+| CPK      | ![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png) | ![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole_color.png)    | ![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform_color.png)    |
+| Material | ![polyethylene tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polyethylene.png) | ![polybenzimidazole tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/polybenzimidazole_matcolor.png) | ![chloroform tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/chloroform_matcolor.png) |
+
+### Alloys
+
+| Mode          | HSS-E                                                                                                                                         |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| By mass       | ![hss-e tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/hsse.png)           | 
+| Not recursive | ![hss-e tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/hsse_norecurse.png) | 
+| By count      | ![hss-e tooltip screenshot](https://raw.githubusercontent.com/RubenVerg/gregtech-molecule-drawings/refs/heads/main/images/hsse_bycount.png)   | 
 
 ## Additional content support
 
-MolDraw comes out of the box with support for not only most of the organic materials from base GTCEu, but also a bunch of addons and modpacks. The currently supported extensions are:
+MolDraw comes out of the box with support for not only most of the organic materials and alloys from base GTCEu, but also a bunch of addons and modpacks. The currently supported extensions are:
 
 * Monifactory
 * Star Technology
@@ -38,6 +46,8 @@ MolDraw comes out of the box with support for not only most of the organic mater
 > This was already so cool and colors made it even better!
 
 > I should be allowed to give Michelin stars to Gregtech add-ons because Madeline is cooking things right.
+
+> Incredibly useless, and yet incredibly cool!
 
 ## Adding your own molecules
 
