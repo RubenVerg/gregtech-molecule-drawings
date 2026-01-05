@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BucketItem;
@@ -145,6 +146,23 @@ public class MolDraw {
     private static final Map<Material, Optional<List<Pair<Material, Long>>>> alloys = new HashMap<>();
 
     public void registerClientReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(new SimplePreparableReloadListener<Unit>() {
+
+            @MethodsReturnNonnullByDefault
+            @ParametersAreNonnullByDefault
+            @Override
+            protected Unit prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
+                return Unit.INSTANCE;
+            }
+
+            @MethodsReturnNonnullByDefault
+            @ParametersAreNonnullByDefault
+            @Override
+            protected void apply(Unit unit, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
+                MoleculeColorize.invalidateColorCache();
+            }
+        });
+
         event.registerReloadListener(
 
                 new SimplePreparableReloadListener<Map<Material, Molecule>>() {
