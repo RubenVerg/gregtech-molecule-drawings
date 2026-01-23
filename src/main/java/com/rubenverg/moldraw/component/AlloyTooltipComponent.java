@@ -117,8 +117,13 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 c.add(new Pair<>(current, comp.getA()));
                 current += comp.getB();
             }
-            stops = s.stream().map(pair -> new Pair<>(Math.PI * 2 * pair.getA() / total, pair.getB())).toList();
-
+            stops = new ArrayList<>(components.size());
+            double offset = 0;
+            for (var comp : components) {
+                double end = offset +  Math.PI * 2 * comp.getB()/(double)total;
+                stops.add(new Pair<>(end, comp.getA()));
+                offset = end;
+            }
             c.remove(0);
             c.add(new Pair<>(total, GTMaterials.NULL));
             centers = Streams
@@ -178,19 +183,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
             final int xm = BASE_WIDTH / 2 + addLeft + x, ym = baseHeight / 2 + addTop + y;
 
-            final IntBinaryOperator sc = (xp, yp) -> {
-                final int rx = xp - xm, ry = yp - ym;
-                final double ng = Math.atan2(rx, -ry);
-                final double angle = ng < 0 ? ng + 2 * Math.PI : ng;
-                for (int si = 1; si <= stops.size(); si++) {
-                    if (angle <= stops.get(si % stops.size()).getA())
-                        return MoleculeColorize.colorForMaterial(stops.get(si - 1).getB());
-                }
-                return MoleculeColorize.colorForMaterial(stops.get(stops.size() - 1).getB());
-            };
-
-            GraphicalUtils.plotCircle(xm, ym, MolDrawConfig.INSTANCE.alloy.pieChartRadius, GraphicalUtils::alwaysDraw,
-                    sc, guiGraphics);
+            GraphicalUtils.plotPieChart(xm, ym, MolDrawConfig.INSTANCE.alloy.pieChartRadius, stops, guiGraphics);
 
             final IntBinaryOperator white = (_xp, _yp) -> 0xffffffff;
 
