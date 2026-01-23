@@ -120,7 +120,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
             stops = new ArrayList<>(components.size());
             double offset = 0;
             for (var comp : components) {
-                double end = offset +  Math.PI * 2 * comp.getB()/(double)total;
+                double end = offset + Math.PI * 2 * comp.getB() / (double) total;
                 stops.add(new Pair<>(end, comp.getA()));
                 offset = end;
             }
