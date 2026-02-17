@@ -2930,7 +2930,8 @@ public class MoleculesData {
             final var transformation = new Matrix4x3f();
             transformation.identity();
             transformation.rotateZ((float) Math.toRadians(180));
-            transformation.setTranslation(1 + MathUtils.SIN18f + MathUtils.COS30f + MathUtils.SIN18f + 1, 0.95f + MathUtils.SIN30f + 0.95f, 0);
+            transformation.setTranslation(1 + MathUtils.SIN18f + MathUtils.COS30f + MathUtils.SIN18f + 1,
+                    0.95f + MathUtils.SIN30f + 0.95f, 0);
             final var half = new Molecule()
                     .xy()
                     .invAtom(0, 0)

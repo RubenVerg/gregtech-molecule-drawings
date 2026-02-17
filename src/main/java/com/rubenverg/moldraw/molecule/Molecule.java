@@ -183,7 +183,8 @@ public class Molecule {
     public Pair<Vector2f, Vector2f> bounds() {
         final var atoms = atoms();
         if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
-        Vector2f min = new Vector2f(atoms.get(0).position().x, atoms.get(0).position().y), max = new Vector2f(atoms.get(0).position().x, atoms.get(0).position().y);
+        Vector2f min = new Vector2f(atoms.get(0).position().x, atoms.get(0).position().y),
+                max = new Vector2f(atoms.get(0).position().x, atoms.get(0).position().y);
         for (final var atom : atoms) {
             min.min(new Vector2f(atom.position().x, atom.position().y));
             max.max(new Vector2f(atom.position().x, atom.position().y));
