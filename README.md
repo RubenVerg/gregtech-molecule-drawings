@@ -87,10 +87,17 @@ interface AtomXY extends AtomCommon {
   y: number;
 }
 
-// or U and V coordinates, which are unit vectors tilted 30 degrees respectively anticlockwise and clockwise from the positive X semiaxis.
+// or U and V coordinates, which are unit vectors tilted 30 degrees respectively anticlockwise and clockwise from the positive X semiaxis...
 interface AtomUV extends AtomCommon {
   u: number;
   v: number;
+}
+
+// or the full 3D X, Y and Z coordinates.
+interface AtomXYZ extends AtomCommon {
+  x: number;
+  y: number;
+  z: number;
 }
 
 // Inward and outward bonds grow in size towards the second atom.
@@ -132,11 +139,12 @@ interface CircleMatrix extends CircleCommon {
   a11: number;
 }
 
-type MoleculeElement = AtomXY | AtomUV | Bond | Parens | CircleXY | CircleMatrix;
+type MoleculeElement = AtomXY | AtomUV | AtomXYZ | Bond | Parens | CircleXY | CircleMatrix;
 
 // A molecule JSON file is of type Molecule.
 interface Molecule {
   contents: MoleculeElement[];
+  spin?: boolean; // If true, the molecule rotates in the tooltip
 }
 ```
 

@@ -8,7 +8,7 @@ import net.minecraft.util.Mth;
 import com.rubenverg.moldraw.molecule.*;
 import org.joml.Matrix2d;
 import org.joml.Matrix2f;
-import org.joml.Matrix3x2f;
+import org.joml.Matrix4x3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -2927,11 +2927,10 @@ public class MoleculesData {
                 .bond(16, 17, true, Bond.DOUBLE)
                 .bond(16, 7));
         {
-            final var transformation = new Matrix3x2f();
+            final var transformation = new Matrix4x3f();
             transformation.identity();
-            transformation.rotate((float) Math.toRadians(180));
-            transformation.setTranslation(1 + MathUtils.SIN18f + MathUtils.COS30f + MathUtils.SIN18f + 1,
-                    0.95f + MathUtils.SIN30f + 0.95f);
+            transformation.rotateZ((float) Math.toRadians(180));
+            transformation.setTranslation(1 + MathUtils.SIN18f + MathUtils.COS30f + MathUtils.SIN18f + 1, 0.95f + MathUtils.SIN30f + 0.95f, 0);
             final var half = new Molecule()
                     .xy()
                     .invAtom(0, 0)

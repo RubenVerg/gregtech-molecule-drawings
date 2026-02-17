@@ -42,12 +42,13 @@ public record MoleculeTooltipComponent(
         private final boolean atomAtBotBot;
         private final boolean atomAtLefLef;
         private final boolean parenAtLef;
+        private final Vector3f center;
         private final Map<Element.Counted, Integer> elementWidths = new HashMap<>();
 
         private UnaryOperator<Vector2f> toScaledFactory(int lineHeight) {
             return xy -> {
                 var result = new Vector2f();
-                xy.sub(xyStart, result);
+                new Vector2f(xy.x, xy.y).sub(xyStart, result);
                 result.mul(MolDrawConfig.INSTANCE.molecule.moleculeScale);
                 return new Vector2f(result.x + 8 + (atomAtLefLef ? 12 : 0) + (parenAtLef ? 6 : 0),
                         -result.y + (atomAtTopTop ? lineHeight * 3 / 2f : atomAtTop ? lineHeight / 2f : 3));
@@ -79,6 +80,19 @@ public record MoleculeTooltipComponent(
                 }
                 return new Pair<>(new Vector2f(x0, y0), new Vector2f(x1, y1));
             };
+        }
+
+        private Vector2f project(Vector3fc xyz, boolean spin) {
+            final var rotationFrequency = 1 / 4f;
+            final var vec = new Vector3f(xyz);
+            vec.sub(center);
+            if (spin) vec.mul(new Matrix3f().rotationY(System.currentTimeMillis() % (int)(1000 / rotationFrequency) / (1000 / rotationFrequency) * Mth.TWO_PI));
+            vec.add(center);
+            return new Vector2f(vec.x, vec.y);
+        }
+
+        private Function<Vector3f, Vector2f> toScaledProjectedFactory(int lineHeight, boolean spin) {
+            return xyz -> toScaledFactory(lineHeight).apply(project(xyz, spin));
         }
 
         /*
@@ -133,6 +147,15 @@ public record MoleculeTooltipComponent(
                 return molecule.contents().stream().anyMatch(el -> el instanceof Parens parens &&
                         Arrays.stream(parens.atoms()).anyMatch(d -> d == atom.index()));
             });
+            {
+                center = new Vector3f(0, 0, 0);
+                int count = 0;
+                for (final var elem : this.molecule.contents()) if (elem instanceof Atom atom) {
+                    center.add(atom.position());
+                    count++;
+                }
+                center.div(count);
+            }
         }
 
         @Override
@@ -153,7 +176,7 @@ public record MoleculeTooltipComponent(
             var mat = new Matrix4f(matrix);
             for (final var elem : this.molecule.contents()) {
                 if (elem instanceof Atom atom) {
-                    final var xyPosition = floored(toScaledFactory(font.lineHeight).apply(atom.position()));
+                    final var xyPosition = floored(toScaledFactory(font.lineHeight).apply(project(atom.position(), molecule.spin())));
                     final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
                     mat.translate(translation);
                     final var width = font.width(atom.element().toString());
@@ -217,8 +240,7 @@ public record MoleculeTooltipComponent(
                         mat.translate(debugTranslation.negate());
                     }
                 } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),
-                            sizeOfAtomFactory(font.lineHeight));
+                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledProjectedFactory(font.lineHeight, molecule.spin()), sizeOfAtomFactory(font.lineHeight));
                     final var xySub = new Vector2i((int) bounds.getSecond().x, (int) bounds.getSecond().y);
                     xySub.add(7, -2);
                     final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
@@ -260,10 +282,10 @@ public record MoleculeTooltipComponent(
                     final var atomBBelow = atomB.below().map(elementWidths::get);
                     final var atomBLeft = atomB.left().map(elementWidths::get);
                     final var atomBInvisible = atomB.isInvisible();
-                    final var start = floored(ts.apply(atomA.position()));
+                    final var start = floored(ts.apply(project(atomA.position(), molecule.spin())));
                     start.add(x, y);
                     start.add(0, font.lineHeight / 2);
-                    final var end = floored(ts.apply(atomB.position()));
+                    final var end = floored(ts.apply(project(atomB.position(), molecule.spin())));
                     end.add(x, y);
                     end.add(0, font.lineHeight / 2);
                     final GraphicalUtils.PixelPredicate notCloseToAtom = (xt, yt, _c) -> {
@@ -384,8 +406,7 @@ public record MoleculeTooltipComponent(
                         }
                     }
                 } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledFactory(font.lineHeight),
-                            sizeOfAtomFactory(font.lineHeight));
+                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(toScaledProjectedFactory(font.lineHeight, molecule.spin()), sizeOfAtomFactory(font.lineHeight));
                     final var xyMin = floored(bounds.getFirst());
                     xyMin.add(x, y);
                     xyMin.add(-2, -1);
@@ -401,14 +422,13 @@ public record MoleculeTooltipComponent(
                 } else if (elem instanceof CircleTransformation ct) {
                     final var centroid = Arrays.stream(ct.atoms())
                             .mapToObj(idx -> this.molecule.getAtom(idx).get().position())
-                            .reduce(new Vector2f(), (a, b) -> new Vector2f(a).add(new Vector2f(b)))
+                            .reduce(new Vector3f(), (a, b) -> new Vector3f(a).add(new Vector3f(b)))
                             .div(ct.atoms().length);
                     for (int part = 0; part < 128; part++) {
                         final var angle = (float) part / 64 * Mth.PI;
-                        final var u = new Vector2f(Mth.cos(angle), Mth.sin(angle));
-                        final var p = u.mul(ct.A()).add(centroid);
-                        final var r = floored(toScaledFactory(font.lineHeight).apply(p)).add(x,
-                                y + font.lineHeight / 2);
+                        final var u = new Vector3f(Mth.cos(angle), Mth.sin(angle), 0);
+                        final var p = u.mul(new Matrix3f(ct.A())).add(centroid.x, centroid.y, centroid.z);
+                        final var r = floored(toScaledProjectedFactory(font.lineHeight, molecule.spin()).apply(p)).add(x, y + font.lineHeight / 2);
                         guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1, defaultColor);
                     }
                     // final var cc = toScreen(font.lineHeight, centroid).add(x, y + font.lineHeight / 2);
