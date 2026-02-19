@@ -79,6 +79,7 @@ interface AtomCommon {
   right?: CountedElement; // etc
   below?: CountedElement;
   left?: CountedElement;
+  spin_group?: number; // Atoms with the same group spin at the same rate, if it's a valid index in the molecule's spin property
 }
 
 // An atom can either specify X and Y coordinates...
@@ -139,12 +140,17 @@ interface CircleMatrix extends CircleCommon {
   a11: number;
 }
 
+type SpinSpec
+  = boolean // Enable spinning with the default speed
+  | number // Enable spinning and set a speed
+  | number[]; // Set speeds for multiple groups
+
 type MoleculeElement = AtomXY | AtomUV | AtomXYZ | Bond | Parens | CircleXY | CircleMatrix;
 
 // A molecule JSON file is of type Molecule.
 interface Molecule {
   contents: MoleculeElement[];
-  spin?: boolean; // If true, the molecule rotates in the tooltip
+  spin?: SpinSpec;
 }
 ```
 

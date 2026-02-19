@@ -14,7 +14,8 @@ public record Atom(
                    Optional<Element.Counted> right,
                    Optional<Element.Counted> below,
                    Optional<Element.Counted> left,
-                   Vector3f position)
+                   Vector3f position,
+                   int spinGroup)
         implements MoleculeElement<Atom> {
 
     @Override
@@ -31,7 +32,8 @@ public record Atom(
                 right,
                 below,
                 left,
-                new Vector3f(position));
+                new Vector3f(position),
+                spinGroup);
     }
 
     public boolean isInvisible() {
@@ -80,7 +82,8 @@ public record Atom(
             } else {
                 throw new JsonParseException("Atom JSON must contain either u and v, or x and y (and possibly z)");
             }
-            return new Atom(index, element, above, right, below, left, position);
+            final var spinGroup = obj.has("spin_group") ? obj.get("spinGroup").getAsInt() : 0;
+            return new Atom(index, element, above, right, below, left, position, spinGroup);
         }
 
         @Override
@@ -99,6 +102,7 @@ public record Atom(
             obj.addProperty("x", atom.position.x);
             obj.addProperty("y", atom.position.y);
             if (atom.position.z != 0) obj.addProperty("z", atom.position.z);
+            if (atom.spinGroup != 0) obj.addProperty("spin_group", atom.spinGroup);
             return obj;
         }
     }
