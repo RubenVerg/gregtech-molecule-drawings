@@ -88,8 +88,9 @@ public record MoleculeTooltipComponent(
 
         private Vector2f project(Vector3fc xyz, int group) {
             final var vec = new Vector3f(xyz);
-            if (group >= 0 && group < molecule.spinGroups().size()) {
-                final var freq = 1000 / molecule.spinGroups().getFloat(group);
+            if (MolDrawConfig.INSTANCE.molecule.spinMolecules && group >= 0 && group < molecule.spinGroups().size()) {
+                final var freq = 1000 /
+                        (molecule.spinGroups().getFloat(group) * MolDrawConfig.INSTANCE.molecule.spinSpeedMultiplier);
                 vec.sub(centers.get(group));
                 vec.mul(new Matrix3f().rotationY(System.currentTimeMillis() % (int) freq / freq * Mth.TWO_PI));
                 vec.add(centers.get(group));
