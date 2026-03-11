@@ -15,6 +15,8 @@
   "config.moldraw.option.molecule": "Molecules",
   "config.moldraw.option.showMolecules": "Show molecule drawings",
   "config.moldraw.option.moleculeScale": "Molecule scale",
+  "config.moldraw.option.spinMolecules": "Allow molecules to spin",
+  "config.moldraw.option.spinSpeedMultiplier": "Spin speed multiplier",
 
   "config.moldraw.option.alloy": "Alloys",
   "config.moldraw.option.showAlloys": "Show alloy composition charts",

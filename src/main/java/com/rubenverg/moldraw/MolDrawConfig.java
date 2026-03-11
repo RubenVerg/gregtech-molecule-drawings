@@ -57,6 +57,12 @@ public class MolDrawConfig {
         @Configurable
         @Configurable.Range(min = 10, max = 50)
         public int moleculeScale = 20;
+
+        @Configurable
+        public boolean spinMolecules = true;
+
+        @Configurable
+        public float spinSpeedMultiplier = 1;
     }
 
     @Configurable

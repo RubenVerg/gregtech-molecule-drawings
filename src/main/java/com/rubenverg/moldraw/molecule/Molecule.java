@@ -2,9 +2,13 @@ package com.rubenverg.moldraw.molecule;
 
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
@@ -14,14 +18,18 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
-import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
+@Accessors(fluent = true, chain = true)
 public class Molecule {
 
     private int atomIndex = -1;
     private final List<MoleculeElement<?>> contents = new ArrayList<>();
     @Getter
-    private final Matrix2d transformation = new Matrix2d();
+    private final Matrix3d transformation = new Matrix3d();
+    @Getter
+    @Setter
+    private FloatList spinGroups = new FloatArrayList();
 
     public Molecule() {}
 
@@ -65,21 +73,41 @@ public class Molecule {
     }
 
     public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
-                         @Nullable Element.Counted below, @Nullable Element.Counted left, Vector2fc ab) {
-        final var xy = new Vector2f(ab);
-        xy.mul(this.transformation);
+                         @Nullable Element.Counted below, @Nullable Element.Counted left, Vector2fc ab, int spinGroup) {
+        return atom(element, above, right, below, left, new Vector3f(ab, 0), spinGroup);
+    }
+
+    public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
+                         @Nullable Element.Counted below, @Nullable Element.Counted left, Vector3fc abc,
+                         int spinGroup) {
+        final var xyz = new Vector3f(abc);
+        xyz.mul(this.transformation);
         this.contents.add(new Atom(++atomIndex, element, Optional.ofNullable(above), Optional.ofNullable(right),
-                Optional.ofNullable(below), Optional.ofNullable(left), xy));
+                Optional.ofNullable(below), Optional.ofNullable(left), xyz, spinGroup));
         return this;
     }
 
     public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
+                         @Nullable Element.Counted below, @Nullable Element.Counted left, float a, float b,
+                         int spinGroup) {
+        return atom(element, above, right, below, left, new Vector2f(a, b), spinGroup);
+    }
+
+    public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
                          @Nullable Element.Counted below, @Nullable Element.Counted left, float a, float b) {
-        return atom(element, above, right, below, left, new Vector2f(a, b));
+        return atom(element, above, right, below, left, a, b, 0);
     }
 
     public Molecule atom(Element element, int count, Vector2f ab) {
-        return atom(element.count(count), null, null, null, null, ab);
+        return atom(element, count, new Vector3f(ab, 0));
+    }
+
+    public Molecule atom(Element element, int count, Vector3f abc, int spinGroup) {
+        return atom(element.count(count), null, null, null, null, abc, spinGroup);
+    }
+
+    public Molecule atom(Element element, int count, Vector3f abc) {
+        return atom(element, count, abc, 0);
     }
 
     public Molecule atom(Element element, int count, float a, float b) {
@@ -92,6 +120,14 @@ public class Molecule {
 
     public Molecule invAtom(Vector2f ab) {
         return atom(Element.INVISIBLE, 1, ab);
+    }
+
+    public Molecule invAtom(Vector3f abc, int spinGroup) {
+        return atom(Element.INVISIBLE, 1, abc, spinGroup);
+    }
+
+    public Molecule invAtom(Vector3f abc) {
+        return invAtom(abc, 0);
     }
 
     public Molecule invAtom(float a, float b) {
@@ -123,7 +159,7 @@ public class Molecule {
         return atoms().stream().filter(atom -> atom.index() == index).findFirst();
     }
 
-    public Molecule affine(Matrix3x2fc transformation) {
+    public Molecule affine(Matrix4x3fc transformation) {
         for (final var atom : atoms()) {
             atom.position().mulPosition(transformation);
         }
@@ -165,15 +201,16 @@ public class Molecule {
     public Pair<Vector2f, Vector2f> bounds() {
         final var atoms = atoms();
         if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
-        Vector2f min = new Vector2f(atoms.get(0).position()), max = new Vector2f(atoms.get(0).position());
+        Vector2f min = new Vector2f(atoms.get(0).position().x, atoms.get(0).position().y),
+                max = new Vector2f(atoms.get(0).position().x, atoms.get(0).position().y);
         for (final var atom : atoms) {
-            min.min(atom.position());
-            max.max(atom.position());
+            min.min(new Vector2f(atom.position().x, atom.position().y));
+            max.max(new Vector2f(atom.position().x, atom.position().y));
         }
         return new Pair<>(min, max);
     }
 
-    public Pair<Vector2f, Vector2f> boundsWithSize(UnaryOperator<Vector2f> translateCoordinates,
+    public Pair<Vector2f, Vector2f> boundsWithSize(Function<Vector3f, Vector2f> translateCoordinates,
                                                    Function<Atom, Pair<Vector2f, Vector2f>> getSize) {
         final var atoms = atoms();
         if (atoms.isEmpty()) return new Pair<>(new Vector2f(), new Vector2f());
@@ -229,6 +266,17 @@ public class Molecule {
                             "Molecule JSON contents have unknown type %s".formatted(type));
                 });
             });
+            if (obj.has("spin")) {
+                if (obj.get("spin").isJsonPrimitive()) {
+                    if (obj.getAsJsonPrimitive("spin").isBoolean() && obj.get("spin").getAsBoolean())
+                        molecule.spinGroups(FloatList.of(1 / 4f));
+                    else if (obj.getAsJsonPrimitive("spin").isNumber())
+                        molecule.spinGroups(FloatList.of(obj.get("spin").getAsFloat()));
+                } else if (obj.get("spin").isJsonArray()) {
+                    molecule.spinGroups(obj.getAsJsonArray("spin").asList().stream().map(JsonElement::getAsFloat)
+                            .collect(Collectors.toCollection(FloatArrayList::new)));
+                } else throw new JsonParseException("Invalid spin");
+            }
             return molecule;
         }
 
@@ -245,6 +293,14 @@ public class Molecule {
                 arr.add(c);
             }
             obj.add("contents", arr);
+            if (!molecule.spinGroups.isEmpty()) {
+                if (molecule.spinGroups.size() == 1) obj.addProperty("spin", molecule.spinGroups.getFloat(0));
+                else {
+                    final var spin = new JsonArray();
+                    molecule.spinGroups.forEach(spin::add);
+                    obj.add("spin", spin);
+                }
+            }
             return obj;
         }
     }
