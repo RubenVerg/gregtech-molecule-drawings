@@ -82,7 +82,7 @@ public record Atom(
             } else {
                 throw new JsonParseException("Atom JSON must contain either u and v, or x and y (and possibly z)");
             }
-            final var spinGroup = obj.has("spin_group") ? obj.get("spinGroup").getAsInt() : 0;
+            final var spinGroup = obj.has("spin_group") ? obj.get("spin_group").getAsInt() : 0;
             return new Atom(index, element, above, right, below, left, position, spinGroup);
         }
 
