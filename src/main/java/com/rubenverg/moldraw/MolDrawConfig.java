@@ -95,5 +95,14 @@ public class MolDrawConfig {
     }
 
     @Configurable
+    public FunConfig fun = new FunConfig();
+
+    public static class FunConfig {
+
+        @Configurable
+        public boolean aromanticBenzene = false;
+    }
+
+    @Configurable
     public boolean debugMode = false;
 }

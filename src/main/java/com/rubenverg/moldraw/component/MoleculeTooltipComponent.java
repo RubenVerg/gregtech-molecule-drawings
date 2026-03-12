@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.MolDrawConfig;
+import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.molecule.*;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -24,6 +25,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.rubenverg.moldraw.MoleculeColorize.*;
@@ -284,12 +286,13 @@ public record MoleculeTooltipComponent(
             final var defaultColor = configColor(null);
             final var ts = toScaledFactory(font.lineHeight);
             for (final var elem : this.molecule.contents()) {
-                renderOneImage(elem, font, x, y, guiGraphics, defaultColor, ts);
+                renderOneImage(elem, font, x, y, guiGraphics, defaultColor, ts, null);
             }
         }
 
         private void renderOneImage(MoleculeElement<?> elem, Font font, int x, int y, GuiGraphics guiGraphics,
-                                    int defaultColor, UnaryOperator<Vector2f> toScaled) {
+                                    int defaultColor, UnaryOperator<Vector2f> toScaled,
+                                    @Nullable IntBinaryOperator overrideColor) {
             if (elem instanceof Bond bond) {
                 if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
                         Objects.isNull(this.molecule.getAtom(bond.b())))
@@ -370,11 +373,11 @@ public record MoleculeTooltipComponent(
                 int addHX = Math.round(dy / length), addHY = -Math.round(dx / length);
                 int colorA = colorForElement(atomA.element().element());
                 int colorB = colorForElement(atomB.element().element());
-                IntBinaryOperator color = (xp, yp) -> {
+                IntBinaryOperator color = Objects.requireNonNullElse(overrideColor, (xp, yp) -> {
                     final var d2a = Math.pow(xp - start.x, 2) + Math.pow(yp - start.y, 2);
                     final var d2b = Math.pow(xp - end.x, 2) + Math.pow(yp - end.y, 2);
                     return d2a < d2b ? colorA : colorB;
-                };
+                });
                 List<Vector2i> allTargets = new ArrayList<>();
                 GraphicalUtils.plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2,
                         GraphicalUtils::alwaysDraw,
@@ -441,12 +444,27 @@ public record MoleculeTooltipComponent(
                 final var xyMax = floored(bounds.getSecond());
                 xyMax.add(x, y);
                 xyMax.add(2, 1);
-                guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, defaultColor);
-                guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, defaultColor);
-                guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, defaultColor);
-                guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMax.y, defaultColor);
-                guiGraphics.vLine(xyMin.x - 2, xyMin.y, xyMax.y, defaultColor);
-                guiGraphics.vLine(xyMax.x + 2, xyMin.y, xyMax.y, defaultColor);
+                if (Objects.isNull(overrideColor)) {
+                    guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, defaultColor);
+                    guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, defaultColor);
+                    guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, defaultColor);
+                    guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMax.y, defaultColor);
+                    guiGraphics.vLine(xyMin.x - 2, xyMin.y, xyMax.y, defaultColor);
+                    guiGraphics.vLine(xyMax.x + 2, xyMin.y, xyMax.y, defaultColor);
+                } else {
+                    GraphicalUtils.plotLine(xyMin.x - 2, xyMin.y, xyMin.x + 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMin.x - 2, xyMax.y, xyMin.x + 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMax.x + 2, xyMin.y, xyMax.x - 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMax.x + 2, xyMax.y, xyMax.x - 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMin.x - 2, xyMin.y, xyMin.x - 2, xyMax.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMax.x + 2, xyMin.y, xyMax.x + 2, xyMax.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                }
             } else if (elem instanceof CircleTransformation ct) {
                 final var centroid = Arrays.stream(ct.atoms())
                         .mapToObj(idx -> this.molecule.getAtom(idx).orElseThrow().position())
@@ -458,13 +476,28 @@ public record MoleculeTooltipComponent(
                     final var p = u.mul(new Matrix3f(ct.A())).add(centroid.x, centroid.y, centroid.z);
                     final var r = floored(toScaledProjectedFactory(font.lineHeight, -1).apply(p))
                             .add(x, y + font.lineHeight / 2);
-                    guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1, defaultColor);
+                    guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1,
+                            Objects.isNull(overrideColor) ? defaultColor : overrideColor.applyAsInt(r.x, r.y));
                 }
                 // final var cc = toScreen(font.lineHeight, centroid).add(x, y + font.lineHeight / 2);
                 // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
             } else if (elem instanceof CompositeElement<?> composite) {
+                IntBinaryOperator color = null;
+                if (elem instanceof BenzeneRing ring && MolDrawConfig.INSTANCE.fun.aromanticBenzene) {
+                    final var bounds = this.molecule.subset(ring.indices()).boundsWithSize(
+                            toScaledProjectedFactory(font.lineHeight, ring.spinGroup()),
+                            sizeOfAtomFactory(font.lineHeight));
+                    final var minY = floored(bounds.getFirst()).y;
+                    final var maxY = floored(bounds.getSecond()).y;
+                    final float dy = maxY - minY;
+                    color = (xp, yp) -> {
+                        final var yo = ((yp - y) - minY) / dy;
+                        return MoleculeColorize.lightenColor(yo < 0.2f ? 0xff3aa740 :
+                                yo < 0.4f ? 0xffa8d47a : yo < 0.6f ? 0xffffffff : yo < 0.8f ? 0xffaaabaa : 0xff000000);
+                    };
+                }
                 for (final var child : composite.children())
-                    renderOneImage(child, font, x, y, guiGraphics, defaultColor, toScaled);
+                    renderOneImage(child, font, x, y, guiGraphics, defaultColor, toScaled, color);
             }
         }
     }
