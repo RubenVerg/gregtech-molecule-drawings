@@ -19,6 +19,11 @@ public record Atom(
         implements MoleculeElement<Atom> {
 
     @Override
+    public String type() {
+        return "atom";
+    }
+
+    @Override
     public int[] coveredAtoms() {
         return new int[] { index };
     }
@@ -34,6 +39,11 @@ public record Atom(
                 left,
                 new Vector3f(position),
                 spinGroup);
+    }
+
+    @Override
+    public void beforeAdd(Molecule to) {
+        position.mul(to.transformation());
     }
 
     public boolean isInvisible() {

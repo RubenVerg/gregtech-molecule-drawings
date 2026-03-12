@@ -86,6 +86,7 @@ public class MolDraw {
             .registerTypeAdapter(Bond.Line.class, Bond.Line.Json.INSTANCE)
             .registerTypeAdapter(Parens.class, Parens.Json.INSTANCE)
             .registerTypeAdapter(CircleTransformation.class, CircleTransformation.Json.INSTANCE)
+            .registerTypeAdapter(BenzeneRing.class, BenzeneRing.Json.INSTANCE)
             .setPrettyPrinting()
             .create();
 

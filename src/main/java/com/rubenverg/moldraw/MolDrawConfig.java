@@ -59,6 +59,9 @@ public class MolDrawConfig {
         public int moleculeScale = 20;
 
         @Configurable
+        public boolean benzeneCircle = false;
+
+        @Configurable
         public boolean spinMolecules = true;
 
         @Configurable
