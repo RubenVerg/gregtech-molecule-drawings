@@ -11,6 +11,11 @@ public record Parens(
         implements MoleculeElement<Parens> {
 
     @Override
+    public String type() {
+        return "parens";
+    }
+
+    @Override
     public int[] coveredAtoms() {
         return atoms;
     }

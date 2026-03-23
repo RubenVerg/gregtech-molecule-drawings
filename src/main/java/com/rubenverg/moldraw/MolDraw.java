@@ -3,7 +3,9 @@ package com.rubenverg.moldraw;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.data.chemical.material.event.MaterialEvent;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -12,6 +14,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.Unit;
@@ -86,6 +89,7 @@ public class MolDraw {
             .registerTypeAdapter(Bond.Line.class, Bond.Line.Json.INSTANCE)
             .registerTypeAdapter(Parens.class, Parens.Json.INSTANCE)
             .registerTypeAdapter(CircleTransformation.class, CircleTransformation.Json.INSTANCE)
+            .registerTypeAdapter(BenzeneRing.class, BenzeneRing.Json.INSTANCE)
             .setPrettyPrinting()
             .create();
 
@@ -259,6 +263,7 @@ public class MolDraw {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static void tryColorizeFormula(Material material, OptionalInt idx,
                                           List<Either<FormattedText, TooltipComponent>> tooltipElements) {
+        if (!MolDrawConfig.INSTANCE.color.colors) return;
         if (Objects.nonNull(material.getMaterialComponents()) && !material.getMaterialComponents().isEmpty() ||
                 material.isElement()) {
             final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);

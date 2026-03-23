@@ -58,6 +58,24 @@ public class MolDrawConfig {
         @Configurable.Range(min = 10, max = 50)
         public int moleculeScale = 20;
 
+        public enum AromaticMode {
+
+            DOUBLE_BONDS,
+            CIRCLE,
+            ;
+
+            @Override
+            public String toString() {
+                return switch (this) {
+                    case DOUBLE_BONDS -> "Double bonds (Kekulé)";
+                    case CIRCLE -> "Circle (Thiele)";
+                };
+            }
+        }
+
+        @Configurable
+        public AromaticMode benzeneCircle = AromaticMode.DOUBLE_BONDS;
+
         @Configurable
         public boolean spinMolecules = true;
 
@@ -89,6 +107,15 @@ public class MolDrawConfig {
         private void invalidateAlloyCache(boolean value, IValidationHandler handler) {
             AlloyTooltipComponent.invalidateComponentsCache();
         }
+    }
+
+    @Configurable
+    public FunConfig fun = new FunConfig();
+
+    public static class FunConfig {
+
+        @Configurable
+        public boolean aromanticBenzene = false;
     }
 
     @Configurable

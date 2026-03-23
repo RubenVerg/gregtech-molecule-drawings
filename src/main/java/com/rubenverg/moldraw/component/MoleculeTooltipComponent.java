@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import com.mojang.datafixers.util.Pair;
 import com.rubenverg.moldraw.MolDrawConfig;
+import com.rubenverg.moldraw.MoleculeColorize;
 import com.rubenverg.moldraw.molecule.*;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -24,6 +25,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.rubenverg.moldraw.MoleculeColorize.*;
@@ -151,7 +153,7 @@ public record MoleculeTooltipComponent(
             this.parenAtLef = molecule.atoms().stream().anyMatch(atom -> {
                 final var distanceFromLef = Math.abs(bounds.getFirst().x - atom.position().x);
                 if (distanceFromLef > 0.1) return false;
-                return molecule.contents().stream().anyMatch(el -> el instanceof Parens parens &&
+                return molecule.flatChildren().stream().anyMatch(el -> el instanceof Parens parens &&
                         Arrays.stream(parens.atoms()).anyMatch(d -> d == atom.index()));
             });
             {
@@ -184,91 +186,98 @@ public record MoleculeTooltipComponent(
             final var defaultColor = configColor(null);
             elementWidths.clear();
             var mat = new Matrix4f(matrix);
-            for (final var elem : this.molecule.contents()) {
-                if (elem instanceof Atom atom) {
-                    final var xyPosition = floored(
-                            toScaledFactory(font.lineHeight).apply(project(atom.position(), atom.spinGroup())));
-                    final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
-                    mat.translate(translation);
-                    final var width = font.width(atom.element().toString());
-                    final var centerTranslation = new Vector3f(Mth.floor(-(float) width / 2) + 1, 1, 0);
-                    mat.translate(centerTranslation);
-                    if (!atom.element().element().invisible) font.drawInBatch(atom.element().toString(), (float) mouseX,
-                            (float) mouseY, colorForElement(atom.element().element()), false, mat,
-                            bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                    mat.translate(centerTranslation.negate());
-                    mat.translate(translation.negate());
-                    elementWidths.put(atom.element(), atom.element().element().invisible ? 0 : width);
-                    if (atom.right().isPresent()) {
-                        final var rightTranslation = new Vector3f(xyPosition.x + Mth.floor((float) width / 2) + 1,
-                                xyPosition.y + 1, 0);
-                        mat.translate(rightTranslation);
-                        if (!atom.right().get().element().invisible) font.drawInBatch(atom.right().get().toString(),
-                                (float) mouseX, (float) mouseY, colorForElement(atom.right().get().element()), false,
-                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                        elementWidths.put(atom.right().get(),
-                                atom.right().get().element().invisible ? 0 : font.width(atom.right().get().toString()));
-                        mat.translate(rightTranslation.negate());
-                    }
-                    if (atom.left().isPresent()) {
-                        final var leftWidth = font.width(atom.left().get().toString());
-                        final var leftTranslation = new Vector3f(
-                                xyPosition.x - leftWidth + Mth.floor(-(float) width / 2), xyPosition.y + 1, 0);
-                        mat.translate(leftTranslation);
-                        if (!atom.left().get().element().invisible) font.drawInBatch(atom.left().get().toString(),
-                                (float) mouseX, (float) mouseY, colorForElement(atom.left().get().element()), false,
-                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                        elementWidths.put(atom.left().get(), atom.left().get().element().invisible ? 0 : leftWidth);
-                        mat.translate(leftTranslation.negate());
-                    }
-                    if (atom.above().isPresent()) {
-                        final var aboveWidth = font.width(atom.above().get().toString());
-                        final var aboveTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) aboveWidth / 2) + 1,
-                                xyPosition.y - font.lineHeight + 1, 0);
-                        mat.translate(aboveTranslation);
-                        if (!atom.above().get().element().invisible) font.drawInBatch(atom.above().get().toString(),
-                                (float) mouseX, (float) mouseY, colorForElement(atom.above().get().element()), false,
-                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                        elementWidths.put(atom.above().get(), atom.above().get().element().invisible ? 0 : aboveWidth);
-                        mat.translate(aboveTranslation.negate());
-                    }
-                    if (atom.below().isPresent()) {
-                        final var belowWidth = font.width(atom.below().get().toString());
-                        final var belowTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) belowWidth / 2) + 1,
-                                xyPosition.y + font.lineHeight + 1, 0);
-                        mat.translate(belowTranslation);
-                        if (!atom.below().get().element().invisible) font.drawInBatch(atom.below().get().toString(),
-                                (float) mouseX, (float) mouseY, colorForElement(atom.below().get().element()), false,
-                                mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                        elementWidths.put(atom.below().get(), atom.below().get().element().invisible ? 0 : belowWidth);
-                        mat.translate(belowTranslation.negate());
-                    }
-                    if (MolDrawConfig.INSTANCE.debugMode) {
-                        final var debugTranslation = new Vector3f(xyPosition.x - 5, xyPosition.y - 2, 3);
-                        mat.translate(debugTranslation);
-                        font.drawInBatch(Integer.toString(atom.index()), (float) mouseX, (float) mouseY, DEBUG_COLOR,
-                                false, mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                        mat.translate(debugTranslation.negate());
-                    }
-                } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(
-                            toScaledProjectedFactory(font.lineHeight, -1),
-                            sizeOfAtomFactory(font.lineHeight));
-                    final var xySub = new Vector2i((int) bounds.getSecond().x, (int) bounds.getSecond().y);
-                    xySub.add(7, -2);
-                    final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
-                    mat.translate(subTranslation);
-                    font.drawInBatch(pp.sub(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
-                            Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                    mat.translate(subTranslation.negate());
-                    final var xySup = new Vector2i((int) bounds.getSecond().x, (int) bounds.getFirst().y);
-                    xySup.add(7, -4);
-                    final var supTranslation = new Vector3f(xySup.x, xySup.y, 0);
-                    mat.translate(supTranslation);
-                    font.drawInBatch(pp.sup(), (float) mouseX, (float) mouseY, defaultColor, false, mat, bufferSource,
-                            Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-                    mat.translate(supTranslation.negate());
+            for (final var elem : this.molecule.contents())
+                renderOneText(elem, font, (float) mouseX, (float) mouseY, mat, bufferSource, defaultColor);
+        }
+
+        private void renderOneText(MoleculeElement<?> elem, Font font, float mouseX, float mouseY, Matrix4f mat,
+                                   MultiBufferSource.BufferSource bufferSource, int defaultColor) {
+            if (elem instanceof Atom atom) {
+                final var xyPosition = floored(
+                        toScaledFactory(font.lineHeight).apply(project(atom.position(), atom.spinGroup())));
+                final var translation = new Vector3f(xyPosition.x, xyPosition.y, 0);
+                mat.translate(translation);
+                final var width = font.width(atom.element().toString());
+                final var centerTranslation = new Vector3f(Mth.floor(-(float) width / 2) + 1, 1, 0);
+                mat.translate(centerTranslation);
+                if (!atom.element().element().invisible) font.drawInBatch(atom.element().toString(), mouseX,
+                        mouseY, colorForElement(atom.element().element()), false, mat,
+                        bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                mat.translate(centerTranslation.negate());
+                mat.translate(translation.negate());
+                elementWidths.put(atom.element(), atom.element().element().invisible ? 0 : width);
+                if (atom.right().isPresent()) {
+                    final var rightTranslation = new Vector3f(xyPosition.x + Mth.floor((float) width / 2) + 1,
+                            xyPosition.y + 1, 0);
+                    mat.translate(rightTranslation);
+                    if (!atom.right().get().element().invisible) font.drawInBatch(atom.right().get().toString(),
+                            mouseX, mouseY, colorForElement(atom.right().get().element()), false,
+                            mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                    elementWidths.put(atom.right().get(),
+                            atom.right().get().element().invisible ? 0 : font.width(atom.right().get().toString()));
+                    mat.translate(rightTranslation.negate());
                 }
+                if (atom.left().isPresent()) {
+                    final var leftWidth = font.width(atom.left().get().toString());
+                    final var leftTranslation = new Vector3f(
+                            xyPosition.x - leftWidth + Mth.floor(-(float) width / 2), xyPosition.y + 1, 0);
+                    mat.translate(leftTranslation);
+                    if (!atom.left().get().element().invisible) font.drawInBatch(atom.left().get().toString(),
+                            mouseX, mouseY, colorForElement(atom.left().get().element()), false,
+                            mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                    elementWidths.put(atom.left().get(), atom.left().get().element().invisible ? 0 : leftWidth);
+                    mat.translate(leftTranslation.negate());
+                }
+                if (atom.above().isPresent()) {
+                    final var aboveWidth = font.width(atom.above().get().toString());
+                    final var aboveTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) aboveWidth / 2) + 1,
+                            xyPosition.y - font.lineHeight + 1, 0);
+                    mat.translate(aboveTranslation);
+                    if (!atom.above().get().element().invisible) font.drawInBatch(atom.above().get().toString(),
+                            mouseX, mouseY, colorForElement(atom.above().get().element()), false,
+                            mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                    elementWidths.put(atom.above().get(), atom.above().get().element().invisible ? 0 : aboveWidth);
+                    mat.translate(aboveTranslation.negate());
+                }
+                if (atom.below().isPresent()) {
+                    final var belowWidth = font.width(atom.below().get().toString());
+                    final var belowTranslation = new Vector3f(xyPosition.x + Mth.floor(-(float) belowWidth / 2) + 1,
+                            xyPosition.y + font.lineHeight + 1, 0);
+                    mat.translate(belowTranslation);
+                    if (!atom.below().get().element().invisible) font.drawInBatch(atom.below().get().toString(),
+                            mouseX, mouseY, colorForElement(atom.below().get().element()), false,
+                            mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                    elementWidths.put(atom.below().get(), atom.below().get().element().invisible ? 0 : belowWidth);
+                    mat.translate(belowTranslation.negate());
+                }
+                if (MolDrawConfig.INSTANCE.debugMode) {
+                    final var debugTranslation = new Vector3f(xyPosition.x - 5, xyPosition.y - 2, 3);
+                    mat.translate(debugTranslation);
+                    font.drawInBatch(Integer.toString(atom.index()), mouseX, mouseY, DEBUG_COLOR,
+                            false, mat, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                    mat.translate(debugTranslation.negate());
+                }
+            } else if (elem instanceof Parens pp) {
+                final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(
+                        toScaledProjectedFactory(font.lineHeight, -1),
+                        sizeOfAtomFactory(font.lineHeight));
+                final var xySub = new Vector2i((int) bounds.getSecond().x, (int) bounds.getSecond().y);
+                xySub.add(7, -2);
+                final var subTranslation = new Vector3f(xySub.x, xySub.y, 0);
+                mat.translate(subTranslation);
+                font.drawInBatch(pp.sub(), mouseX, mouseY, defaultColor, false, mat, bufferSource,
+                        Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                mat.translate(subTranslation.negate());
+                final var xySup = new Vector2i((int) bounds.getSecond().x, (int) bounds.getFirst().y);
+                xySup.add(7, -4);
+                final var supTranslation = new Vector3f(xySup.x, xySup.y, 0);
+                mat.translate(supTranslation);
+                font.drawInBatch(pp.sup(), mouseX, mouseY, defaultColor, false, mat, bufferSource,
+                        Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                mat.translate(supTranslation.negate());
+            } else if (elem instanceof CompositeElement<?> composite) {
+                for (final var child : composite.children())
+                    renderOneText(child, font, mouseX, mouseY, mat, bufferSource, defaultColor);
             }
         }
 
@@ -277,179 +286,218 @@ public record MoleculeTooltipComponent(
             final var defaultColor = configColor(null);
             final var ts = toScaledFactory(font.lineHeight);
             for (final var elem : this.molecule.contents()) {
-                if (elem instanceof Bond bond) {
-                    if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
-                            Objects.isNull(this.molecule.getAtom(bond.b())))
-                        continue;
-                    final var atomA = this.molecule.getAtom(bond.a()).orElseThrow();
-                    final var atomAWidth = elementWidths.get(atomA.element());
-                    final var atomAAbove = atomA.above().map(elementWidths::get);
-                    final var atomARight = atomA.right().map(elementWidths::get);
-                    final var atomABelow = atomA.below().map(elementWidths::get);
-                    final var atomALeft = atomA.left().map(elementWidths::get);
-                    final var atomAInvisible = atomA.isInvisible();
-                    final var atomB = this.molecule.getAtom(bond.b()).orElseThrow();
-                    final var atomBWidth = elementWidths.get(atomB.element());
-                    final var atomBAbove = atomB.above().map(elementWidths::get);
-                    final var atomBRight = atomB.right().map(elementWidths::get);
-                    final var atomBBelow = atomB.below().map(elementWidths::get);
-                    final var atomBLeft = atomB.left().map(elementWidths::get);
-                    final var atomBInvisible = atomB.isInvisible();
-                    final var start = floored(ts.apply(project(atomA.position(), atomA.spinGroup())));
-                    start.add(x, y);
-                    start.add(0, font.lineHeight / 2);
-                    final var end = floored(ts.apply(project(atomB.position(), atomB.spinGroup())));
-                    end.add(x, y);
-                    end.add(0, font.lineHeight / 2);
-                    final GraphicalUtils.PixelPredicate notCloseToAtom = (xt, yt, _c) -> {
-                        if (atomAInvisible && atomBInvisible)
-                            return true;
-                        Vector2ic t = new Vector2i(xt, yt);
-                        var diff = new Vector2i();
-                        start.sub(t, diff);
-                        diff.absolute();
-                        if (diff.x < atomAWidth * 2 / 3 && (!atomAInvisible && diff.y < font.lineHeight * 2 / 3))
-                            return false;
-                        if (atomAAbove.isPresent() && diff.x < atomAAbove.get() * 2 / 3 &&
-                                Math.abs((start.y - font.lineHeight - 1) - yt) < font.lineHeight * 2 / 3)
-                            return false;
-                        if (atomABelow.isPresent() && diff.x < atomABelow.get() * 2 / 3 &&
-                                Math.abs((start.y + font.lineHeight + 1) - yt) < font.lineHeight * 2 / 3)
-                            return false;
-                        if (atomARight.isPresent() &&
-                                Math.abs((start.x + (atomAWidth + atomARight.get()) / 2 + 1) - xt) <
-                                        atomARight.get() * 2 / 3 &&
-                                diff.y < font.lineHeight * 2 / 3)
-                            return false;
-                        if (atomALeft.isPresent() && Math.abs((start.x - (atomAWidth + atomALeft.get()) / 2 - 1) - xt) <
-                                atomALeft.get() * 2 / 3 && diff.y < font.lineHeight * 2 / 3)
-                            return false;
-                        end.sub(t, diff);
-                        diff.absolute();
-                        if (diff.x < atomBWidth * 2 / 3 && (!atomBInvisible && diff.y < font.lineHeight * 2 / 3))
-                            return false;
-                        if (atomBAbove.isPresent() && diff.x < atomBAbove.get() * 2 / 3 &&
-                                Math.abs((end.y - font.lineHeight - 1) - yt) < font.lineHeight * 2 / 3)
-                            return false;
-                        if (atomBBelow.isPresent() && diff.x < atomBBelow.get() * 2 / 3 &&
-                                Math.abs((end.y + font.lineHeight + 1) - yt) < font.lineHeight * 2 / 3)
-                            return false;
-                        if (atomBRight.isPresent() &&
-                                Math.abs((end.x + (atomBWidth + atomBRight.get()) / 2 + 1) - xt) <
-                                        atomBRight.get() * 2 / 3 &&
-                                diff.y < font.lineHeight * 2 / 3)
-                            return false;
-                        if (atomBLeft.isPresent() && Math.abs((end.x - (atomBWidth + atomBLeft.get()) / 2 - 1) - xt) <
-                                atomBLeft.get() * 2 / 3 && diff.y < font.lineHeight * 2 / 3)
-                            return false;
+                renderOneImage(elem, font, x, y, guiGraphics, defaultColor, ts, null);
+            }
+        }
+
+        private void renderOneImage(MoleculeElement<?> elem, Font font, int x, int y, GuiGraphics guiGraphics,
+                                    int defaultColor, UnaryOperator<Vector2f> toScaled,
+                                    @Nullable IntBinaryOperator overrideColor) {
+            if (elem instanceof Bond bond) {
+                if (Objects.isNull(this.molecule.getAtom(bond.a())) ||
+                        Objects.isNull(this.molecule.getAtom(bond.b())))
+                    return;
+                final var atomA = this.molecule.getAtom(bond.a()).orElseThrow();
+                final var atomAWidth = elementWidths.get(atomA.element());
+                final var atomAAbove = atomA.above().map(elementWidths::get);
+                final var atomARight = atomA.right().map(elementWidths::get);
+                final var atomABelow = atomA.below().map(elementWidths::get);
+                final var atomALeft = atomA.left().map(elementWidths::get);
+                final var atomAInvisible = atomA.isInvisible();
+                final var atomB = this.molecule.getAtom(bond.b()).orElseThrow();
+                final var atomBWidth = elementWidths.get(atomB.element());
+                final var atomBAbove = atomB.above().map(elementWidths::get);
+                final var atomBRight = atomB.right().map(elementWidths::get);
+                final var atomBBelow = atomB.below().map(elementWidths::get);
+                final var atomBLeft = atomB.left().map(elementWidths::get);
+                final var atomBInvisible = atomB.isInvisible();
+                final var start = floored(toScaled.apply(project(atomA.position(), atomA.spinGroup())));
+                start.add(x, y);
+                start.add(0, font.lineHeight / 2);
+                final var end = floored(toScaled.apply(project(atomB.position(), atomB.spinGroup())));
+                end.add(x, y);
+                end.add(0, font.lineHeight / 2);
+                final GraphicalUtils.PixelPredicate notCloseToAtom = (xt, yt, _c) -> {
+                    if (atomAInvisible && atomBInvisible)
                         return true;
-                    };
-                    final var startEnd = new Vector2f(end).sub(new Vector2f(start));
-                    final float dy = startEnd.y, dx = startEnd.x, length = startEnd.length();
-                    final BiFunction<Integer, Integer, GraphicalUtils.PixelPredicate> notCloseToAtomAndDot = (m,
-                                                                                                              b) -> notCloseToAtom
-                                                                                                                      .and((xt,
-                                                                                                                            yt,
-                                                                                                                            count) -> count %
-                                                                                                                                    m <
-                                                                                                                                    b);
-                    int addX = Math.round(dy / length * 2), addY = -Math.round(dx / length * 2);
-                    int addHX = Math.round(dy / length), addHY = -Math.round(dx / length);
-                    int colorA = colorForElement(atomA.element().element());
-                    int colorB = colorForElement(atomB.element().element());
-                    IntBinaryOperator color = (xp, yp) -> {
-                        final var d2a = Math.pow(xp - start.x, 2) + Math.pow(yp - start.y, 2);
-                        final var d2b = Math.pow(xp - end.x, 2) + Math.pow(yp - end.y, 2);
-                        return d2a < d2b ? colorA : colorB;
-                    };
-                    List<Vector2i> allTargets = new ArrayList<>();
-                    GraphicalUtils.plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2,
-                            GraphicalUtils::alwaysDraw,
-                            (xp, yp) -> {
-                                allTargets.add(new Vector2i(xp / 2, yp / 2));
-                                allTargets.add(new Vector2i((xp + 1) / 2, yp / 2));
-                                allTargets.add(new Vector2i(xp / 2, (yp + 1) / 2));
-                                allTargets.add(new Vector2i((xp + 1) / 2, (yp + 1) / 2));
-                            });
-                    final var aboveEnd = new Vector2f(end).sub(new Vector2f(start)).perpendicular().normalize(2)
-                            .add(new Vector2f(end));
-                    List<Vector2i> above = new ArrayList<>();
-                    GraphicalUtils.plotLine(start.x, start.y, Math.round(aboveEnd.x), Math.round(aboveEnd.y),
-                            GraphicalUtils::alwaysDraw, (xp, yp) -> above.add(new Vector2i(xp, yp)));
-                    final var thickness = bond.totalThickness();
-                    final var starting = bond.centered() ? (thickness - 1) / 2f : (float) ((thickness - 1) / 2);
-                    var done = bond.lines().length > 0 && bond.lines()[0].thick ? 1 : 0;
-                    for (var i = 0; i < bond.lines().length; done += bond.lines()[i].thick ? 3 : 1, i++) {
-                        final var delta = done - starting;
-                        final var sX = Mth.floor(delta) * addX + (int) (Mth.frac(delta) * 2) * addHX;
-                        final var sY = Mth.floor(delta) * addY + (int) (Mth.frac(delta) * 2) * addHY;
-                        switch (bond.lines()[i]) {
-                            case SOLID -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
-                                    notCloseToAtom, color, guiGraphics);
-                            case DOTTED -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
-                                    notCloseToAtomAndDot.apply(2, 1), color, guiGraphics);
-                            case INWARD -> {
-                                for (int j = 0;; j++) {
-                                    if (j >= above.size()) break;
-                                    if (j % 3 != 0) continue;
-                                    final var abovePoint = above.get(j);
-                                    final var a = new Vector2f(abovePoint);
-                                    final var startA = new Vector2f(a).sub(new Vector2f(start));
-                                    final var b = new Vector2f(start).add(
-                                            new Vector2f(startEnd).mul(startEnd.dot(startA) / startEnd.dot(startEnd)))
-                                            .mul(2).sub(a);
-                                    final var belowPoint = new Vector2i(Math.round(b.x), Math.round(b.y));
-                                    GraphicalUtils.plotLine(abovePoint.x + sX, abovePoint.y + sY, belowPoint.x + sX,
-                                            belowPoint.y + sY, notCloseToAtom, color, guiGraphics);
-                                }
+                    Vector2ic t = new Vector2i(xt, yt);
+                    var diff = new Vector2i();
+                    start.sub(t, diff);
+                    diff.absolute();
+                    if (diff.x < atomAWidth * 2 / 3 && (!atomAInvisible && diff.y < font.lineHeight * 2 / 3))
+                        return false;
+                    if (atomAAbove.isPresent() && diff.x < atomAAbove.get() * 2 / 3 &&
+                            Math.abs((start.y - font.lineHeight - 1) - yt) < font.lineHeight * 2 / 3)
+                        return false;
+                    if (atomABelow.isPresent() && diff.x < atomABelow.get() * 2 / 3 &&
+                            Math.abs((start.y + font.lineHeight + 1) - yt) < font.lineHeight * 2 / 3)
+                        return false;
+                    if (atomARight.isPresent() &&
+                            Math.abs((start.x + (atomAWidth + atomARight.get()) / 2 + 1) - xt) <
+                                    atomARight.get() * 2 / 3 &&
+                            diff.y < font.lineHeight * 2 / 3)
+                        return false;
+                    if (atomALeft.isPresent() && Math.abs((start.x - (atomAWidth + atomALeft.get()) / 2 - 1) - xt) <
+                            atomALeft.get() * 2 / 3 && diff.y < font.lineHeight * 2 / 3)
+                        return false;
+                    end.sub(t, diff);
+                    diff.absolute();
+                    if (diff.x < atomBWidth * 2 / 3 && (!atomBInvisible && diff.y < font.lineHeight * 2 / 3))
+                        return false;
+                    if (atomBAbove.isPresent() && diff.x < atomBAbove.get() * 2 / 3 &&
+                            Math.abs((end.y - font.lineHeight - 1) - yt) < font.lineHeight * 2 / 3)
+                        return false;
+                    if (atomBBelow.isPresent() && diff.x < atomBBelow.get() * 2 / 3 &&
+                            Math.abs((end.y + font.lineHeight + 1) - yt) < font.lineHeight * 2 / 3)
+                        return false;
+                    if (atomBRight.isPresent() &&
+                            Math.abs((end.x + (atomBWidth + atomBRight.get()) / 2 + 1) - xt) <
+                                    atomBRight.get() * 2 / 3 &&
+                            diff.y < font.lineHeight * 2 / 3)
+                        return false;
+                    if (atomBLeft.isPresent() && Math.abs((end.x - (atomBWidth + atomBLeft.get()) / 2 - 1) - xt) <
+                            atomBLeft.get() * 2 / 3 && diff.y < font.lineHeight * 2 / 3)
+                        return false;
+                    return true;
+                };
+                final var startEnd = new Vector2f(end).sub(new Vector2f(start));
+                final float dy = startEnd.y, dx = startEnd.x, length = startEnd.length();
+                final BiFunction<Integer, Integer, GraphicalUtils.PixelPredicate> notCloseToAtomAndDot = (m,
+                                                                                                          b) -> notCloseToAtom
+                                                                                                                  .and((xt,
+                                                                                                                        yt,
+                                                                                                                        count) -> count %
+                                                                                                                                m <
+                                                                                                                                b);
+                int addX = Math.round(dy / length * 2), addY = -Math.round(dx / length * 2);
+                int addHX = Math.round(dy / length), addHY = -Math.round(dx / length);
+                int colorA = colorForElement(atomA.element().element());
+                int colorB = colorForElement(atomB.element().element());
+                IntBinaryOperator color = Objects.requireNonNullElse(overrideColor, (xp, yp) -> {
+                    final var d2a = Math.pow(xp - start.x, 2) + Math.pow(yp - start.y, 2);
+                    final var d2b = Math.pow(xp - end.x, 2) + Math.pow(yp - end.y, 2);
+                    return d2a < d2b ? colorA : colorB;
+                });
+                List<Vector2i> allTargets = new ArrayList<>();
+                GraphicalUtils.plotLine(addX * 3 / 2, addY * 3 / 2, -addX * 3 / 2, -addY * 3 / 2,
+                        GraphicalUtils::alwaysDraw,
+                        (xp, yp) -> {
+                            allTargets.add(new Vector2i(xp / 2, yp / 2));
+                            allTargets.add(new Vector2i((xp + 1) / 2, yp / 2));
+                            allTargets.add(new Vector2i(xp / 2, (yp + 1) / 2));
+                            allTargets.add(new Vector2i((xp + 1) / 2, (yp + 1) / 2));
+                        });
+                final var aboveEnd = new Vector2f(end).sub(new Vector2f(start)).perpendicular().normalize(2)
+                        .add(new Vector2f(end));
+                List<Vector2i> above = new ArrayList<>();
+                GraphicalUtils.plotLine(start.x, start.y, Math.round(aboveEnd.x), Math.round(aboveEnd.y),
+                        GraphicalUtils::alwaysDraw, (xp, yp) -> above.add(new Vector2i(xp, yp)));
+                final var thickness = bond.totalThickness();
+                final var starting = bond.centered() ? (thickness - 1) / 2f : (float) ((thickness - 1) / 2);
+                var done = bond.lines().length > 0 && bond.lines()[0].thick ? 1 : 0;
+                for (var i = 0; i < bond.lines().length; done += bond.lines()[i].thick ? 3 : 1, i++) {
+                    final var delta = done - starting;
+                    final var sX = Mth.floor(delta) * addX + (int) (Mth.frac(delta) * 2) * addHX;
+                    final var sY = Mth.floor(delta) * addY + (int) (Mth.frac(delta) * 2) * addHY;
+                    switch (bond.lines()[i]) {
+                        case SOLID -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                                notCloseToAtom, color, guiGraphics);
+                        case DOTTED -> GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + sX, end.y + sY,
+                                notCloseToAtomAndDot.apply(2, 1), color, guiGraphics);
+                        case INWARD -> {
+                            for (int j = 0;; j++) {
+                                if (j >= above.size()) break;
+                                if (j % 3 != 0) continue;
+                                final var abovePoint = above.get(j);
+                                final var a = new Vector2f(abovePoint);
+                                final var startA = new Vector2f(a).sub(new Vector2f(start));
+                                final var b = new Vector2f(start).add(
+                                        new Vector2f(startEnd).mul(startEnd.dot(startA) / startEnd.dot(startEnd)))
+                                        .mul(2).sub(a);
+                                final var belowPoint = new Vector2i(Math.round(b.x), Math.round(b.y));
+                                GraphicalUtils.plotLine(abovePoint.x + sX, abovePoint.y + sY, belowPoint.x + sX,
+                                        belowPoint.y + sY, notCloseToAtom, color, guiGraphics);
                             }
-                            case OUTWARD -> {
-                                for (final var pair : allTargets) {
-                                    GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX,
-                                            end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
-                                }
+                        }
+                        case OUTWARD -> {
+                            for (final var pair : allTargets) {
+                                GraphicalUtils.plotLine(start.x + sX, start.y + sY, end.x + pair.x + sX,
+                                        end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
                             }
-                            case THICK -> {
-                                for (final var pair : allTargets) {
-                                    GraphicalUtils.plotLine(start.x + pair.x + sX, start.y + pair.y + sY,
-                                            end.x + pair.x + sX,
-                                            end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
-                                }
+                        }
+                        case THICK -> {
+                            for (final var pair : allTargets) {
+                                GraphicalUtils.plotLine(start.x + pair.x + sX, start.y + pair.y + sY,
+                                        end.x + pair.x + sX,
+                                        end.y + pair.y + sY, notCloseToAtom, color, guiGraphics);
                             }
                         }
                     }
-                } else if (elem instanceof Parens pp) {
-                    final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(
-                            toScaledProjectedFactory(font.lineHeight, -1),
-                            sizeOfAtomFactory(font.lineHeight));
-                    final var xyMin = floored(bounds.getFirst());
-                    xyMin.add(x, y);
-                    xyMin.add(-2, -1);
-                    final var xyMax = floored(bounds.getSecond());
-                    xyMax.add(x, y);
-                    xyMax.add(2, 1);
+                }
+            } else if (elem instanceof Parens pp) {
+                final var bounds = this.molecule.subset(pp.atoms()).boundsWithSize(
+                        toScaledProjectedFactory(font.lineHeight, -1),
+                        sizeOfAtomFactory(font.lineHeight));
+                final var xyMin = floored(bounds.getFirst());
+                xyMin.add(x, y);
+                xyMin.add(-2, -1);
+                final var xyMax = floored(bounds.getSecond());
+                xyMax.add(x, y);
+                xyMax.add(2, 1);
+                if (Objects.isNull(overrideColor)) {
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMin.y, defaultColor);
                     guiGraphics.hLine(xyMin.x - 2, xyMin.x + 2, xyMax.y, defaultColor);
                     guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMin.y, defaultColor);
                     guiGraphics.hLine(xyMax.x + 2, xyMax.x - 2, xyMax.y, defaultColor);
                     guiGraphics.vLine(xyMin.x - 2, xyMin.y, xyMax.y, defaultColor);
                     guiGraphics.vLine(xyMax.x + 2, xyMin.y, xyMax.y, defaultColor);
-                } else if (elem instanceof CircleTransformation ct) {
-                    final var centroid = Arrays.stream(ct.atoms())
-                            .mapToObj(idx -> this.molecule.getAtom(idx).orElseThrow().position())
-                            .reduce(new Vector3f(), (a, b) -> new Vector3f(a).add(new Vector3f(b)))
-                            .div(ct.atoms().length);
-                    for (int part = 0; part < 128; part++) {
-                        final var angle = (float) part / 64 * Mth.PI;
-                        final var u = new Vector3f(Mth.cos(angle), Mth.sin(angle), 0);
-                        final var p = u.mul(new Matrix3f(ct.A())).add(centroid.x, centroid.y, centroid.z);
-                        final var r = floored(toScaledProjectedFactory(font.lineHeight, -1).apply(p))
-                                .add(x, y + font.lineHeight / 2);
-                        guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1, defaultColor);
-                    }
-                    // final var cc = toScreen(font.lineHeight, centroid).add(x, y + font.lineHeight / 2);
-                    // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
+                } else {
+                    GraphicalUtils.plotLine(xyMin.x - 2, xyMin.y, xyMin.x + 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMin.x - 2, xyMax.y, xyMin.x + 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMax.x + 2, xyMin.y, xyMax.x - 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMax.x + 2, xyMax.y, xyMax.x - 2, xyMin.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMin.x - 2, xyMin.y, xyMin.x - 2, xyMax.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
+                    GraphicalUtils.plotLine(xyMax.x + 2, xyMin.y, xyMax.x + 2, xyMax.y,
+                            GraphicalUtils.PixelPredicate::always, overrideColor, guiGraphics);
                 }
+            } else if (elem instanceof CircleTransformation ct) {
+                final var centroid = Arrays.stream(ct.atoms())
+                        .mapToObj(idx -> this.molecule.getAtom(idx).orElseThrow().position())
+                        .reduce(new Vector3f(), (a, b) -> new Vector3f(a).add(new Vector3f(b)))
+                        .div(ct.atoms().length);
+                for (int part = 0; part < 128; part++) {
+                    final var angle = (float) part / 64 * Mth.PI;
+                    final var u = new Vector3f(Mth.cos(angle), Mth.sin(angle), 0);
+                    final var p = u.mul(new Matrix3f(ct.A())).add(centroid.x, centroid.y, centroid.z);
+                    final var r = floored(toScaledProjectedFactory(font.lineHeight, -1).apply(p))
+                            .add(x, y + font.lineHeight / 2);
+                    guiGraphics.fill(r.x, r.y, r.x + 1, r.y + 1,
+                            Objects.isNull(overrideColor) ? defaultColor : overrideColor.applyAsInt(r.x, r.y));
+                }
+                // final var cc = toScreen(font.lineHeight, centroid).add(x, y + font.lineHeight / 2);
+                // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
+            } else if (elem instanceof CompositeElement<?> composite) {
+                IntBinaryOperator color = null;
+                if (elem instanceof BenzeneRing ring && MolDrawConfig.INSTANCE.fun.aromanticBenzene) {
+                    final var bounds = this.molecule.subset(ring.indices()).boundsWithSize(
+                            toScaledProjectedFactory(font.lineHeight, ring.spinGroup()),
+                            sizeOfAtomFactory(font.lineHeight));
+                    final var minY = floored(bounds.getFirst()).y;
+                    final var maxY = floored(bounds.getSecond()).y;
+                    final float dy = maxY - minY;
+                    color = (xp, yp) -> {
+                        final var yo = ((yp - y) - minY) / dy;
+                        return MoleculeColorize.lightenColor(yo < 0.2f ? 0xff3aa740 :
+                                yo < 0.4f ? 0xffa8d47a : yo < 0.6f ? 0xffffffff : yo < 0.8f ? 0xffaaabaa : 0xff000000);
+                    };
+                }
+                for (final var child : composite.children())
+                    renderOneImage(child, font, x, y, guiGraphics, defaultColor, toScaled, color);
             }
         }
     }

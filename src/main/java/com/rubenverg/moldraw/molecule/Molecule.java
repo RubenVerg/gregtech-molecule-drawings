@@ -21,7 +21,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 
 @Accessors(fluent = true, chain = true)
-public class Molecule {
+public class Molecule implements CompositeElement<Molecule> {
 
     private int atomIndex = -1;
     private final List<MoleculeElement<?>> contents = new ArrayList<>();
@@ -32,6 +32,11 @@ public class Molecule {
     private FloatList spinGroups = new FloatArrayList();
 
     public Molecule() {}
+
+    @Override
+    public String type() {
+        return "molecule";
+    }
 
     public Molecule transformation(Matrix2dc matrix) {
         matrix.get(this.transformation);
@@ -48,18 +53,25 @@ public class Molecule {
         return this.transformation(mat);
     }
 
-    public Molecule add(MoleculeElement<?> elem) {
+    public Molecule addNoTransform(MoleculeElement<?> elem) {
         this.contents.add(elem);
         return this;
     }
 
+    public Molecule add(MoleculeElement<?> elem) {
+        elem.beforeAdd(this);
+        return addNoTransform(elem);
+    }
+
     public Molecule addAll(Collection<MoleculeElement<?>> elems) {
-        this.contents.addAll(elems);
+        for (final var elem : elems) add(elem);
         return this;
     }
 
     public Molecule addAll(Molecule mol) {
-        return addAll(mol.contents);
+        // don't call beforeAdd since they were already added
+        this.contents.addAll(mol.contents);
+        return this;
     }
 
     public Molecule skipAnAtom() {
@@ -80,10 +92,8 @@ public class Molecule {
     public Molecule atom(Element.Counted element, @Nullable Element.Counted above, @Nullable Element.Counted right,
                          @Nullable Element.Counted below, @Nullable Element.Counted left, Vector3fc abc,
                          int spinGroup) {
-        final var xyz = new Vector3f(abc);
-        xyz.mul(this.transformation);
-        this.contents.add(new Atom(++atomIndex, element, Optional.ofNullable(above), Optional.ofNullable(right),
-                Optional.ofNullable(below), Optional.ofNullable(left), xyz, spinGroup));
+        add(new Atom(++atomIndex, element, Optional.ofNullable(above), Optional.ofNullable(right),
+                Optional.ofNullable(below), Optional.ofNullable(left), new Vector3f(abc), spinGroup));
         return this;
     }
 
@@ -135,7 +145,7 @@ public class Molecule {
     }
 
     public Molecule bond(int a, int b, boolean centered, Bond.Line... lines) {
-        this.contents.add(new Bond(a, b, centered, lines));
+        add(new Bond(a, b, centered, lines));
         return this;
     }
 
@@ -147,12 +157,31 @@ public class Molecule {
         return bond(a, b, Bond.Line.SOLID);
     }
 
+    public Molecule ring(Vector3fc first, Vector3fc next, int spinGroup) {
+        add(BenzeneRing.counterClockwise(++atomIndex, first, next, spinGroup));
+        atomIndex += 5;
+        return this;
+    }
+
+    public Molecule ring(float x0, float y0, float x1, float y1, int spinGroup) {
+        return ring(new Vector3f(x0, y0, 0), new Vector3f(x1, y1, 0), spinGroup);
+    }
+
+    public Molecule ring(float x0, float y0, float x1, float y1) {
+        return ring(x0, y0, x1, y1, 0);
+    }
+
     public List<MoleculeElement<?>> contents() {
         return this.contents.stream().toList();
     }
 
+    @Override
+    public Collection<MoleculeElement<?>> children() {
+        return contents();
+    }
+
     public List<Atom> atoms() {
-        return this.contents.stream().filter(elem -> elem instanceof Atom).map(elem -> (Atom) elem).toList();
+        return flatChildren().stream().filter(elem -> elem instanceof Atom).map(elem -> (Atom) elem).toList();
     }
 
     public Optional<Atom> getAtom(int index) {
@@ -194,6 +223,18 @@ public class Molecule {
                         .map(index -> numbersMapping.computeIfAbsent(index, (_i) -> atomCount.incrementAndGet()))
                         .toArray()));
             }
+        }
+        return result;
+    }
+
+    @Override
+    public Molecule replaceInOrder(int[] newIndices) {
+        var idx = 0;
+        final var result = subset();
+        for (final var elem : this.contents) {
+            final var c = elem.coveredAtoms().length;
+            result.add(elem.replaceInOrder(Arrays.copyOfRange(newIndices, idx, idx + c)));
+            idx += c;
         }
         return result;
     }
@@ -258,10 +299,12 @@ public class Molecule {
                 final var contentObj = content.getAsJsonObject();
                 final var type = contentObj.get("type").getAsString();
                 molecule.add(switch (type) {
+                    // is there a better way?
                     case "atom" -> jsonDeserializationContext.deserialize(contentObj, Atom.class);
                     case "bond" -> jsonDeserializationContext.deserialize(contentObj, Bond.class);
                     case "parens" -> jsonDeserializationContext.deserialize(contentObj, Parens.class);
                     case "circle" -> jsonDeserializationContext.deserialize(contentObj, CircleTransformation.class);
+                    case "benzene" -> jsonDeserializationContext.deserialize(contentObj, BenzeneRing.class);
                     default -> throw new JsonParseException(
                             "Molecule JSON contents have unknown type %s".formatted(type));
                 });
@@ -286,10 +329,7 @@ public class Molecule {
             final var arr = new JsonArray();
             for (final var content : molecule.contents) {
                 final var c = jsonSerializationContext.serialize(content);
-                c.getAsJsonObject().addProperty("type", content instanceof Atom ? "atom" :
-                        content instanceof Bond ? "bond" : content instanceof Parens ? "parens" :
-                                content instanceof CircleTransformation ? "circle" : "e");
-                if (c.getAsJsonObject().get("type").getAsString().equals("e")) throw new RuntimeException("???");
+                c.getAsJsonObject().addProperty("type", content.type());
                 arr.add(c);
             }
             obj.add("contents", arr);

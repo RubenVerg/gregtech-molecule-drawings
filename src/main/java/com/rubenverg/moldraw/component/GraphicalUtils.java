@@ -37,6 +37,14 @@ public class GraphicalUtils {
         default PixelPredicate xor(PixelPredicate that) {
             return (x, y, count) -> this.test(x, y, count) ^ that.test(x, y, count);
         }
+
+        static boolean always(int x, int y, int count) {
+            return true;
+        }
+
+        static boolean never(int x, int y, int count) {
+            return false;
+        }
     }
 
     public static boolean alwaysDraw(int _x, int _y, int _count) {

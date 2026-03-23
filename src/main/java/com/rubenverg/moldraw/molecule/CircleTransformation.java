@@ -13,6 +13,11 @@ public record CircleTransformation(
         implements MoleculeElement<CircleTransformation> {
 
     @Override
+    public String type() {
+        return "circle";
+    }
+
+    @Override
     public int[] coveredAtoms() {
         return atoms;
     }

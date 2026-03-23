@@ -13,6 +13,11 @@ public record Bond(
         implements MoleculeElement<Bond> {
 
     @Override
+    public String type() {
+        return "bond";
+    }
+
+    @Override
     public int[] coveredAtoms() {
         return new int[] { a, b };
     }
