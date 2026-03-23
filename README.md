@@ -49,6 +49,8 @@ MolDraw comes out of the box with support for not only most of the organic mater
 
 > Incredibly useless, and yet incredibly cool!
 
+> yay aro representation
+
 ## Adding your own molecules
 
 Molecules are stored in resource packs under `assets/<namespace>/molecules/<compound>.json`, corresponding to the GT material with ID `<namespace>:<compound>`.
@@ -142,12 +144,43 @@ interface CircleMatrix extends CircleCommon {
   a11: number;
 }
 
+// A benzene ring
+interface BenzeneCommon {
+  type: 'benzene';
+  start_index: number; // The index of the first atom in the ring
+  clockwise?: boolean; // Whether the ring runs clockwise or counterclockwise (defaults to clockwise)
+  spin_group?: number; // Spin group of the atoms in the ring
+}
+
+interface BenzeneXY extends BenzeneCommon {
+  x0: number; // X coordinate of the first atom
+  y0: number; // Y coordinate of the first atom
+  x1: number; // X coordinate of the second atom
+  y1: number; // Y coordinate of the second atom
+}
+
+interface BenzeneUV extends BenzeneCommon {
+  u0: number; // U coordinate of the first atom
+  v0: number; // V coordinate of the first atom
+  u1: number; // U coordinate of the second atom
+  v1: number; // V coordinate of the second atom
+}
+
+interface BenzeneXYZ extends BenzeneCommon {
+  x0: number; // X coordinate of the first atom
+  y0: number; // Y coordinate of the first atom
+  z0: number; // Z coordinate of the first atom
+  x1: number; // X coordinate of the second atom
+  y1: number; // Y coordinate of the second atom
+  z1: number; // Z coordinate of the second atom
+}
+
 type SpinSpec
   = boolean // Enable spinning with the default speed
   | number // Enable spinning and set a speed
   | number[]; // Set speeds for multiple groups
 
-type MoleculeElement = AtomXY | AtomUV | AtomXYZ | Bond | Parens | CircleXY | CircleMatrix;
+type MoleculeElement = AtomXY | AtomUV | AtomXYZ | Bond | Parens | CircleXY | CircleMatrix | BenzeneXY | BenzeneUV | BenzeneXYZ;
 
 // A molecule JSON file is of type Molecule.
 interface Molecule {
@@ -158,7 +191,7 @@ interface Molecule {
 
 An atom's position can either be stored as a pair of `x` and `y` coordinates or a pair of `u` and `v` coordinates, which are the unit vectors tilted 30 degrees respectively anticlockwise and clockwise from the positive horizontal semiaxis. Most often, encoding positions with `u` and `v` is easier since organic compounds' skeletal diagrams follow a hexagonal grid as much as possible.
 
-For example, this is the encoding of benzene:
+For example, this is the encoding of benzene, if it didn't use the `benzene` component:
 
 ```json
 {
