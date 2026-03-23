@@ -54,8 +54,9 @@ public record BenzeneRing(
                         case CIRCLE -> Bond.SINGLE;
                     }));
         }
-        if (MolDrawConfig.INSTANCE.molecule.benzeneCircle == MolDrawConfig.MoleculeConfig.AromaticMode.CIRCLE) result.add(new CircleTransformation(
-                new Matrix2f().identity().scale(new Vector3f(next).sub(first).length() * 2 / 3), indices));
+        if (MolDrawConfig.INSTANCE.molecule.benzeneCircle == MolDrawConfig.MoleculeConfig.AromaticMode.CIRCLE)
+            result.add(new CircleTransformation(
+                    new Matrix2f().identity().scale(new Vector3f(next).sub(first).length() * 2 / 3), indices));
         return result;
     }
 

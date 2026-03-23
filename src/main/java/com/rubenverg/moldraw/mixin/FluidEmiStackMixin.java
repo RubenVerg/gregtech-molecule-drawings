@@ -50,6 +50,7 @@ public class FluidEmiStackMixin {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static void moldraw$tryColorizeFormula(List<ClientTooltipComponent> list, Material material,
                                                    OptionalInt idx, OptionalInt quantityIdx) {
+        if (!MolDrawConfig.INSTANCE.color.colors) return;
         if (Objects.nonNull(material.getMaterialComponents()) && !material.getMaterialComponents().isEmpty() ||
                 material.isElement()) {
             final var coloredFormula = MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true);

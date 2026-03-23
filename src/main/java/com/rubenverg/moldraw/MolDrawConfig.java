@@ -59,6 +59,7 @@ public class MolDrawConfig {
         public int moleculeScale = 20;
 
         public enum AromaticMode {
+
             DOUBLE_BONDS,
             CIRCLE,
             ;
