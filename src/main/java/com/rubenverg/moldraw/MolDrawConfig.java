@@ -58,8 +58,22 @@ public class MolDrawConfig {
         @Configurable.Range(min = 10, max = 50)
         public int moleculeScale = 20;
 
+        public enum AromaticMode {
+            DOUBLE_BONDS,
+            CIRCLE,
+            ;
+
+            @Override
+            public String toString() {
+                return switch (this) {
+                    case DOUBLE_BONDS -> "Double bonds (Kekulé)";
+                    case CIRCLE -> "Circle (Thiele)";
+                };
+            }
+        }
+
         @Configurable
-        public boolean benzeneCircle = false;
+        public AromaticMode benzeneCircle = AromaticMode.DOUBLE_BONDS;
 
         @Configurable
         public boolean spinMolecules = true;

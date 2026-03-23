@@ -49,10 +49,12 @@ public record BenzeneRing(
             result.add(new Atom(indices[idx], Element.INVISIBLE.count(1), Optional.empty(), Optional.empty(),
                     Optional.empty(), Optional.empty(), new Vector3f(points[idx]), spinGroup));
             result.add(new Bond(indices[idx], indices[(idx + 1) % points.length], false,
-                    MolDrawConfig.INSTANCE.molecule.benzeneCircle ? Bond.SINGLE :
-                            idx % 2 == 0 ? Bond.SINGLE : Bond.DOUBLE));
+                    switch (MolDrawConfig.INSTANCE.molecule.benzeneCircle) {
+                        case DOUBLE_BONDS -> idx % 2 == 0 ? Bond.SINGLE : Bond.DOUBLE;
+                        case CIRCLE -> Bond.SINGLE;
+                    }));
         }
-        if (MolDrawConfig.INSTANCE.molecule.benzeneCircle) result.add(new CircleTransformation(
+        if (MolDrawConfig.INSTANCE.molecule.benzeneCircle == MolDrawConfig.MoleculeConfig.AromaticMode.CIRCLE) result.add(new CircleTransformation(
                 new Matrix2f().identity().scale(new Vector3f(next).sub(first).length() * 2 / 3), indices));
         return result;
     }
