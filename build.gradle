@@ -66,6 +66,15 @@ repositories {
     maven {
         url = "https://thedarkcolour.github.io/KotlinForForge/"
     }
+    maven {
+        url = "https://maven.architectury.dev"
+    }
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.mods"
+        }
+    }
 }
 
 version = mod_version
@@ -163,6 +172,14 @@ dependencies {
     // lombok
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // kubejs
+    modCompileOnly("dev.latvian.mods:rhino-forge:${rhino_version}")
+    modCompileOnly("dev.latvian.mods:kubejs-forge:${kubejs_version}")
+
+    modRuntimeOnly("dev.architectury:architectury-forge:${architectury_version}")
+    modRuntimeOnly("dev.latvian.mods:rhino-forge:${rhino_version}")
+    modRuntimeOnly("dev.latvian.mods:kubejs-forge:${kubejs_version}")
 }
 
 // See com.example.examplemod.mixin.DummyMixin for information about mixins

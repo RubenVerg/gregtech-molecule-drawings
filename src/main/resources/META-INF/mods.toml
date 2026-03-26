@@ -47,3 +47,9 @@ This client-side only mod adds data-driven molecule drawings for GregTech chemic
         versionRange = "[${configuration_version},)"
         ordering = "AFTER"
         side = "CLIENT"
+    [[dependencies.${mod_id}]]
+        modId = "kubejs"
+        mandatory = false
+        versionRange = "[2001,)"
+        ordering = "AFTER"
+        side = "CLIENT"
