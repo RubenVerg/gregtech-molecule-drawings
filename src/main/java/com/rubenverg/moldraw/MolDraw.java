@@ -2,25 +2,32 @@ package com.rubenverg.moldraw;
 
 import java.util.*;
 
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import com.rubenverg.moldraw.component.AlloyTooltipHandler;
+import com.rubenverg.moldraw.component.MoleculeTooltipHandler;
 import com.rubenverg.moldraw.data.Alloys;
 import com.rubenverg.moldraw.data.Molecules;
 import com.rubenverg.moldraw.molecule.*;
 
 import akka.japi.Pair;
+import bartworks.system.material.BWMetaGeneratedItems;
 import bartworks.system.material.Werkstoff;
-import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.lib.gui.GuiDraw;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gregtech.api.interfaces.IOreMaterial;
+import gregtech.api.util.GTOreDictUnificator;
+import gtPlusPlus.core.item.base.BaseItemComponent;
 
 @Mod(
     modid = MolDraw.MOD_ID,
@@ -46,12 +53,63 @@ public class MolDraw {
     public void preInit(FMLPreInitializationEvent event) {
         LOGGER.info("preInit");
         MolDrawConfig.init();
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        LOGGER.info("postInit");
-        GuiContainerManager.addTooltipHandler(new MolDrawHandler());
+    @SubscribeEvent
+    public void itemTooltip(ItemTooltipEvent event) {
+        Molecule mol = null;
+        List<Pair<IOreMaterial, Long>> alloy = null;
+        String formula = null;
+        if (event.itemStack.getItem() instanceof BaseItemComponent bic
+            && bic.componentType == BaseItemComponent.ComponentTypes.CELL
+            && Objects.isNull(bic.componentMaterial)) {
+            if (FluidRegistry.getFluid(
+                bic.unlocalName.replaceFirst("^itemCell", "")
+                    .toLowerCase()) instanceof Fluid fluid)
+                mol = MolDraw.getMolecule(fluid);
+            else if (FluidRegistry.getFluid(
+                bic.unlocalName.replaceFirst("^itemCell", "fluid.")
+                    .toLowerCase()) instanceof Fluid fluid)
+                mol = MolDraw.getMolecule(fluid);
+        } else {
+            IOreMaterial material = null;
+            if (Objects.isNull(material) && event.itemStack.getItem() instanceof BWMetaGeneratedItems)
+                material = Werkstoff.werkstoffHashMap.get((short) event.itemStack.getItemDamage());
+            if (Objects.isNull(material) && event.itemStack.getItem() instanceof BaseItemComponent bic)
+                material = bic.componentMaterial;
+            if (Objects.isNull(material))
+                material = Optional.ofNullable(GTOreDictUnificator.getItemData(event.itemStack))
+                    .map(d -> d.mMaterial.mMaterial)
+                    .orElse(null);
+            if (!Objects.isNull(material)) {
+                mol = MolDraw.getMolecule(material);
+                alloy = MolDraw.getAlloy(material);
+                formula = AlloyTooltipHandler.getFormula(material);
+            }
+        }
+        Integer index = null;
+        MolDraw.LOGGER.info("There are {} tooltips to check: {}", event.toolTip.size(), event.toolTip);
+        for (var i = 0; i < event.toolTip.size(); i++) {
+            MolDraw.LOGGER.info("Comparing {} against {}", event.toolTip.get(i), formula);
+            if (event.toolTip.get(i)
+                .replaceAll("§.", "")
+                .equals(formula)) {
+                index = i;
+                break;
+            }
+        }
+        if (Objects.nonNull(mol)) {
+            if (Objects.isNull(index))
+                event.toolTip.add(1, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new MoleculeTooltipHandler(mol)));
+            else event.toolTip
+                .set(index, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new MoleculeTooltipHandler(mol)));
+        } else if (Objects.nonNull(alloy)) {
+            if (Objects.isNull(index))
+                event.toolTip.add(1, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new AlloyTooltipHandler(alloy)));
+            else event.toolTip
+                .set(index, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new AlloyTooltipHandler(alloy)));
+        }
     }
 
     public static @Nullable Molecule getMolecule(IOreMaterial material) {

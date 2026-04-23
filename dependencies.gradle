@@ -4,4 +4,6 @@ dependencies {
 
     implementation "com.github.GTNewHorizons:NotEnoughItems:$neiVersion:dev"
     implementation "com.github.GTNewHorizons:GT5-Unofficial:$gtVersion:dev"
+    // implementation("com.github.GTNewHorizons:ChromaticTooltips:$chromaticVersion:dev") { transitive = false }
+    // implementation("com.github.GTNewHorizons:ChromaticTooltipsCompat:$chromaticCompatVersion:dev") { transitive = false }
 }
