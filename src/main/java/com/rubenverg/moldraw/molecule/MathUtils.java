@@ -1,17 +1,13 @@
 package com.rubenverg.moldraw.molecule;
 
-import net.minecraft.ChatFormatting;
+import org.joml.Matrix2d;
+import org.joml.Matrix2dc;
 
-import org.joml.*;
-
-import java.lang.Math;
-import java.util.Objects;
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 public class MathUtils {
 
-    public static Matrix2dc UVtoXY = new Matrix2d(
-            Math.sqrt(3) / 2, 0.5,
-            Math.sqrt(3) / 2, -0.5);
+    public static Matrix2dc UVtoXY = new Matrix2d(Math.sqrt(3) / 2, 0.5, Math.sqrt(3) / 2, -0.5);
 
     public static double COS18 = Math.cos(Math.toRadians(18));
     public static double SIN18 = Math.sin(Math.toRadians(18));
@@ -32,6 +28,13 @@ public class MathUtils {
     public static float PHIf = (float) PHI;
 
     public static int chatFormattingColor(ChatFormatting formatting) {
-        return Objects.requireNonNull(formatting.getColor()) | (0xff << 24);
+        final var idx = "0123456789abcdef".indexOf(formatting.getChar());
+        if (idx == -1) return 0xffffffff;
+        var j = (idx >> 3 & 1) * 85;
+        var r = (idx >> 2 & 1) * 170 + j;
+        var g = (idx >> 1 & 1) * 170 + j;
+        var b = (idx >> 0 & 1) * 170 + j;
+        if (idx == 6) r += 85;
+        return (0xff << 24) | (r & 255) << 16 | (g & 255) << 8 | (b & 255) << 0;
     }
 }

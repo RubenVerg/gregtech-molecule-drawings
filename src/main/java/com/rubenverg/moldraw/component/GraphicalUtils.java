@@ -1,15 +1,19 @@
 package com.rubenverg.moldraw.component;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiGraphics;
-
 import java.util.function.IntBinaryOperator;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import codechicken.lib.gui.GuiDraw;
+import gregtech.api.util.MethodsReturnNonnullByDefault;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GraphicalUtils {
+
+    public static void screenPixel(int x, int y, int color) {
+        GuiDraw.drawRect(x, y, 1, 1, color);
+    }
 
     @FunctionalInterface
     public interface DrawPixel {
@@ -72,10 +76,8 @@ public class GraphicalUtils {
         }
     }
 
-    public static void plotLine(int x0, int y0, int x1, int y1, PixelPredicate shouldDraw, IntBinaryOperator color,
-                                GuiGraphics graphics) {
-        plotLine(x0, y0, x1, y1, shouldDraw,
-                (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
+    public static void plotLine(int x0, int y0, int x1, int y1, PixelPredicate shouldDraw, IntBinaryOperator color) {
+        plotLine(x0, y0, x1, y1, shouldDraw, (DrawPixel) ((xp, yp) -> screenPixel(xp, yp, color.applyAsInt(xp, yp))));
     }
 
     public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, DrawPixel doDraw) {
@@ -94,8 +96,7 @@ public class GraphicalUtils {
         }
     }
 
-    public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, IntBinaryOperator color,
-                                  GuiGraphics graphics) {
-        plotCircle(xm, ym, r, shouldDraw, (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
+    public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, IntBinaryOperator color) {
+        plotCircle(xm, ym, r, shouldDraw, (DrawPixel) (xp, yp) -> screenPixel(xp, yp, color.applyAsInt(xp, yp)));
     }
 }

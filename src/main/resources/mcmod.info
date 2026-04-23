@@ -1,0 +1,11 @@
+{
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "This client-side only mod adds data-driven molecule drawings for GregTech chemicals.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "authorList": ["RubenVerg"]
+  }]
+}

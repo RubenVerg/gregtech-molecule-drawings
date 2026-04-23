@@ -1,13 +1,13 @@
 package com.rubenverg.moldraw;
 
-import com.rubenverg.moldraw.component.AlloyTooltipComponent;
-import dev.toma.configuration.Configuration;
-import dev.toma.configuration.client.IValidationHandler;
-import dev.toma.configuration.config.Config;
-import dev.toma.configuration.config.Configurable;
-import dev.toma.configuration.config.format.ConfigFormats;
+import java.io.File;
+import java.util.Arrays;
 
-@Config(id = MolDraw.MOD_ID)
+import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.common.config.Configuration;
+
+import com.rubenverg.moldraw.component.AlloyTooltipHandler;
+
 public class MolDrawConfig {
 
     public static MolDrawConfig INSTANCE;
@@ -16,53 +16,82 @@ public class MolDrawConfig {
     public static void init() {
         synchronized (LOCK) {
             if (INSTANCE == null) {
-                INSTANCE = Configuration.registerConfig(MolDrawConfig.class, ConfigFormats.yaml()).getConfigInstance();
+                INSTANCE = new MolDrawConfig();
+                INSTANCE.reload();
             }
         }
     }
 
-    @Configurable
-    public boolean enabled = true;
+    public void reload() {
+        final var config = new Configuration(new File(Launch.minecraftHome, "config/moldraw.cfg"));
+        config.load();
 
-    @Configurable
-    public boolean onlyShowOnShift = false;
+        enabled = config.getBoolean("enabled", "", true, "");
+        onlyShowOnShift = config.getBoolean("onlyShowOnShift", "", false, "");
 
-    @Configurable
-    public ColorConfig color = new ColorConfig();
+        color.colors = config.getBoolean("colors", "color", true, "");
+        color.useMaterialColors = config.getBoolean("useMaterialColors", "color", true, "");
+        color.defaultColor = config.getString("defaultColor", "color", "§e", "");
+        color.minimumBrightness = config.getFloat("minimumBrightness", "color", 0.1f, 0, 1, "");
+
+        molecule.showMolecules = config.getBoolean("showMolecules", "molecule", true, "");
+        molecule.moleculeScale = config.getInt("moleculeScale", "molecule", 20, 10, 50, "");
+        molecule.benzeneCircle = MoleculeConfig.AromaticMode.valueOf(
+            config.getString(
+                "benzeneCircle",
+                "molecule",
+                MoleculeConfig.AromaticMode.DOUBLE_BONDS.name(),
+                "",
+                Arrays.stream(MoleculeConfig.AromaticMode.values())
+                    .map(MoleculeConfig.AromaticMode::name)
+                    .toArray(String[]::new)));
+        molecule.spinMolecules = config.getBoolean("spinMolecules", "molecule", true, "");
+        molecule.spinSpeedMultiplier = config.getFloat("spinSpeedMultiplier", "molecule", 1, 0, 5, "");
+
+        alloy.showAlloys = config.getBoolean("showAlloys", "alloy", true, "");
+        alloy.pieChartRadius = config.getInt("pieChartRadius", "alloy", 32, 25, 50, "");
+        alloy.recursive = config.getBoolean("recursive", "alloy", true, "");
+        alloy.partsByMass = config.getBoolean("partsByMass", "alloy", true, "");
+
+        fun.aromanticBenzene = config.getBoolean("aromanticBenzene", "fun", false, "");
+
+        debugMode = config.getBoolean("debugMode", "", false, "");
+
+        if (config.hasChanged()) {
+            AlloyTooltipHandler.invalidateComponentsCache();
+            config.save();
+        }
+    }
+
+    public boolean enabled;
+
+    public boolean onlyShowOnShift;
+
+    public final ColorConfig color = new ColorConfig();
 
     public static class ColorConfig {
 
-        @Configurable
-        public boolean colors = true;
+        public boolean colors;
 
-        @Configurable
-        public boolean useMaterialColors = true;
+        public boolean useMaterialColors;
 
-        @Configurable
-        public String defaultColor = "§e";
+        public String defaultColor;
 
-        @Configurable
-        @Configurable.Range(min = 0, max = 1)
-        public float minimumBrightness = 0.1f;
+        public float minimumBrightness;
     }
 
-    @Configurable
-    public MoleculeConfig molecule = new MoleculeConfig();
+    public final MoleculeConfig molecule = new MoleculeConfig();
 
     public static class MoleculeConfig {
 
-        @Configurable
-        public boolean showMolecules = true;
+        public boolean showMolecules;
 
-        @Configurable
-        @Configurable.Range(min = 10, max = 50)
-        public int moleculeScale = 20;
+        public int moleculeScale;
 
         public enum AromaticMode {
 
             DOUBLE_BONDS,
-            CIRCLE,
-            ;
+            CIRCLE,;
 
             @Override
             public String toString() {
@@ -73,51 +102,32 @@ public class MolDrawConfig {
             }
         }
 
-        @Configurable
-        public AromaticMode benzeneCircle = AromaticMode.DOUBLE_BONDS;
+        public AromaticMode benzeneCircle;
 
-        @Configurable
-        public boolean spinMolecules = true;
+        public boolean spinMolecules;
 
-        @Configurable
-        public float spinSpeedMultiplier = 1;
+        public float spinSpeedMultiplier;
     }
 
-    @Configurable
-    public AlloyConfig alloy = new AlloyConfig();
+    public final AlloyConfig alloy = new AlloyConfig();
 
     public static class AlloyConfig {
 
-        @Configurable
-        public boolean showAlloys = true;
+        public boolean showAlloys;
 
-        @Configurable
-        @Configurable.Range(min = 25, max = 50)
-        public int pieChartRadius = 32;
+        public int pieChartRadius;
 
-        @Configurable
-        @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
-        public boolean recursive = true;
+        public boolean recursive;
 
-        @Configurable
-        @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
-        public boolean partsByMass = true;
-
-        @SuppressWarnings("unused")
-        private void invalidateAlloyCache(boolean value, IValidationHandler handler) {
-            AlloyTooltipComponent.invalidateComponentsCache();
-        }
+        public boolean partsByMass;
     }
 
-    @Configurable
-    public FunConfig fun = new FunConfig();
+    public final FunConfig fun = new FunConfig();
 
     public static class FunConfig {
 
-        @Configurable
-        public boolean aromanticBenzene = false;
+        public boolean aromanticBenzene;
     }
 
-    @Configurable
-    public boolean debugMode = false;
+    public boolean debugMode;
 }

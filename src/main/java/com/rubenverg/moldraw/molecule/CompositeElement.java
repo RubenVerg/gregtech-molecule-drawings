@@ -1,11 +1,11 @@
 package com.rubenverg.moldraw.molecule;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public interface CompositeElement<This extends CompositeElement<?>> extends MoleculeElement<This> {
 
@@ -14,7 +14,7 @@ public interface CompositeElement<This extends CompositeElement<?>> extends Mole
     default Collection<MoleculeElement<?>> flatChildren() {
         final List<MoleculeElement<?>> children = new ArrayList<>();
         for (final var child : children())
-            if (child instanceof CompositeElement<?> composite) children.addAll(composite.flatChildren());
+            if (child instanceof CompositeElement<?>composite) children.addAll(composite.flatChildren());
             else children.add(child);
         return children;
     }

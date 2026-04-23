@@ -1,0 +1,110 @@
+package com.rubenverg.moldraw.data;
+
+import java.util.*;
+
+import akka.japi.Pair;
+import bartworks.system.material.WerkstoffLoader;
+import goodgenerator.items.GGMaterial;
+import gregtech.api.enums.Materials;
+import gregtech.api.interfaces.IOreMaterial;
+import gtPlusPlus.core.material.MaterialsAlloy;
+
+@SuppressWarnings("removal")
+public class Alloys {
+
+    public static Map<IOreMaterial, Optional<List<Pair<IOreMaterial, Long>>>> alloys() {
+        final Map<IOreMaterial, Optional<List<Pair<IOreMaterial, Long>>>> alloys = new HashMap<>();
+        alloys.put(Materials.BatteryAlloy, Optional.empty());
+        alloys.put(Materials.Brass, Optional.empty());
+        alloys.put(Materials.Bronze, Optional.empty());
+        alloys.put(Materials.Cupronickel, Optional.empty());
+        alloys.put(Materials.Electrum, Optional.empty());
+        alloys.put(Materials.Invar, Optional.empty());
+        alloys.put(Materials.Kanthal, Optional.empty());
+        alloys.put(Materials.Magnalium, Optional.empty());
+        alloys.put(Materials.Nichrome, Optional.empty());
+        alloys.put(Materials.NiobiumTitanium, Optional.empty());
+        alloys.put(Materials.SterlingSilver, Optional.empty());
+        alloys.put(Materials.RoseGold, Optional.empty());
+        alloys.put(Materials.BlackBronze, Optional.empty());
+        alloys.put(Materials.BismuthBronze, Optional.empty());
+        alloys.put(WerkstoffLoader.Ruridit, Optional.empty());
+        alloys.put(Materials.SolderingAlloy, Optional.empty());
+        alloys.put(Materials.StainlessSteel, Optional.empty());
+        alloys.put(Materials.TinAlloy, Optional.empty());
+        alloys.put(Materials.Ultimet, Optional.empty());
+        alloys.put(Materials.VanadiumGallium, Optional.empty());
+        alloys.put(Materials.YttriumBariumCuprate, Optional.empty());
+        alloys.put(Materials.Osmiridium, Optional.empty());
+        alloys.put(Materials.GalliumArsenide, Optional.empty());
+        alloys.put(Materials.IndiumGalliumPhosphide, Optional.empty());
+        alloys.put(Materials.NickelZincFerrite, Optional.empty());
+        alloys.put(Materials.TungstenCarbide, Optional.empty());
+        alloys.put(Materials.BlackSteel, Optional.empty());
+        alloys.put(Materials.TungstenSteel, Optional.empty());
+        alloys.put(Materials.CobaltBrass, Optional.empty());
+        alloys.put(Materials.VanadiumSteel, Optional.empty());
+        alloys.put(MaterialsAlloy.POTIN, Optional.empty());
+        alloys.put(Materials.NaquadahAlloy, Optional.empty());
+        alloys.put(WerkstoffLoader.LuVTierMaterial, Optional.empty());
+        alloys.put(Materials.RedSteel, Optional.empty());
+        alloys.put(Materials.BlueSteel, Optional.empty());
+        alloys.put(Materials.HSSG, Optional.empty());
+        alloys.put(Materials.RedAlloy, Optional.empty());
+        alloys.put(Materials.HSSE, Optional.empty());
+        alloys.put(Materials.HSSS, Optional.empty());
+        alloys.put(Materials.BlueAlloy, Optional.empty());
+        alloys.put(MaterialsAlloy.TANTALUM_CARBIDE, Optional.empty());
+        alloys.put(Materials.HSLA, Optional.empty());
+        alloys.put(MaterialsAlloy.ZERON_100, Optional.empty());
+        alloys.put(MaterialsAlloy.AQUATIC_STEEL, Optional.empty());
+        alloys.put(MaterialsAlloy.INCOLOY_MA956, Optional.empty());
+        alloys.put(MaterialsAlloy.MARAGING300, Optional.empty());
+        alloys.put(MaterialsAlloy.HASTELLOY_X, Optional.empty());
+        alloys.put(MaterialsAlloy.STELLITE, Optional.empty());
+        alloys.put(MaterialsAlloy.TUNGSTEN_TITANIUM_CARBIDE, Optional.empty());
+        alloys.put(MaterialsAlloy.HASTELLOY_C276, Optional.empty());
+        alloys.put(Materials.Steel, Optional.empty());
+        alloys.put(Materials.ConductiveIron, Optional.empty());
+        alloys.put(MaterialsAlloy.TRINIUM_NAQUADAH, Optional.empty());
+        alloys.put(Materials.EndSteel, Optional.empty());
+        alloys.put(GGMaterial.lumiium, Optional.empty());
+        alloys.put(Materials.Manyullyn, Optional.empty());
+        alloys.put(GGMaterial.signalium, Optional.empty());
+        alloys.put(Materials.EnergeticAlloy, Optional.empty());
+        alloys.put(Materials.VibrantAlloy, Optional.empty());
+        alloys.put(Materials.Enderium, Optional.empty());
+        alloys.put(Materials.DarkSteel, Optional.empty());
+        alloys.put(Materials.ElectricalSteel, Optional.empty());
+        alloys.put(GGMaterial.marM200, Optional.empty());
+        alloys.put(GGMaterial.artheriumSn, Optional.empty());
+        alloys.put(MaterialsAlloy.HG1223, Optional.empty());
+        alloys.put(GGMaterial.marCeM200, Optional.empty());
+        alloys.put(MaterialsAlloy.CINOBITE, Optional.empty());
+        alloys.put(GGMaterial.adamantiumAlloy, Optional.empty());
+        alloys.put(MaterialsAlloy.INCONEL_792, Optional.empty());
+        alloys.put(Materials.Duralumin, Optional.empty());
+        alloys.put(Materials.MelodicAlloy, Optional.empty());
+        alloys.put(MaterialsAlloy.PIKYONIUM, Optional.empty());
+        alloys.put(MaterialsAlloy.INCOLOY_020, Optional.empty());
+        alloys.put(MaterialsAlloy.INCOLOY_DS, Optional.empty());
+        alloys.put(MaterialsAlloy.ZIRCONIUM_CARBIDE, Optional.empty());
+        alloys.put(MaterialsAlloy.NITINOL_60, Optional.empty());
+        alloys.put(MaterialsAlloy.INCONEL_690, Optional.empty());
+        alloys.put(MaterialsAlloy.TANTALLOY_60, Optional.empty());
+        alloys.put(MaterialsAlloy.HASTELLOY_N, Optional.empty());
+        alloys.put(Materials.EnrichedHolmium, Optional.empty());
+        alloys.put(MaterialsAlloy.TRINIUM_NAQUADAH_CARBON, Optional.empty());
+        alloys.put(Materials.StellarAlloy, Optional.empty());
+        alloys.put(MaterialsAlloy.INCONEL_625, Optional.empty());
+        alloys.put(MaterialsAlloy.SILICON_CARBIDE, Optional.empty());
+        alloys.put(MaterialsAlloy.LAFIUM, Optional.empty());
+        alloys.put(MaterialsAlloy.TANTALLOY_61, Optional.empty());
+        alloys.put(MaterialsAlloy.EGLIN_STEEL, Optional.empty());
+        alloys.put(GGMaterial.incoloy903, Optional.empty());
+        alloys.put(MaterialsAlloy.TUMBAGA, Optional.empty());
+        alloys.put(MaterialsAlloy.ABYSSAL, Optional.empty());
+
+        return alloys;
+    }
+}

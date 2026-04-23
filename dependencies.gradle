@@ -1,0 +1,7 @@
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.18.46"
+    annotationProcessor "org.projectlombok:lombok:1.18.46"
+
+    implementation "com.github.GTNewHorizons:NotEnoughItems:$neiVersion:dev"
+    implementation "com.github.GTNewHorizons:GT5-Unofficial:$gtVersion:dev"
+}
