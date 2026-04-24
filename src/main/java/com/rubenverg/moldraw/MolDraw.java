@@ -2,6 +2,7 @@ package com.rubenverg.moldraw;
 
 import java.util.*;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -11,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import com.rubenverg.moldraw.component.AlloyTooltipHandler;
 import com.rubenverg.moldraw.component.MoleculeTooltipHandler;
 import com.rubenverg.moldraw.data.Alloys;
@@ -52,12 +54,13 @@ public class MolDraw {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         LOGGER.info("preInit");
-        MolDrawConfig.init();
+        ConfigurationManager.registerConfig(MolDrawConfig.class);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void itemTooltip(ItemTooltipEvent event) {
+        if (!MolDrawConfig.enabled) return;
         Molecule mol = null;
         List<Pair<IOreMaterial, Long>> alloy = null;
         String formula = null;
@@ -99,16 +102,26 @@ public class MolDraw {
                 break;
             }
         }
-        if (Objects.nonNull(mol)) {
-            if (Objects.isNull(index))
-                event.toolTip.add(1, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new MoleculeTooltipHandler(mol)));
-            else event.toolTip
-                .set(index, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new MoleculeTooltipHandler(mol)));
-        } else if (Objects.nonNull(alloy)) {
-            if (Objects.isNull(index))
-                event.toolTip.add(1, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new AlloyTooltipHandler(alloy)));
-            else event.toolTip
-                .set(index, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new AlloyTooltipHandler(alloy)));
+        if (Objects.nonNull(mol) && MolDrawConfig.molecule.showMolecules) {
+            if (MolDrawConfig.onlyShowOnShift && !GuiScreen.isShiftKeyDown()) {
+                if (Objects.isNull(index)) event.toolTip.add(1, "§7Press Shift to view the structure");
+                else event.toolTip.add(index + 1, "§7Press Shift to view the structure");
+            } else {
+                if (Objects.isNull(index)) event.toolTip
+                    .add(1, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new MoleculeTooltipHandler(mol)));
+                else event.toolTip
+                    .set(index, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new MoleculeTooltipHandler(mol)));
+            }
+        } else if (Objects.nonNull(alloy) && MolDrawConfig.alloy.showAlloys) {
+            if (MolDrawConfig.onlyShowOnShift && !GuiScreen.isShiftKeyDown()) {
+                if (Objects.isNull(index)) event.toolTip.add(1, "§7Press Shift to view the composition");
+                else event.toolTip.add(index + 1, "§7Press Shift to view the composition");
+            } else {
+                if (Objects.isNull(index)) event.toolTip
+                    .add(1, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new AlloyTooltipHandler(alloy)));
+                else event.toolTip
+                    .set(index, GuiDraw.TOOLTIP_HANDLER + GuiDraw.getTipLineId(new AlloyTooltipHandler(alloy)));
+            }
         }
     }
 

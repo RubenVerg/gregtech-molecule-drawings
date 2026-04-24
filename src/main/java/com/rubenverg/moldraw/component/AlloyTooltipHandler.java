@@ -23,7 +23,7 @@ import gtPlusPlus.core.material.Material;
 public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
 
     private static long maybeMultiplyByMass(IOreMaterial material, long count) {
-        if (!MolDrawConfig.INSTANCE.alloy.partsByMass) return count;
+        if (!MolDrawConfig.alloy.partsByMass) return count;
         if (material instanceof Materials gt) return count * gt.getMass();
         if (material instanceof Werkstoff bw) return count * bw.getStats()
             .getMass();
@@ -59,7 +59,7 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
         }, pair.second())).toList();
         final Map<IOreMaterial, Pair<Long, Long>> collectedComponents = new HashMap<>();
         for (final var c : normalizedComponents) {
-            if (MolDrawConfig.INSTANCE.alloy.recursive) {
+            if (MolDrawConfig.alloy.recursive) {
                 final var innerComponents = deriveComponents(c.first());
                 final var innerTotal = innerComponents.stream().map(Pair::second).reduce(0L, Long::sum);
                 for (final var inner : innerComponents) {
@@ -118,7 +118,7 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
     private final int addLeft, addRight;
 
     public AlloyTooltipHandler(List<Pair<IOreMaterial, Long>> rcs) {
-        baseHeight = MolDrawConfig.INSTANCE.alloy.pieChartRadius * 5 / 2;
+        baseHeight = MolDrawConfig.alloy.pieChartRadius * 5 / 2;
 
         rawComponents = rcs;
         components = maybeMultiplyByMass(rcs);
@@ -163,9 +163,9 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
                 .first();
             final var center = centers.get(i)
                 .first();
-            final int cy = (int) (-Math.cos(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
+            final int cy = (int) (-Math.cos(center) * 0.9 * MolDrawConfig.alloy.pieChartRadius);
             final var left = center > Math.PI;
-            final var ex = (left ? -1 : 1) * (MolDrawConfig.INSTANCE.alloy.pieChartRadius + 10);
+            final var ex = (left ? -1 : 1) * (MolDrawConfig.alloy.pieChartRadius + 10);
             final var percentage = count * 100d / total;
             final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
             final var text = percentageString + " " + getFormula(material);
@@ -186,8 +186,8 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
         textStarts = ts;
         addTop = Math.max(0, -atMostY - baseHeight / 2);
         addBottom = Math.max(0, atLeastY - baseHeight / 2);
-        addLeft = Math.max(0, al + MolDrawConfig.INSTANCE.alloy.pieChartRadius + 20 - BASE_WIDTH / 2);
-        addRight = Math.max(0, ar + MolDrawConfig.INSTANCE.alloy.pieChartRadius + 20 - BASE_WIDTH / 2);
+        addLeft = Math.max(0, al + MolDrawConfig.alloy.pieChartRadius + 20 - BASE_WIDTH / 2);
+        addRight = Math.max(0, ar + MolDrawConfig.alloy.pieChartRadius + 20 - BASE_WIDTH / 2);
     }
 
     @Override
@@ -217,7 +217,7 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
                     .second());
         };
 
-        GraphicalUtils.plotCircle(xm, ym, MolDrawConfig.INSTANCE.alloy.pieChartRadius, GraphicalUtils::alwaysDraw, sc);
+        GraphicalUtils.plotCircle(xm, ym, MolDrawConfig.alloy.pieChartRadius, GraphicalUtils::alwaysDraw, sc);
 
         final IntBinaryOperator white = (_xp, _yp) -> 0xffffffff;
 
@@ -233,10 +233,10 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
             final var topY = ym + textStart.y;
             final var centerY = topY + font.FONT_HEIGHT / 2;
             final var startX = xm + textStart.x;
-            final var cx = xm + (int) (Math.sin(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
-            final var cy = ym - (int) (Math.cos(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
+            final var cx = xm + (int) (Math.sin(center) * 0.9 * MolDrawConfig.alloy.pieChartRadius);
+            final var cy = ym - (int) (Math.cos(center) * 0.9 * MolDrawConfig.alloy.pieChartRadius);
             final var left = center > Math.PI;
-            final var ex = xm + (left ? -1 : 1) * (MolDrawConfig.INSTANCE.alloy.pieChartRadius + 10);
+            final var ex = xm + (left ? -1 : 1) * (MolDrawConfig.alloy.pieChartRadius + 10);
             final var percentage = count * 100d / total;
             final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
             final var percentageText = percentageString + " ";

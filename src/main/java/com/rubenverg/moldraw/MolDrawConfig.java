@@ -1,94 +1,61 @@
 package com.rubenverg.moldraw;
 
-import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import net.minecraft.launchwrapper.Launch;
-import net.minecraftforge.common.config.Configuration;
+import com.gtnewhorizon.gtnhlib.config.Config;
 
-import com.rubenverg.moldraw.component.AlloyTooltipHandler;
+import akka.japi.Pair;
+import cpw.mods.fml.client.config.GuiConfig;
+import cpw.mods.fml.client.config.GuiConfigEntries;
+import cpw.mods.fml.client.config.IConfigElement;
 
+@Config(modid = MolDraw.MOD_ID, filename = "moldraw")
+@Config.Order(0)
+@Config.Entry(GuiConfigEntries.CategoryEntry.class)
 public class MolDrawConfig {
 
-    public static MolDrawConfig INSTANCE;
-    private static final Object LOCK = new Object();
+    @Config.Comment("Enable mod")
+    public static boolean enabled = true;
 
-    public static void init() {
-        synchronized (LOCK) {
-            if (INSTANCE == null) {
-                INSTANCE = new MolDrawConfig();
-                INSTANCE.reload();
-            }
-        }
-    }
+    @Config.Comment("Only show drawings when pressing Shift")
+    public static boolean onlyShowOnShift = false;
 
-    public void reload() {
-        final var config = new Configuration(new File(Launch.minecraftHome, "config/moldraw.cfg"));
-        config.load();
-
-        enabled = config.getBoolean("enabled", "", true, "");
-        onlyShowOnShift = config.getBoolean("onlyShowOnShift", "", false, "");
-
-        color.colors = config.getBoolean("colors", "color", true, "");
-        color.useMaterialColors = config.getBoolean("useMaterialColors", "color", true, "");
-        color.defaultColor = config.getString("defaultColor", "color", "§e", "");
-        color.minimumBrightness = config.getFloat("minimumBrightness", "color", 0.1f, 0, 1, "");
-
-        molecule.showMolecules = config.getBoolean("showMolecules", "molecule", true, "");
-        molecule.moleculeScale = config.getInt("moleculeScale", "molecule", 20, 10, 50, "");
-        molecule.benzeneCircle = MoleculeConfig.AromaticMode.valueOf(
-            config.getString(
-                "benzeneCircle",
-                "molecule",
-                MoleculeConfig.AromaticMode.DOUBLE_BONDS.name(),
-                "",
-                Arrays.stream(MoleculeConfig.AromaticMode.values())
-                    .map(MoleculeConfig.AromaticMode::name)
-                    .toArray(String[]::new)));
-        molecule.spinMolecules = config.getBoolean("spinMolecules", "molecule", true, "");
-        molecule.spinSpeedMultiplier = config.getFloat("spinSpeedMultiplier", "molecule", 1, 0, 5, "");
-
-        alloy.showAlloys = config.getBoolean("showAlloys", "alloy", true, "");
-        alloy.pieChartRadius = config.getInt("pieChartRadius", "alloy", 32, 25, 50, "");
-        alloy.recursive = config.getBoolean("recursive", "alloy", true, "");
-        alloy.partsByMass = config.getBoolean("partsByMass", "alloy", true, "");
-
-        fun.aromanticBenzene = config.getBoolean("aromanticBenzene", "fun", false, "");
-
-        debugMode = config.getBoolean("debugMode", "", false, "");
-
-        if (config.hasChanged()) {
-            AlloyTooltipHandler.invalidateComponentsCache();
-            config.save();
-        }
-    }
-
-    public boolean enabled;
-
-    public boolean onlyShowOnShift;
-
-    public final ColorConfig color = new ColorConfig();
+    @Config.Comment("Colors")
+    @Config.Entry(GuiConfigEntries.CategoryEntry.class)
+    public static ColorConfig color = new ColorConfig();
 
     public static class ColorConfig {
 
-        public boolean colors;
+        @Config.Comment("Color element symbols")
+        public boolean colors = true;
 
-        public boolean useMaterialColors;
+        @Config.Comment("Use material colors for elements")
+        public boolean useMaterialColors = true;
 
-        public String defaultColor;
+        @Config.Comment("Default element color")
+        public String defaultColor = "&e";
 
-        public float minimumBrightness;
+        @Config.Comment("Minimum brightness for colored elements")
+        @Config.RangeFloat(min = 0, max = 1)
+        public float minimumBrightness = 0.1f;
     }
 
-    public final MoleculeConfig molecule = new MoleculeConfig();
+    @Config.Comment("Molecules")
+    @Config.Entry(GuiConfigEntries.CategoryEntry.class)
+    public static MoleculeConfig molecule = new MoleculeConfig();
 
     public static class MoleculeConfig {
 
-        public boolean showMolecules;
+        @Config.Comment("Show molecule drawings")
+        public boolean showMolecules = true;
 
-        public int moleculeScale;
+        @Config.Comment("Molecule scale")
+        @Config.RangeInt(min = 10, max = 50)
+        public int moleculeScale = 20;
 
-        public enum AromaticMode {
+        public static enum AromaticMode {
 
             DOUBLE_BONDS,
             CIRCLE,;
@@ -102,32 +69,61 @@ public class MolDrawConfig {
             }
         }
 
-        public AromaticMode benzeneCircle;
+        public static class AromaticModeEntry extends GuiConfigEntries.SelectValueEntry {
 
-        public boolean spinMolecules;
+            public AromaticModeEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList,
+                IConfigElement<String> configElement) {
+                super(owningScreen, owningEntryList, configElement, getSelectableValues());
+            }
 
-        public float spinSpeedMultiplier;
+            private static Map<Object, String> getSelectableValues() {
+                return Arrays.stream(AromaticMode.values())
+                    .map(mode -> new Pair<>(mode, mode.toString()))
+                    .collect(Collectors.toMap(Pair::first, Pair::second));
+            }
+        }
+
+        @Config.Comment("Benzene render mode")
+        @Config.Entry(AromaticModeEntry.class)
+        public AromaticMode benzeneCircle = AromaticMode.DOUBLE_BONDS;
+
+        @Config.Comment("Allow molecules to spin")
+        public boolean spinMolecules = true;
+
+        @Config.Comment("Spin speed multiplier")
+        public float spinSpeedMultiplier = 1;
     }
 
-    public final AlloyConfig alloy = new AlloyConfig();
+    @Config.Comment("Alloys")
+    @Config.Entry(GuiConfigEntries.CategoryEntry.class)
+    public static AlloyConfig alloy = new AlloyConfig();
 
     public static class AlloyConfig {
 
-        public boolean showAlloys;
+        @Config.Comment("Show alloy composition charts")
+        public boolean showAlloys = true;
 
-        public int pieChartRadius;
+        @Config.Comment("Radius of the alloy composition pie chart")
+        @Config.RangeInt(min = 25, max = 50)
+        public int pieChartRadius = 32;
 
-        public boolean recursive;
+        @Config.Comment("Recursively decompose alloys into their constituent elements")
+        public boolean recursive = true;
 
-        public boolean partsByMass;
+        @Config.Comment("Show percentages of alloy components by mass")
+        public boolean partsByMass = true;
     }
 
-    public final FunConfig fun = new FunConfig();
+    @Config.Comment("Fun")
+    @Config.Entry(GuiConfigEntries.CategoryEntry.class)
+    public static FunConfig fun = new FunConfig();
 
     public static class FunConfig {
 
-        public boolean aromanticBenzene;
+        @Config.Comment("Aromantic Benzene")
+        public boolean aromanticBenzene = false;
     }
 
-    public boolean debugMode;
+    @Config.Comment("Debug mode")
+    public static boolean debugMode = false;
 }

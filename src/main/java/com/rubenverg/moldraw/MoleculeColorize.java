@@ -22,8 +22,8 @@ public class MoleculeColorize {
     public static int FALLBACK_COLOR = MathUtils.chatFormattingColor(ChatFormatting.YELLOW);
 
     public static int configColor(@Nullable String config) {
-        final var str = Objects.requireNonNullElse(config, MolDrawConfig.INSTANCE.color.defaultColor);
-        if (str.length() == 2 && str.charAt(0) == '§') {
+        final var str = Objects.requireNonNullElse(config, MolDrawConfig.color.defaultColor);
+        if (str.length() == 2 && str.charAt(0) == '&') {
             final var formatting = ChatFormatting.getByChar(str.charAt(1));
             return Objects.isNull(formatting) ? FALLBACK_COLOR : MathUtils.chatFormattingColor(formatting);
         } else if (str.length() == 7 && str.charAt(0) == '#') {
@@ -93,7 +93,7 @@ public class MoleculeColorize {
     public static int lightenColor(int color) {
         final var arr = new float[3];
         Color.RGBtoHSB(color >> 16 & 0xff, color >> 8 & 0xff, color >> 0 & 0xff, arr);
-        arr[2] = Math.max(arr[2], MolDrawConfig.INSTANCE.color.minimumBrightness);
+        arr[2] = Math.max(arr[2], MolDrawConfig.color.minimumBrightness);
         return Color.HSBtoRGB(arr[0], arr[1], arr[2]);
     }
 
@@ -103,12 +103,12 @@ public class MoleculeColorize {
 
     public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.color.useMaterialColors && Objects.nonNull(element.material))
+        if (MolDrawConfig.color.useMaterialColors && Objects.nonNull(element.material))
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();
         else if (element.color instanceof Element.Color.Optional optional)
-            return MolDrawConfig.INSTANCE.color.colors ? optional.color() : defaultColor;
+            return MolDrawConfig.color.colors ? optional.color() : defaultColor;
         return defaultColor;
     }
 

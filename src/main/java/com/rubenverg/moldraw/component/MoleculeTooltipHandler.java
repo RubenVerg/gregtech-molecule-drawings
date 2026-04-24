@@ -51,7 +51,7 @@ public class MoleculeTooltipHandler implements GuiDraw.ITooltipLineHandler {
         return xy -> {
             var result = new Vector2f();
             new Vector2f(xy.x, xy.y).sub(xyStart, result);
-            result.mul(MolDrawConfig.INSTANCE.molecule.moleculeScale);
+            result.mul(MolDrawConfig.molecule.moleculeScale);
             return new Vector2f(
                 result.x + 8 + (atomAtLefLef ? 12 : 0) + (parenAtLef ? 6 : 0),
                 -result.y + (atomAtTopTop ? lineHeight * 3 / 2f : atomAtTop ? lineHeight / 2f : 3));
@@ -117,11 +117,11 @@ public class MoleculeTooltipHandler implements GuiDraw.ITooltipLineHandler {
 
     private Vector2f project(Vector3fc xyz, int group) {
         final var vec = new Vector3f(xyz);
-        if (MolDrawConfig.INSTANCE.molecule.spinMolecules && group >= 0
+        if (MolDrawConfig.molecule.spinMolecules && group >= 0
             && group < molecule.spinGroups()
                 .size()) {
             final var freq = 1000 / (molecule.spinGroups()
-                .getFloat(group) * MolDrawConfig.INSTANCE.molecule.spinSpeedMultiplier);
+                .getFloat(group) * MolDrawConfig.molecule.spinSpeedMultiplier);
             vec.sub(centers.get(group));
             vec.mul(
                 new Matrix3f().rotationY(System.currentTimeMillis() % (int) freq / freq * org.joml.Math.PI_TIMES_2_f));
@@ -154,7 +154,7 @@ public class MoleculeTooltipHandler implements GuiDraw.ITooltipLineHandler {
         final Vector2f diff = new Vector2f();
         bounds.second()
             .sub(bounds.first(), diff);
-        diff.mul(MolDrawConfig.INSTANCE.molecule.moleculeScale);
+        diff.mul(MolDrawConfig.molecule.moleculeScale);
         diff.ceil();
         this.xySize = new Vector2i((int) diff.x, (int) diff.y);
         this.xyStart = new Vector2f(bounds.first().x, bounds.second().y);
@@ -372,7 +372,7 @@ public class MoleculeTooltipHandler implements GuiDraw.ITooltipLineHandler {
                         .get()
                         .element().invisible ? 0 : belowWidth);
             }
-            if (MolDrawConfig.INSTANCE.debugMode) font.drawString(
+            if (MolDrawConfig.debugMode) font.drawString(
                 Integer.toString(atom.index()),
                 x + xyPosition.x - 5,
                 y + xyPosition.y - 2,
@@ -640,7 +640,7 @@ public class MoleculeTooltipHandler implements GuiDraw.ITooltipLineHandler {
             // guiGraphics.fill(cc.x, cc.y, cc.x + 1, cc.y + 1, DEBUG_COLOR);
         } else if (elem instanceof CompositeElement<?>composite) {
             IntBinaryOperator color = null;
-            if (elem instanceof BenzeneRing ring && MolDrawConfig.INSTANCE.fun.aromanticBenzene) {
+            if (elem instanceof BenzeneRing ring && MolDrawConfig.fun.aromanticBenzene) {
                 final var bounds = this.molecule.subset(ring.indices())
                     .boundsWithSize(
                         toScaledProjectedFactory(font.FONT_HEIGHT, ring.spinGroup()),
