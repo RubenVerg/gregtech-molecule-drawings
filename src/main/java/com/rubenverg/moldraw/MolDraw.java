@@ -92,9 +92,7 @@ public class MolDraw {
             }
         }
         Integer index = null;
-        MolDraw.LOGGER.info("There are {} tooltips to check: {}", event.toolTip.size(), event.toolTip);
         for (var i = 0; i < event.toolTip.size(); i++) {
-            MolDraw.LOGGER.info("Comparing {} against {}", event.toolTip.get(i), formula);
             if (event.toolTip.get(i)
                 .replaceAll("§.", "")
                 .equals(formula)) {
