@@ -19,16 +19,22 @@ import codechicken.lib.gui.GuiDraw;
 import gregtech.api.enums.Materials;
 import gregtech.api.interfaces.IOreMaterial;
 import gtPlusPlus.core.material.Material;
+import gtPlusPlus.core.material.MaterialsAlloy;
 
 public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
 
+    private static long mass(IOreMaterial material) {
+        if (material instanceof Materials gt) return gt.getMass() == 0 ? 1 : gt.getMass();
+        if (material instanceof Werkstoff bw) return bw.getStats()
+            .getMass() == 0 ? 1
+                : bw.getStats()
+                    .getMass();
+        if (material instanceof Material pp) return pp.getMass() == 0 ? 1 : pp.getMass();
+        return 1;
+    }
+
     private static long maybeMultiplyByMass(IOreMaterial material, long count) {
-        if (!MolDrawConfig.alloy.partsByMass) return count;
-        if (material instanceof Materials gt) return count * gt.getMass();
-        if (material instanceof Werkstoff bw) return count * bw.getStats()
-            .getMass();
-        if (material instanceof gtPlusPlus.core.material.Material pp) return count * pp.getMass();
-        return count;
+        return MolDrawConfig.alloy.partsByMass ? count * mass(material) : count;
     }
 
     private static List<Pair<IOreMaterial, Long>> maybeMultiplyByMass(List<Pair<IOreMaterial, Long>> rawComponents) {
@@ -53,14 +59,18 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
         if (Objects.isNull(materialComponents) || materialComponents.isEmpty())
             return List.of(new Pair<>(material, 1L));
         final var normalizedComponents = materialComponents.stream().map(pair -> new Pair<>(switch (pair.first()) {
-            case Werkstoff bw -> bw.getBridgeMaterial();
+            case Material pp when pp == MaterialsAlloy.TUNGSTENSTEEL -> Materials.TungstenSteel;
             case Material pp when Objects.nonNull(pp.getGTMaterial()) -> pp.getGTMaterial();
             case IOreMaterial other -> other;
         }, pair.second())).toList();
         final Map<IOreMaterial, Pair<Long, Long>> collectedComponents = new HashMap<>();
         for (final var c : normalizedComponents) {
             if (MolDrawConfig.alloy.recursive) {
-                final var innerComponents = deriveComponents(c.first());
+                final var innerComponents = deriveComponents(c.first()).stream().map(pair -> new Pair<>(switch (pair.first()) {
+                    case Werkstoff bw -> bw.getBridgeMaterial();
+                    case Material pp when Objects.nonNull(pp.getGTMaterial()) -> pp.getGTMaterial();
+                    case IOreMaterial other -> other;
+                }, pair.second())).toList();
                 final var innerTotal = innerComponents.stream().map(Pair::second).reduce(0L, Long::sum);
                 for (final var inner : innerComponents) {
                     collectedComponents.compute(inner.first(),
@@ -89,7 +99,7 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
 
     public static List<Pair<IOreMaterial, Long>> deriveComponents(IOreMaterial material) {
         // Intentionally not using `computeIfAbsent` since the recursive calls will cause concurrent modification
-        if (!COMPONENTS_CACHE.containsKey(material)) {
+        if (true || !COMPONENTS_CACHE.containsKey(material)) {
             COMPONENTS_CACHE.put(material, doDeriveComponents(material));
         }
         return COMPONENTS_CACHE.get(material);

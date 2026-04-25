@@ -395,7 +395,7 @@ public class Molecules {
                 .bond(1, 2)
                 .bond(2, 3));
         molecules.put(
-            WerkstoffLoader.FormicAcid.getBridgeMaterial(),
+            WerkstoffLoader.FormicAcid,
             new Molecule().uv()
                 .atom(Element.O, 0, 0)
                 .invAtom(-1, 1)
@@ -1052,7 +1052,7 @@ public class Molecules {
                 .bond(1, 2)
                 .bond(2, 0));
         molecules.put(
-            WerkstoffMaterialPool.Butanediol.getBridgeMaterial(),
+            WerkstoffMaterialPool.Butanediol,
             new Molecule().uv()
                 .atom(Element.O.one(), null, null, null, Element.H.one(), 0, 0)
                 .invAtom(1, 0)
@@ -1066,7 +1066,7 @@ public class Molecules {
                 .bond(3, 4)
                 .bond(4, 5));
         molecules.put(
-            GGMaterial.ferrocene.getBridgeMaterial(),
+            GGMaterial.ferrocene,
             new Molecule().xy()
                 .invAtom(0, 0.5f)
                 .invAtom(0.85f, 0)
@@ -1148,7 +1148,7 @@ public class Molecules {
                 .bond(0, 2)
                 .bond(0, 3));
         molecules.put(
-            GGMaterial.oxalate.getBridgeMaterial(),
+            GGMaterial.oxalate,
             new Molecule().uv()
                 .invAtom(0, 0)
                 .invAtom(1, 0)
@@ -1167,6 +1167,250 @@ public class Molecules {
                 .invAtom(0, 0)
                 .atom(Element.N.one(), null, Element.H.count(2), null, null, 1, 0)
                 .bond(0, 1));
+        molecules.put(
+            Materials.Ethenone,
+            new Molecule().uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, 1, 1)
+                .bond(0, 1, true, Bond.DOUBLE)
+                .bond(1, 2, true, Bond.DOUBLE));
+        molecules.put(
+            Materials.DimethylTerephthalate,
+            new Molecule().uv()
+                .ring(0, 0, -1, 1)
+                .invAtom(2, -1)
+                .atom(Element.O, 2, -2)
+                .atom(Element.O, 3, -1)
+                .invAtom(3, 0)
+                .invAtom(-2, 3)
+                .atom(Element.O, -2, 4)
+                .atom(Element.O, -3, 3)
+                .invAtom(-3, 2)
+                .bond(5, 6)
+                .bond(6, 7, true, Bond.DOUBLE)
+                .bond(6, 8)
+                .bond(8, 9)
+                .bond(2, 10)
+                .bond(10, 11, true, Bond.DOUBLE)
+                .bond(10, 12)
+                .bond(12, 13));
+        {
+            final var kevlar = new Molecule().uv()
+                .invAtom(0, 0)
+                .atom(Element.N.one(), null, null, Element.H.one(), null, 0, 1)
+                .ring(2, 0, 1, 1)
+                .atom(Element.N.one(), Element.H.one(), null, null, null, 4, 1)
+                .invAtom(4, 2)
+                .atom(Element.O, 3, 3)
+                .ring(6, 1, 5, 2)
+                .invAtom(8, 2)
+                .atom(Element.O, 9, 1)
+                .invAtom(8, 3)
+                .bond(0, 1)
+                .bond(1, 3)
+                .bond(6, 8)
+                .bond(8, 9)
+                .bond(9, 10, true, Bond.DOUBLE)
+                .bond(9, 12)
+                .bond(15, 17)
+                .bond(17, 18, true, Bond.DOUBLE)
+                .bond(17, 19)
+                .add(Parens.polymer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+            molecules.put(Materials.Kevlar, kevlar);
+            molecules.put(Materials.LiquidCrystalKevlar, kevlar);
+        }
+        molecules.put(
+            Materials.GammaButyrolactone,
+            new Molecule().xy()
+                .invAtom(-0.5f, 0)
+                .invAtom(0.5f, 0)
+                .invAtom(-0.5f - MathUtils.SIN18f, MathUtils.COS18f)
+                .invAtom(0.5f + MathUtils.SIN18f, MathUtils.COS18f)
+                .atom(Element.O, 0, MathUtils.COS18f + MathUtils.COS54f)
+                .atom(Element.O, 0.5f + MathUtils.SIN18f + MathUtils.COS18f, MathUtils.COS18f + MathUtils.SIN18f)
+                .bond(0, 1)
+                .bond(1, 3)
+                .bond(3, 4)
+                .bond(4, 2)
+                .bond(2, 0)
+                .bond(3, 5, true, Bond.DOUBLE));
+        molecules.put(
+            Materials.NMethylIIPyrrolidone,
+            new Molecule().xy()
+                .invAtom(-0.5f, 0)
+                .invAtom(0.5f, 0)
+                .invAtom(-0.5f - MathUtils.SIN18f, MathUtils.COS18f)
+                .invAtom(0.5f + MathUtils.SIN18f, MathUtils.COS18f)
+                .atom(Element.N, 0, MathUtils.COS18f + MathUtils.COS54f)
+                .atom(Element.O, 0.5f + MathUtils.SIN18f + MathUtils.COS18f, MathUtils.COS18f + MathUtils.SIN18f)
+                .invAtom(0, MathUtils.COS18f + MathUtils.COS54f + 1)
+                .bond(0, 1)
+                .bond(1, 3)
+                .bond(3, 4)
+                .bond(4, 2)
+                .bond(2, 0)
+                .bond(3, 5, true, Bond.DOUBLE)
+                .bond(4, 6));
+        molecules.put(
+            Materials.Acetaldehyde,
+            new Molecule().uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, 1, 1)
+                .bond(0, 1)
+                .bond(1, 2, true, Bond.DOUBLE));
+        molecules.put(
+            Materials.Isobutyraldehyde,
+            new Molecule().uv()
+                .invAtom(0, 0)
+                .invAtom(0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 1, 2)
+                .invAtom(-1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, true, Bond.DOUBLE)
+                .bond(1, 4));
+        molecules.put(
+            Materials.DiphenylmethaneDiisocyanate,
+            new Molecule().uv()
+                .atom(Element.N, 0, 0) // 0
+                .ring(2, -1, 1, 0)
+                .bond(0, 2)
+                .invAtom(4, 0) // 7
+                .skipAnAtom() // 8
+                .skipAnAtom() // 9
+                .bond(5, 7)
+                .ring(4, 1, 3, 2)
+                .atom(Element.N, 4, 4) // 16
+                .bond(7, 10)
+                .bond(13, 16)
+                .atom(Element.C, 0, -1)
+                .atom(Element.O, 0, -2)
+                .bond(0, 17, true, Bond.DOUBLE)
+                .bond(17, 18, true, Bond.DOUBLE)
+                .atom(Element.C, 5, 4)
+                .atom(Element.O, 6, 4)
+                .bond(16, 19, true, Bond.DOUBLE)
+                .bond(19, 20, true, Bond.DOUBLE));
+        molecules.put(
+            MaterialMisc.CHLOROACETIC_ACID,
+            new Molecule().uv()
+                .atom(Element.Cl, 0, 0)
+                .invAtom(0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 2, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, true, Bond.DOUBLE)
+                .bond(2, 4));
+        molecules.put(
+            MaterialMisc.DICHLOROACETIC_ACID,
+            new Molecule().uv()
+                .atom(Element.Cl, 0, 0)
+                .invAtom(0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 2, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 2)
+                .atom(Element.Cl, -1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, true, Bond.DOUBLE)
+                .bond(2, 4)
+                .bond(1, 5));
+        molecules.put(
+            MaterialMisc.TRICHLOROACETIC_ACID,
+            new Molecule().uv()
+                .atom(Element.Cl, 0, 0)
+                .invAtom(0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 2, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 2)
+                .atom(Element.Cl, -1, 2)
+                .atom(Element.Cl, -1, 1)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, true, Bond.DOUBLE)
+                .bond(2, 4)
+                .bond(1, 5)
+                .bond(1, 6));
+        molecules.put(
+            WerkstoffLoader.Sodiumformate,
+            new Molecule().uv()
+                .xy()
+                .skipAnAtom() // 0
+                .skipAnAtom() // 1
+                .skipAnAtom() // 2
+                .atom(Element.Na.posIon(), 1, 0) // 3
+                .skipAnAtom() // 4
+                .atom(Element.H, 2, 0) // 5
+                .atom(Element.C, 3, 0) // 6
+                .atom(Element.O, 3.5f, MathUtils.COS30f) // 7
+                .atom(Element.O, 3.5f, -MathUtils.COS30f) // 8
+                .bond(5, 6)
+                .bond(7, 6, Bond.Line.SOLID, Bond.Line.DOTTED)
+                .bond(6, 8, Bond.Line.SOLID, Bond.Line.DOTTED)
+                .add(Parens.negIon(5, 6, 7, 8)));
+        molecules.put(
+            GGMaterial.ether,
+            new Molecule().uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, 1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4));
+        molecules.put(
+            GGMaterial.towEthyl1Hexanol,
+            new Molecule().uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .invAtom(3, 2)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 3)
+                .invAtom(1, 3)
+                .invAtom(0, 3)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 6)
+                .bond(4, 7)
+                .bond(7, 8));
+        molecules.put(
+            GGMaterial.cyclopentadiene,
+            new Molecule().xy()
+                .invAtom(-0.5f, 0)
+                .invAtom(0.5f, 0)
+                .invAtom(-0.5f - MathUtils.SIN18f, MathUtils.COS18f)
+                .invAtom(0.5f + MathUtils.SIN18f, MathUtils.COS18f)
+                .invAtom(0, MathUtils.COS18f + MathUtils.COS54f)
+                .bond(0, 1)
+                .bond(1, 3, Bond.DOUBLE)
+                .bond(3, 4)
+                .bond(4, 2)
+                .bond(2, 0, Bond.DOUBLE));
+        molecules.put(
+            WerkstoffMaterialPool.Tetrahydrofuran,
+            new Molecule().xy()
+                .invAtom(-0.5f, 0)
+                .invAtom(0.5f, 0)
+                .invAtom(-0.5f - MathUtils.SIN18f, MathUtils.COS18f)
+                .invAtom(0.5f + MathUtils.SIN18f, MathUtils.COS18f)
+                .atom(Element.O, 0, MathUtils.COS18f + MathUtils.COS54f)
+                .bond(0, 1)
+                .bond(1, 3)
+                .bond(3, 4)
+                .bond(4, 2)
+                .bond(2, 0));
         return molecules;
     }
 
@@ -1393,6 +1637,48 @@ public class Molecules {
                 .bond(5, 0)
                 .atom(Element.O, 2, -1)
                 .bond(5, 6, true, Bond.DOUBLE));
+        molecules.put(
+            GTPPFluids.PropionicAcid,
+            new Molecule().uv()
+                .invAtom(0, 0)
+                .invAtom(0, 1)
+                .invAtom(1, 1)
+                .atom(Element.O, 2, 0)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3, true, Bond.DOUBLE)
+                .bond(2, 4));
+        molecules.put(
+            GTPPFluids.Cadaverine,
+            new Molecule().uv()
+                .atom(Element.N.one(), null, null, null, Element.H.count(2), 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .invAtom(3, 2)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 3, 3)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5)
+                .bond(5, 6));
+        molecules.put(
+            GTPPFluids.Putrescine,
+            new Molecule().uv()
+                .atom(Element.N.one(), null, null, null, Element.H.count(2), 0, 0)
+                .invAtom(1, 0)
+                .invAtom(1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 3, 2)
+                .bond(0, 1)
+                .bond(1, 2)
+                .bond(2, 3)
+                .bond(3, 4)
+                .bond(4, 5));
         return molecules;
     }
 }
