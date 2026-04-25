@@ -1,12 +1,7 @@
 package com.rubenverg.moldraw;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.gtnewhorizon.gtnhlib.config.Config;
 
-import akka.japi.Pair;
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.GuiConfigEntries;
 import cpw.mods.fml.client.config.IConfigElement;
@@ -69,17 +64,81 @@ public class MolDrawConfig {
             }
         }
 
-        public static class AromaticModeEntry extends GuiConfigEntries.SelectValueEntry {
+        public static class AromaticModeEntry extends GuiConfigEntries.ButtonEntry {
+
+            protected final AromaticMode beforeValue;
+            protected AromaticMode currentValue;
 
             public AromaticModeEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList,
                 IConfigElement<String> configElement) {
-                super(owningScreen, owningEntryList, configElement, getSelectableValues());
+                super(owningScreen, owningEntryList, configElement);
+                this.beforeValue = AromaticMode.valueOf(
+                    configElement.get()
+                        .toString());
+                this.currentValue = beforeValue;
+                this.btnValue.enabled = enabled();
+                updateValueButtonText();
             }
 
-            private static Map<Object, String> getSelectableValues() {
-                return Arrays.stream(AromaticMode.values())
-                    .map(mode -> new Pair<>(mode, mode.toString()))
-                    .collect(Collectors.toMap(Pair::first, Pair::second));
+            @Override
+            public void updateValueButtonText() {
+                this.btnValue.displayString = currentValue.toString();
+            }
+
+            @Override
+            public void valueButtonPressed(int slotIndex) {
+                if (enabled())
+                    currentValue = AromaticMode.values()[(currentValue.ordinal() + 1) % AromaticMode.values().length];
+            }
+
+            @Override
+            public boolean isDefault() {
+                return currentValue == AromaticMode.valueOf(
+                    configElement.getDefault()
+                        .toString());
+            }
+
+            @Override
+            public void setToDefault() {
+                if (enabled()) {
+                    currentValue = AromaticMode.valueOf(
+                        configElement.getDefault()
+                            .toString());
+                    updateValueButtonText();
+                }
+            }
+
+            @Override
+            public boolean isChanged() {
+                return currentValue != beforeValue;
+            }
+
+            @Override
+            public void undoChanges() {
+                if (enabled()) {
+                    currentValue = beforeValue;
+                    updateValueButtonText();
+                }
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public boolean saveConfigElement() {
+                if (enabled() && isChanged()) {
+                    ((IConfigElement<String>) configElement).set(currentValue.name());
+                    return configElement.requiresMcRestart();
+                }
+                return false;
+            }
+
+            @Override
+            public AromaticMode getCurrentValue() {
+                return currentValue;
+            }
+
+            @Override
+            public Object[] getCurrentValues() {
+                return new AromaticMode[] { currentValue };
             }
         }
 
