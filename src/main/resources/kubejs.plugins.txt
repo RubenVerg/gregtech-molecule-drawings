@@ -1,0 +1,1 @@
+com.rubenverg.moldraw.kubejs.MolDrawKJSPlugin

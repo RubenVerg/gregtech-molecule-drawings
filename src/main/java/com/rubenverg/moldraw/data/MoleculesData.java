@@ -794,17 +794,21 @@ public class MoleculesData {
                 .atom(Element.N.one(), null, Element.H.count(2), null, null, -2, 3)
                 .bond(5, 6)
                 .bond(2, 7));
-        molecules.put(GTCEu.id("butanol"), new Molecule()
-                .uv()
-                .invAtom(0, 0)
-                .invAtom(1, 0)
-                .invAtom(1, 1)
-                .invAtom(2, 1)
-                .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 2)
-                .bond(0, 1)
-                .bond(1, 2)
-                .bond(2, 3)
-                .bond(3, 4));
+        {
+            final var butanol = new Molecule()
+                    .uv()
+                    .invAtom(0, 0)
+                    .invAtom(1, 0)
+                    .invAtom(1, 1)
+                    .invAtom(2, 1)
+                    .atom(Element.O.one(), null, Element.H.one(), null, null, 2, 2)
+                    .bond(0, 1)
+                    .bond(1, 2)
+                    .bond(2, 3)
+                    .bond(3, 4);
+            molecules.put(GTCEu.id("butanol"), butanol);
+            molecules.put(GTCEu.id("n-butanol"), butanol);
+        }
         molecules.put(GTCEu.id("tributyl_phosphate"), new Molecule()
                 .uv()
                 .invAtom(0, 0) // 0
@@ -3082,6 +3086,59 @@ public class MoleculesData {
                 .bond(0, 1)
                 .bond(1, 2)
                 .bond(1, 3, true, Bond.DOUBLE));
+        molecules.put(GTCEu.id("oxalic_acid"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .invAtom(1, 0)
+                .atom(Element.O, -1, 1)
+                .atom(Element.O, 2, -1)
+                .atom(Element.O.one(), null, null, null, Element.H.one(), 0, -1)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 1, 1)
+                .bond(0, 1)
+                .bond(0, 4)
+                .bond(1, 5)
+                .bond(0, 2, true, Bond.DOUBLE)
+                .bond(1, 3, true, Bond.DOUBLE));
+        molecules.put(GTCEu.id("methylamine"), new Molecule()
+                .uv()
+                .invAtom(0, 0)
+                .atom(Element.N.one(), null, Element.H.count(2), null, null, 1, 0)
+                .bond(0, 1));
+        molecules.put(GTCEu.id("phenylacetic_acid"), new Molecule()
+                .uv()
+                .ring(0, 0, -1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .atom(Element.O, 1, 3)
+                .atom(Element.O.one(), null, Element.H.one(), null, null, 3, 2)
+                .bond(4, 6)
+                .bond(6, 7)
+                .bond(7, 8, true, Bond.DOUBLE)
+                .bond(7, 9));
+        molecules.put(GTCEu.id("phenylacetone"), new Molecule()
+                .uv()
+                .ring(0, 0, -1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .atom(Element.O, 1, 3)
+                .invAtom(3, 2)
+                .bond(4, 6)
+                .bond(6, 7)
+                .bond(7, 8, true, Bond.DOUBLE)
+                .bond(7, 9));
+        molecules.put(GTCEu.id("crystal_methamphetamine"), new Molecule()
+                .uv()
+                .ring(0, 0, -1, 1)
+                .invAtom(2, 1)
+                .invAtom(2, 2)
+                .invAtom(1, 3)
+                .atom(Element.N.one(), Element.H.one(), null, null, null, 3, 2)
+                .invAtom(3, 3)
+                .bond(4, 6)
+                .bond(6, 7)
+                .bond(7, 8)
+                .bond(7, 9)
+                .bond(9, 10));
         return molecules;
     }
 }
