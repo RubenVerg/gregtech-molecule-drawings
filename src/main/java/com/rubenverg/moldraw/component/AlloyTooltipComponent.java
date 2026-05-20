@@ -9,14 +9,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import com.google.common.collect.Streams;
 import com.google.common.math.LongMath;
 import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeColorize;
+import org.joml.Matrix4f;
 import org.joml.Vector2i;
+import org.w3c.dom.Text;
 import oshi.util.tuples.Pair;
 
 import java.util.*;
@@ -188,33 +193,91 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 }
                 return MoleculeColorize.colorForMaterial(stops.get(stops.size() - 1).getB());
             };
-
+            guiGraphics.pose().pushPose();
             GraphicalUtils.plotCircle(xm, ym, MolDrawConfig.INSTANCE.alloy.pieChartRadius, GraphicalUtils::alwaysDraw,
                     sc, guiGraphics);
-
+            guiGraphics.pose().popPose();
             final IntBinaryOperator white = (_xp, _yp) -> 0xffffffff;
-
+            List<LineRenderInformation> LineRenders = new ArrayList<>();
             for (int i = 0; i < components.size(); i++) {
-                final var count = components.get(i).getB();
-                final var material = components.get(i).getA();
                 final var center = centers.get(i).getA();
                 final var textStart = textStarts.get(i).getA();
                 final var topY = ym + textStart.y;
                 final var centerY = topY + font.lineHeight / 2;
-                final var startX = xm + textStart.x;
+
                 final var cx = xm + (int) (Math.sin(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
                 final var cy = ym - (int) (Math.cos(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
                 final var left = center > Math.PI;
                 final var ex = xm + (left ? -1 : 1) * (MolDrawConfig.INSTANCE.alloy.pieChartRadius + 10);
+                LineRenders.add(new LineRenderInformation(cx,cy,cx,centerY));
+                LineRenders.add(new LineRenderInformation(cx, centerY, ex, centerY));
+            }
+            guiGraphics.pose().pushPose();
+            for (LineRenderInformation info: LineRenders)
+            {
+                GraphicalUtils.plotLine(info.x, info.y, info.z, info.center, GraphicalUtils::alwaysDraw, white, guiGraphics);
+            }
+            guiGraphics.pose().popPose();
+        }
+
+
+        @Override
+        public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource)
+        {
+            final int xm = BASE_WIDTH / 2 + addLeft + mouseX, ym = baseHeight / 2 + addTop + mouseY;
+            List<TextRenderInfo> TextRenders = new ArrayList<>();
+            for (int i = 0; i < components.size(); i++) {
+                final var count = components.get(i).getB();
+                final var material = components.get(i).getA();
+                final var textStart = textStarts.get(i).getA();
+                final var topY = ym + textStart.y;
+                final var startX = xm + textStart.x;
                 final var percentage = count * 100d / total;
                 final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
                 final var text = Component.literal(percentageString + " ")
                         .append(MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true));
-
-                GraphicalUtils.plotLine(cx, cy, cx, centerY, GraphicalUtils::alwaysDraw, white, guiGraphics);
-                GraphicalUtils.plotLine(cx, centerY, ex, centerY, GraphicalUtils::alwaysDraw, white, guiGraphics);
-                guiGraphics.drawString(font, text, startX, topY, 0xffffffff);
+                TextRenders.add(new TextRenderInfo(text,startX,topY));
+                //guiGraphics.drawString(font, text, startX, topY, 0xffffffff);
             }
+
+            for (TextRenderInfo info: TextRenders)
+            {
+                font.drawInBatch(info.component, info.x, info.y, 0xffffffff,true,matrix,bufferSource, Font.DisplayMode.NORMAL,0, LightTexture.FULL_BRIGHT);
+            }
+
         }
     }
+
+
+    private static class LineRenderInformation {
+
+        int x; int y; int z; int center;
+        LineRenderInformation(int x, int y , int z, int center)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.center = center;
+
+        }
+
+    }
+
+    private static class TextRenderInfo
+    {
+        MutableComponent component;
+        int x;
+        int y;
+
+        TextRenderInfo(MutableComponent component, int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+            this.component = component;
+
+        }
+
+    }
+
+
 }
