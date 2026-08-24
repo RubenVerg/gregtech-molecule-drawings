@@ -13,23 +13,22 @@ import oshi.util.tuples.Pair;
 
 import java.util.*;
 
-@SuppressWarnings("removal")
 public class AlloysData {
 
     private static ResourceLocation tfg(String path) {
-        return new ResourceLocation("tfg", path);
+        return ResourceLocation.fromNamespaceAndPath("tfg", path);
     }
 
     private static ResourceLocation cosmiccore(String path) {
-        return new ResourceLocation("cosmiccore", path);
+        return ResourceLocation.fromNamespaceAndPath("cosmiccore", path);
     }
 
     private static ResourceLocation gtca(String path) {
-        return new ResourceLocation("gtca", path);
+        return ResourceLocation.fromNamespaceAndPath("gtca", path);
     }
 
     private static ResourceLocation gcyr(String path) {
-        return new ResourceLocation("gcyr", path);
+        return ResourceLocation.fromNamespaceAndPath("gcyr", path);
     }
 
     public static Map<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> alloys() {

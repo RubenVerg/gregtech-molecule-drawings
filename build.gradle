@@ -1,18 +1,8 @@
-buildscript {
-    repositories {
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
 plugins {
     id "idea"
     id "eclipse"
     id "maven-publish"
-    id 'net.neoforged.moddev.legacyforge' version '2.0.91'
+    id 'net.neoforged.moddev' version '2.0.144'
     id 'com.diffplug.spotless' version '7.0.2'
 }
 
@@ -33,11 +23,10 @@ repositories {
         }
     }
     maven {
-        name 'FirstDarkDev'
-        url "https://maven.firstdarkdev.xyz/snapshots/"
+        url = "https://repo.repsy.io/mvn/toma/public"
     }
     maven { // Registrate
-        url = "https://maven.tterrag.com/"
+        url = "https://mvn.devos.one/snapshots/"
         content {
             // need to be specific here due to version overlaps
             includeGroup("com.tterrag.registrate")
@@ -52,10 +41,9 @@ repositories {
         url = "https://maven.theillusivec4.top/"
     }
     maven {
-        // Curse Forge File
-        url "https://cursemaven.com/"
+        url "https://api.modrinth.com/maven/"
         content {
-            includeGroup "curse.maven"
+            includeGroup "maven.modrinth"
         }
     }
     maven {
@@ -73,20 +61,22 @@ repositories {
         url "https://maven.latvian.dev/releases"
         content {
             includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
         }
     }
+    maven { url 'https://jitpack.io' }
 }
 
 version = mod_version
 group = maven_group
 base { archivesName = archives_base_name }
 java {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
 }
 
-legacyForge {
-    version = project.minecraft_version + '-' + project.forge_version
+neoForge {
+    version = project.neo_version
 
     parchment {
         mappingsVersion = project.mapping_version
@@ -153,39 +143,29 @@ dependencies {
     // Mixin
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor')
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
-
     // JEI, EMI, Jade
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-    modImplementation("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
-    modRuntimeOnly("curse.maven:jade-324717:5390389")
-    modImplementation("dev.emi:emi-forge:${emi_version}+${minecraft_version}")
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    implementation("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+    runtimeOnly("maven.modrinth:jade:15.10.0+neoforge")
+    implementation("dev.emi:emi-neoforge:${emi_version}+${minecraft_version}")
 
     // GregTech and dependencies
-    modImplementation("com.gregtechceu.gtceu:gtceu-${minecraft_version}:${gtceu_version}:slim") { transitive = false }
-    modImplementation("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:${ldlib_version}") { transitive = false }
-    modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
-    modImplementation("dev.toma.configuration:configuration-forge-${minecraft_version}:${configuration_version}")
+    implementation("com.gregtechceu.gtceu:gtceu-${minecraft_version}:${gtceu_version}") { transitive = false }
+    implementation("com.tterrag.registrate:Registrate:${registrate_version}")
+    implementation("dev.toma.configuration:configuration-${minecraft_version}:${configuration_version}-neoforge")
 
     // lombok
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     // kubejs
-    modCompileOnly("dev.latvian.mods:rhino-forge:${rhino_version}")
-    modCompileOnly("dev.latvian.mods:kubejs-forge:${kubejs_version}")
+    compileOnly("dev.latvian.mods:rhino:${rhino_version}")
+    compileOnly("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
 
-    // modRuntimeOnly("dev.architectury:architectury-forge:${architectury_version}")
-    // modRuntimeOnly("dev.latvian.mods:rhino-forge:${rhino_version}")
-    // modRuntimeOnly("dev.latvian.mods:kubejs-forge:${kubejs_version}")
-}
-
-// See com.example.examplemod.mixin.DummyMixin for information about mixins
-mixin {
-    add sourceSets.main, "mixins.${mod_id}.refmap.json"
-    config "${mod_id}.mixins.json"
+    // runtimeOnly("dev.architectury:architectury-neoforge:${architectury_version}")
+    // runtimeOnly("dev.latvian.mods:rhino:${rhino_version}")
+    // runtimeOnly("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -196,26 +176,25 @@ tasks.named('processResources', ProcessResources).configure {
             "mod_name": mod_name,
             "mod_url": mod_url,
             "mod_author": mod_author,
-            "forge_version": forge_version.split("\\.")[0], // only specify major version of forge
+            "neo_version": neo_version,
             "minecraft_version": minecraft_version,
             "gtceu_version": gtceu_version,
             "configuration_version": configuration_version,
     ]
     inputs.properties(properties)
 
-    filesMatching("META-INF/mods.toml") {
+    filesMatching("META-INF/neoforge.mods.toml") {
         expand properties + [project: project]
     }
 }
 
-tasks.named('jar', Jar).configure { finalizedBy 'reobfJar' }
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly
     // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
     // If Javadoc is generated, this must be specified in that task too.
     options.encoding = "UTF-8"
-    options.release.set(17)
+    options.release.set(21)
     options.compilerArgs << "-Aquiet=true" // Suppress mixin notes
 }
 
@@ -233,5 +212,12 @@ publishing {
                 }
             }
         }
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
 }

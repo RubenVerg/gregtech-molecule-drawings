@@ -6,7 +6,7 @@ import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ClientTextTooltip.class)
+@Mixin(value = ClientTextTooltip.class, remap = false)
 public interface ClientTextTooltipMixin {
 
     @Accessor

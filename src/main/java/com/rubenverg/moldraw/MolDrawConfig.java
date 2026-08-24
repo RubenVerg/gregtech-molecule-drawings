@@ -2,10 +2,10 @@ package com.rubenverg.moldraw;
 
 import com.rubenverg.moldraw.component.AlloyTooltipComponent;
 import dev.toma.configuration.Configuration;
-import dev.toma.configuration.client.IValidationHandler;
 import dev.toma.configuration.config.Config;
 import dev.toma.configuration.config.Configurable;
 import dev.toma.configuration.config.format.ConfigFormats;
+import dev.toma.configuration.config.validate.IValidationResult;
 
 @Config(id = MolDraw.MOD_ID)
 public class MolDrawConfig {
@@ -16,7 +16,13 @@ public class MolDrawConfig {
     public static void init() {
         synchronized (LOCK) {
             if (INSTANCE == null) {
-                INSTANCE = Configuration.registerConfig(MolDrawConfig.class, ConfigFormats.yaml()).getConfigInstance();
+                final var holder = Configuration.registerConfig(MolDrawConfig.class, ConfigFormats.YAML);
+                holder.getConfigValue("alloy.recursive", Boolean.class).orElseThrow().addValidator((_v, _x) -> {
+                    // This is really dumb, but I can't find a better way
+                    AlloyTooltipComponent.invalidateComponentsCache();
+                    return IValidationResult.success();
+                });
+                INSTANCE = holder.getConfigInstance();
             }
         }
     }
@@ -96,17 +102,10 @@ public class MolDrawConfig {
         public int pieChartRadius = 32;
 
         @Configurable
-        @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
         public boolean recursive = true;
 
         @Configurable
-        @Configurable.ValueUpdateCallback(method = "invalidateAlloyCache")
         public boolean partsByMass = true;
-
-        @SuppressWarnings("unused")
-        private void invalidateAlloyCache(boolean value, IValidationHandler handler) {
-            AlloyTooltipComponent.invalidateComponentsCache();
-        }
     }
 
     @Configurable

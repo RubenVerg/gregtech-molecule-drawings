@@ -3,14 +3,14 @@ package com.rubenverg.moldraw.kubejs;
 import net.minecraft.resources.ResourceLocation;
 
 import com.rubenverg.moldraw.molecule.Molecule;
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import lombok.experimental.Delegate;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class MolDrawMoleculesJS extends EventJS {
+public class MolDrawMoleculesJS implements KubeEvent {
 
     @HideFromJS
     private final BiConsumer<ResourceLocation, Molecule> consumer;

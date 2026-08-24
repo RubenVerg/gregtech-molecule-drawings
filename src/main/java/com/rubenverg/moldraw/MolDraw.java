@@ -1,9 +1,9 @@
 package com.rubenverg.moldraw;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -18,18 +18,17 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BucketItem;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import com.google.common.hash.HashCode;
 import com.google.gson.Gson;
@@ -42,6 +41,7 @@ import com.rubenverg.moldraw.component.MoleculeTooltipComponent;
 import com.rubenverg.moldraw.data.AlloysData;
 import com.rubenverg.moldraw.data.MoleculesData;
 import com.rubenverg.moldraw.molecule.*;
+import com.tterrag.registrate.util.RegistrateDistExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +56,7 @@ import java.util.stream.IntStream;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@Mod(MolDraw.MOD_ID)
+@Mod(value = MolDraw.MOD_ID, dist = Dist.CLIENT)
 @SuppressWarnings("removal")
 public class MolDraw {
 
@@ -64,15 +64,15 @@ public class MolDraw {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public MolDraw() {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        RegistrateDistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            IEventBus modEventBus = Objects.requireNonNull(ModLoadingContext.get().getActiveContainer().getEventBus());
 
             modEventBus.addListener(this::modConstruct);
             modEventBus.addListener(this::gatherData);
             modEventBus.addListener(this::registerClientTooltipComponents);
             modEventBus.addListener(this::registerClientReloadListeners);
 
-            MinecraftForge.EVENT_BUS.addListener(this::tooltipGatherComponents);
+            NeoForge.EVENT_BUS.addListener(this::tooltipGatherComponents);
         });
     }
 
@@ -178,7 +178,7 @@ public class MolDraw {
                                 .listResources("molecules", path -> path.toString().endsWith(".json")).keySet()) {
                             try (final var stream = resourceManager.open(id)) {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-                                final var material = GTCEuAPI.materialManager
+                                final var material = GTRegistries.MATERIALS
                                         .getMaterial(id.toString().replace(".json", "").replace("molecules/", ""));
                                 if (Objects.isNull(material)) {
                                     continue;
@@ -214,7 +214,7 @@ public class MolDraw {
                                 .listResources("alloys", path -> path.toString().endsWith(".json")).keySet()) {
                             try (final var stream = resourceManager.open(id)) {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-                                final var material = GTCEuAPI.materialManager
+                                final var material = GTRegistries.MATERIALS
                                         .getMaterial(id.toString().replace(".json", "").replace("alloys/", ""));
                                 if (Objects.isNull(material)) {
                                     continue;
@@ -224,7 +224,7 @@ public class MolDraw {
                                     alloys.put(material, Optional.empty());
                                 } else {
                                     alloys.put(material, Optional.of(alloy.get().stream().map(pair -> {
-                                        final var subMat = GTCEuAPI.materialManager.getMaterial(pair.getA().toString());
+                                        final var subMat = GTRegistries.MATERIALS.getMaterial(pair.getA().toString());
                                         if (Objects.isNull(subMat) || subMat.isNull()) throw new RuntimeException(
                                                 "Alloy JSON contains a material that doesn't exist");
                                         return new Pair<>(subMat, pair.getB());
@@ -269,6 +269,13 @@ public class MolDraw {
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static void tryColorizeFormulaComponents(Material material, OptionalInt idx,
+                                                    List<Component> tooltipElements) {
+        tryColorizeFormula(material, idx,
+                tooltipElements.stream().map(Either::<FormattedText, TooltipComponent>left).toList());
+    }
+
     @SubscribeEvent
     public void tooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
         if (!MolDrawConfig.INSTANCE.enabled) return;
@@ -277,7 +284,7 @@ public class MolDraw {
 
         Material material;
         if (event.getItemStack().getItem() instanceof BucketItem bi) {
-            material = ChemicalHelper.getMaterial(bi.getFluid());
+            material = ChemicalHelper.getMaterial(bi.content);
         } else {
             final var materialStack = ChemicalHelper.getMaterialEntry(event.getItemStack().getItem());
             if (materialStack.isEmpty()) return;

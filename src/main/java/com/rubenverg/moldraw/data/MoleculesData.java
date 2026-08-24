@@ -13,19 +13,18 @@ import org.joml.Matrix4x3f;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("removal")
 public class MoleculesData {
 
     private static ResourceLocation gtca(String path) {
-        return new ResourceLocation("gtca", path);
+        return ResourceLocation.fromNamespaceAndPath("gtca", path);
     }
 
     private static ResourceLocation gcyr(String path) {
-        return new ResourceLocation("gcyr", path);
+        return ResourceLocation.fromNamespaceAndPath("gcyr", path);
     }
 
     private static ResourceLocation tfg(String path) {
-        return new ResourceLocation("tfg", path);
+        return ResourceLocation.fromNamespaceAndPath("tfg", path);
     }
 
     public static Map<ResourceLocation, Molecule> molecules() {

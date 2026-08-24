@@ -1,7 +1,7 @@
 package com.rubenverg.moldraw.molecule;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
 import com.google.gson.*;
@@ -245,7 +245,7 @@ public class Element {
                 if (obj.has("color")) return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean(),
                         jsonDeserializationContext.deserialize(obj.get("color"), Element.Color.class),
-                        obj.has("material") ? GTCEuAPI.materialManager.getMaterial(obj.get("material").getAsString()) :
+                        obj.has("material") ? GTRegistries.MATERIALS.getMaterial(obj.get("material").getAsString()) :
                                 null);
                 else return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean());

@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "[1,)"
 license = "${mod_license}"
 
 # This is a URL to e.g. your GitHub or CurseForge issues page.
@@ -22,34 +22,36 @@ license = "${mod_license}"
     description = '''
 This client-side only mod adds data-driven molecule drawings for GregTech chemicals.
 '''
+    [[mixins]]
+        config="${mod_id}.mixins.json"
 
     [[dependencies.${mod_id}]]
-        modId = "forge"
-        mandatory = true
-        versionRange = "[${forge_version},)"
+        modId = "neoforge"
+        type = "required"
+        versionRange = "[${neo_version},)"
         ordering = "NONE"
         side = "CLIENT"
     [[dependencies.${mod_id}]]
         modId = "minecraft"
-        mandatory = true
+        type = "required"
         versionRange = "[${minecraft_version},)"
         ordering = "NONE"
         side = "CLIENT"
     [[dependencies.${mod_id}]]
         modId = "gtceu"
-        mandatory = true
+        type = "required"
         versionRange = "[7,)"
         ordering = "AFTER"
         side = "CLIENT"
     [[dependencies.${mod_id}]]
         modId = "configuration"
-        mandatory = true
+        type = "required"
         versionRange = "[${configuration_version},)"
         ordering = "AFTER"
         side = "CLIENT"
     [[dependencies.${mod_id}]]
         modId = "kubejs"
-        mandatory = false
-        versionRange = "[2001,)"
+        type = "optional"
+        versionRange = "[2101,)"
         ordering = "AFTER"
         side = "CLIENT"

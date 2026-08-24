@@ -2,7 +2,7 @@ package com.rubenverg.moldraw.kubejs;
 
 import net.minecraft.resources.ResourceLocation;
 
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import oshi.util.tuples.Pair;
 
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class MolDrawAlloysJS extends EventJS {
+public class MolDrawAlloysJS implements KubeEvent {
 
     @HideFromJS
     private final BiConsumer<ResourceLocation, Optional<List<Pair<ResourceLocation, Long>>>> consumer;
