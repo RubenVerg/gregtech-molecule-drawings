@@ -39,5 +39,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: 'gtmoldraw'
+        name: 'gtmoldraw (for experimental GT 1.21.1 builds)'
         path: './build/libs/'
