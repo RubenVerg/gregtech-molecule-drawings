@@ -80,7 +80,7 @@ public class GraphicalUtils {
                                 GuiGraphics graphics) {
         plotLine(x0, y0, x1, y1, shouldDraw,
                 (xp, yp) -> fill(RenderType.gui(), xp, yp, xp + 1, yp + 1,0, color.applyAsInt(xp, yp),graphics));
-        graphics.flush();
+
     }
 
     public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, DrawPixel doDraw) {
@@ -103,7 +103,6 @@ public class GraphicalUtils {
     public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, IntBinaryOperator color,
                                   GuiGraphics graphics) {
         plotCircle(xm, ym, r, shouldDraw, (xp, yp) -> fill(RenderType.gui(),xp, yp, xp + 1, yp + 1,0, color.applyAsInt(xp, yp),graphics));
-        graphics.flush();
     }
 
 
@@ -127,10 +126,14 @@ public class GraphicalUtils {
         float f1 = (float) FastColor.ARGB32.green(color) / 255.0F;
         float f2 = (float) FastColor.ARGB32.blue(color) / 255.0F;
         VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(renderType);
-        vertexconsumer.vertex(matrix4f, (float)minX, (float)minY, (float)z).color(f, f1, f2, f3).endVertex();
-        vertexconsumer.vertex(matrix4f, (float)minX, (float)maxY, (float)z).color(f, f1, f2, f3).endVertex();
-        vertexconsumer.vertex(matrix4f, (float)maxX, (float)maxY, (float)z).color(f, f1, f2, f3).endVertex();
-        vertexconsumer.vertex(matrix4f, (float)maxX, (float)minY, (float)z).color(f, f1, f2, f3).endVertex();
+
+        vertexconsumer.defaultColor((int)(f*255.0f), (int)(f1*255.0f), (int)(f2*255.0f), (int)(f3*255.0f));
+        vertexconsumer.vertex(matrix4f, (float)minX, (float)minY, (float)z).endVertex();
+        vertexconsumer.vertex(matrix4f, (float)minX, (float)maxY, (float)z).endVertex();
+        vertexconsumer.vertex(matrix4f, (float)maxX, (float)maxY, (float)z).endVertex();
+        vertexconsumer.vertex(matrix4f, (float)maxX, (float)minY, (float)z).endVertex();
+        vertexconsumer.unsetDefaultColor();
+
 
     }
 

@@ -181,6 +181,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
 
         @Override
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+
             final int xm = BASE_WIDTH / 2 + addLeft + x, ym = baseHeight / 2 + addTop + y;
 
             final IntBinaryOperator sc = (xp, yp) -> {
@@ -197,8 +198,8 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
             GraphicalUtils.plotCircle(xm, ym, MolDrawConfig.INSTANCE.alloy.pieChartRadius, GraphicalUtils::alwaysDraw,
                     sc, guiGraphics);
             guiGraphics.pose().popPose();
+
             final IntBinaryOperator white = (_xp, _yp) -> 0xffffffff;
-            List<LineRenderInformation> LineRenders = new ArrayList<>();
             for (int i = 0; i < components.size(); i++) {
                 final var center = centers.get(i).getA();
                 final var textStart = textStarts.get(i).getA();
@@ -209,15 +210,9 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final var cy = ym - (int) (Math.cos(center) * 0.9 * MolDrawConfig.INSTANCE.alloy.pieChartRadius);
                 final var left = center > Math.PI;
                 final var ex = xm + (left ? -1 : 1) * (MolDrawConfig.INSTANCE.alloy.pieChartRadius + 10);
-                LineRenders.add(new LineRenderInformation(cx,cy,cx,centerY));
-                LineRenders.add(new LineRenderInformation(cx, centerY, ex, centerY));
+                GraphicalUtils.plotLine(cx, cy, cx, centerY, GraphicalUtils::alwaysDraw, white, guiGraphics);
+                GraphicalUtils.plotLine(cx, centerY, ex, centerY, GraphicalUtils::alwaysDraw, white, guiGraphics);
             }
-            guiGraphics.pose().pushPose();
-            for (LineRenderInformation info: LineRenders)
-            {
-                GraphicalUtils.plotLine(info.x, info.y, info.z, info.center, GraphicalUtils::alwaysDraw, white, guiGraphics);
-            }
-            guiGraphics.pose().popPose();
         }
 
 
@@ -225,7 +220,6 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
         public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource)
         {
             final int xm = BASE_WIDTH / 2 + addLeft + mouseX, ym = baseHeight / 2 + addTop + mouseY;
-            List<TextRenderInfo> TextRenders = new ArrayList<>();
             for (int i = 0; i < components.size(); i++) {
                 final var count = components.get(i).getB();
                 final var material = components.get(i).getA();
@@ -236,48 +230,9 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
                 final var text = Component.literal(percentageString + " ")
                         .append(MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true));
-                TextRenders.add(new TextRenderInfo(text,startX,topY));
-                //guiGraphics.drawString(font, text, startX, topY, 0xffffffff);
+                font.drawInBatch(text, startX, topY, 0xffffffff,true,matrix,bufferSource, Font.DisplayMode.NORMAL,0, LightTexture.FULL_BRIGHT);
             }
-
-            for (TextRenderInfo info: TextRenders)
-            {
-                font.drawInBatch(info.component, info.x, info.y, 0xffffffff,true,matrix,bufferSource, Font.DisplayMode.NORMAL,0, LightTexture.FULL_BRIGHT);
-            }
-
         }
     }
-
-
-    private static class LineRenderInformation {
-
-        int x; int y; int z; int center;
-        LineRenderInformation(int x, int y , int z, int center)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.center = center;
-
-        }
-
-    }
-
-    private static class TextRenderInfo
-    {
-        MutableComponent component;
-        int x;
-        int y;
-
-        TextRenderInfo(MutableComponent component, int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-            this.component = component;
-
-        }
-
-    }
-
 
 }
