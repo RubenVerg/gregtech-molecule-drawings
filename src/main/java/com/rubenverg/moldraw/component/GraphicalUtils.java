@@ -120,14 +120,8 @@ public class GraphicalUtils {
             minY = maxY;
             maxY = j;
         }
-
-        float f3 = (float) FastColor.ARGB32.alpha(color) / 255.0F;
-        float f = (float) FastColor.ARGB32.red(color) / 255.0F;
-        float f1 = (float) FastColor.ARGB32.green(color) / 255.0F;
-        float f2 = (float) FastColor.ARGB32.blue(color) / 255.0F;
         VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(renderType);
-
-        vertexconsumer.defaultColor((int)(f*255.0f), (int)(f1*255.0f), (int)(f2*255.0f), (int)(f3*255.0f));
+        vertexconsumer.defaultColor(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color),  FastColor.ARGB32.alpha(color););
         vertexconsumer.vertex(matrix4f, (float)minX, (float)minY, (float)z).endVertex();
         vertexconsumer.vertex(matrix4f, (float)minX, (float)maxY, (float)z).endVertex();
         vertexconsumer.vertex(matrix4f, (float)maxX, (float)maxY, (float)z).endVertex();
