@@ -121,7 +121,7 @@ public class GraphicalUtils {
             maxY = j;
         }
         VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(renderType);
-        vertexconsumer.defaultColor(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color),  FastColor.ARGB32.alpha(color););
+        vertexconsumer.defaultColor(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color),  FastColor.ARGB32.alpha(color));
         vertexconsumer.vertex(matrix4f, (float)minX, (float)minY, (float)z).endVertex();
         vertexconsumer.vertex(matrix4f, (float)minX, (float)maxY, (float)z).endVertex();
         vertexconsumer.vertex(matrix4f, (float)maxX, (float)maxY, (float)z).endVertex();

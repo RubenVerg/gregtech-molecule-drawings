@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import com.google.common.collect.Streams;
@@ -21,7 +20,6 @@ import com.rubenverg.moldraw.MolDrawConfig;
 import com.rubenverg.moldraw.MoleculeColorize;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
-import org.w3c.dom.Text;
 import oshi.util.tuples.Pair;
 
 import java.util.*;
@@ -181,7 +179,6 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
 
         @Override
         public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-
             final int xm = BASE_WIDTH / 2 + addLeft + x, ym = baseHeight / 2 + addTop + y;
 
             final IntBinaryOperator sc = (xp, yp) -> {
@@ -215,10 +212,9 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
             }
         }
 
-
         @Override
-        public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource)
-        {
+        public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix,
+                               MultiBufferSource.BufferSource bufferSource) {
             final int xm = BASE_WIDTH / 2 + addLeft + mouseX, ym = baseHeight / 2 + addTop + mouseY;
             for (int i = 0; i < components.size(); i++) {
                 final var count = components.get(i).getB();
@@ -230,9 +226,9 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
                 final var percentageString = percentage < 0.1 ? "<0.1%" : "%.1f%%".formatted(percentage);
                 final var text = Component.literal(percentageString + " ")
                         .append(MoleculeColorize.coloredFormula(new MaterialStack(material, 1), true));
-                font.drawInBatch(text, startX, topY, 0xffffffff,true,matrix,bufferSource, Font.DisplayMode.NORMAL,0, LightTexture.FULL_BRIGHT);
+                font.drawInBatch(text, startX, topY, 0xffffffff, true, matrix, bufferSource, Font.DisplayMode.NORMAL, 0,
+                        LightTexture.FULL_BRIGHT);
             }
         }
     }
-
 }
