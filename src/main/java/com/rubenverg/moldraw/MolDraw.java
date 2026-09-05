@@ -181,7 +181,8 @@ public class MolDraw {
                             try (final var stream = resourceManager.open(id)) {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
                                 final var material = GTRegistries.MATERIALS
-                                        .get(ResourceLocation.tryParse(id.toString().replace(".json", "").replace("molecules/", "")));
+                                        .get(ResourceLocation.tryParse(
+                                                id.toString().replace(".json", "").replace("molecules/", "")));
                                 if (Objects.isNull(material)) {
                                     continue;
                                 }
@@ -217,7 +218,8 @@ public class MolDraw {
                             try (final var stream = resourceManager.open(id)) {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
                                 final var material = GTRegistries.MATERIALS
-                                        .get(ResourceLocation.tryParse(id.toString().replace(".json", "").replace("alloys/", "")));
+                                        .get(ResourceLocation
+                                                .tryParse(id.toString().replace(".json", "").replace("alloys/", "")));
                                 if (Objects.isNull(material)) {
                                     continue;
                                 }
@@ -226,9 +228,13 @@ public class MolDraw {
                                     alloys.put(material, Optional.empty());
                                 } else {
                                     alloys.put(material, Optional.of(alloy.get().stream().map(pair -> {
-                                        final var subMat = GTRegistries.MATERIALS.get(!pair.getA().toString().contains(":") ? GTCEu.id(pair.getA().toString()) : ResourceLocation.tryParse(pair.getA().toString()));
-                                        if (Objects.isNull(subMat) || Objects.isNull(subMat)) throw new RuntimeException(
-                                                "Alloy JSON contains a material that doesn't exist");
+                                        final var subMat = GTRegistries.MATERIALS
+                                                .get(!pair.getA().toString().contains(":") ?
+                                                        GTCEu.id(pair.getA().toString()) :
+                                                        ResourceLocation.tryParse(pair.getA().toString()));
+                                        if (Objects.isNull(subMat) || Objects.isNull(subMat))
+                                            throw new RuntimeException(
+                                                    "Alloy JSON contains a material that doesn't exist");
                                         return new Pair<>(subMat, pair.getB());
                                     }).toList()));
                                 }

@@ -5,8 +5,9 @@ import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
-import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
+
+import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +75,8 @@ public class Element {
 
     public static Optional<Element> forMaterial(Material material) {
         for (final var e : elements.values())
-            if ((Objects.nonNull(e.material) && e.material.equals(material)) || e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
+            if ((Objects.nonNull(e.material) && e.material.equals(material)) ||
+                    e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
                 return Optional.of(e);
         return Optional.empty();
     }
@@ -247,7 +249,10 @@ public class Element {
                 if (obj.has("color")) return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean(),
                         jsonDeserializationContext.deserialize(obj.get("color"), Element.Color.class),
-                        obj.has("material") ? GTRegistries.MATERIALS.get(!obj.get("material").getAsString().contains(":") ? GTCEu.id(obj.get("material").getAsString()) : ResourceLocation.tryParse(obj.get("material").getAsString())) :
+                        obj.has("material") ?
+                                GTRegistries.MATERIALS.get(!obj.get("material").getAsString().contains(":") ?
+                                        GTCEu.id(obj.get("material").getAsString()) :
+                                        ResourceLocation.tryParse(obj.get("material").getAsString())) :
                                 null);
                 else return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean());
