@@ -2,6 +2,11 @@ package com.rubenverg.moldraw.component;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.FastColor;
+
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import org.joml.Matrix4f;
 
 import java.util.function.IntBinaryOperator;
 
@@ -75,7 +80,7 @@ public class GraphicalUtils {
     public static void plotLine(int x0, int y0, int x1, int y1, PixelPredicate shouldDraw, IntBinaryOperator color,
                                 GuiGraphics graphics) {
         plotLine(x0, y0, x1, y1, shouldDraw,
-                (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
+                (xp, yp) -> fill(RenderType.gui(), xp, yp, xp + 1, yp + 1, 0, color.applyAsInt(xp, yp), graphics));
     }
 
     public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, DrawPixel doDraw) {
@@ -96,6 +101,32 @@ public class GraphicalUtils {
 
     public static void plotCircle(int xm, int ym, int r, PixelPredicate shouldDraw, IntBinaryOperator color,
                                   GuiGraphics graphics) {
-        plotCircle(xm, ym, r, shouldDraw, (xp, yp) -> graphics.fill(xp, yp, xp + 1, yp + 1, color.applyAsInt(xp, yp)));
+        plotCircle(xm, ym, r, shouldDraw,
+                (xp, yp) -> fill(RenderType.gui(), xp, yp, xp + 1, yp + 1, 0, color.applyAsInt(xp, yp), graphics));
+    }
+
+    public static void fill(RenderType renderType, int minX, int minY, int maxX, int maxY, int z, int color,
+                            GuiGraphics graphics) {
+        Matrix4f matrix4f = graphics.pose().last().pose();
+        int j;
+        if (minX < maxX) {
+            j = minX;
+            minX = maxX;
+            maxX = j;
+        }
+
+        if (minY < maxY) {
+            j = minY;
+            minY = maxY;
+            maxY = j;
+        }
+        VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(renderType);
+        vertexconsumer.defaultColor(FastColor.ARGB32.red(color), FastColor.ARGB32.green(color),
+                FastColor.ARGB32.blue(color), FastColor.ARGB32.alpha(color));
+        vertexconsumer.vertex(matrix4f, (float) minX, (float) minY, (float) z).endVertex();
+        vertexconsumer.vertex(matrix4f, (float) minX, (float) maxY, (float) z).endVertex();
+        vertexconsumer.vertex(matrix4f, (float) maxX, (float) maxY, (float) z).endVertex();
+        vertexconsumer.vertex(matrix4f, (float) maxX, (float) minY, (float) z).endVertex();
+        vertexconsumer.unsetDefaultColor();
     }
 }
