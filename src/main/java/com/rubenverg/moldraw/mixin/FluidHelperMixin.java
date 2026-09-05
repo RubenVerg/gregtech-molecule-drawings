@@ -33,7 +33,7 @@ public class FluidHelperMixin {
         if (!MolDrawConfig.INSTANCE.enabled) return;
 
         final var material = ChemicalHelper.getMaterial(ingredient.getFluid());
-        if (material.isNull()) return;
+        if (Objects.isNull(material)) return;
 
         final var mol = MolDraw.getMolecule(material);
         final var alloy = MolDraw.getAlloy(material);

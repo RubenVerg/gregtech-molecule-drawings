@@ -72,7 +72,7 @@ public class FluidEmiStackMixin {
                                          @Local(name = "list") List<ClientTooltipComponent> list) {
         if (!MolDrawConfig.INSTANCE.enabled) return;
         final var material = ChemicalHelper.getMaterial(fluid);
-        if (material.isNull()) return;
+        if (Objects.isNull(material)) return;
         if (Objects.isNull(material.getMaterialComponents())) return;
 
         final var mol = MolDraw.getMolecule(material);

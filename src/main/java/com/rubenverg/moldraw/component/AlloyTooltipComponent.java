@@ -120,7 +120,7 @@ public record AlloyTooltipComponent(List<Pair<Material, Long>> rawComponents) im
             stops = s.stream().map(pair -> new Pair<>(Math.PI * 2 * pair.getA() / total, pair.getB())).toList();
 
             c.remove(0);
-            c.add(new Pair<>(total, GTMaterials.NULL));
+            c.add(new Pair<>(total, null));
             centers = Streams
                     .zip(s.stream(), c.stream(),
                             (begin, end) -> new Pair<>(Math.PI *

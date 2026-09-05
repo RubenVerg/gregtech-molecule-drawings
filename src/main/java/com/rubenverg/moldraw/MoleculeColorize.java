@@ -105,7 +105,7 @@ public class MoleculeColorize {
 
     public static int getColorForElement(Element element) {
         final var defaultColor = configColor(null);
-        if (MolDrawConfig.INSTANCE.color.useMaterialColors && !element.material.isNull())
+        if (MolDrawConfig.INSTANCE.color.useMaterialColors && Objects.nonNull(element.material))
             return colorForMaterial(element.material);
         else if (element.color instanceof Element.Color.None) return defaultColor;
         else if (element.color instanceof Element.Color.Always always) return always.color();

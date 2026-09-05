@@ -1,10 +1,12 @@
 package com.rubenverg.moldraw.molecule;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
 import com.google.gson.*;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +23,7 @@ public class Element {
     public final String symbol;
     public final boolean invisible;
     public final Color color;
-    public final @NotNull Material material;
+    public final @Nullable Material material;
     public final List<Material> additionalMaterials;
     boolean standard;
 
@@ -30,7 +32,7 @@ public class Element {
         this.invisible = invisible;
         this.color = Color.NONE;
         this.standard = false;
-        this.material = GTMaterials.NULL;
+        this.material = null;
         this.additionalMaterials = new ArrayList<>();
     }
 
@@ -40,7 +42,7 @@ public class Element {
         this.invisible = invisible;
         this.color = color;
         this.standard = false;
-        this.material = Objects.requireNonNullElse(material, GTMaterials.NULL);
+        this.material = material;
         this.additionalMaterials = new ArrayList<>(Arrays.asList(additionalMaterials));
     }
 
@@ -72,7 +74,7 @@ public class Element {
 
     public static Optional<Element> forMaterial(Material material) {
         for (final var e : elements.values())
-            if (e.material.equals(material) || e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
+            if ((Objects.nonNull(e.material) && e.material.equals(material)) || e.additionalMaterials.stream().anyMatch(mat -> mat.equals(material)))
                 return Optional.of(e);
         return Optional.empty();
     }
@@ -245,7 +247,7 @@ public class Element {
                 if (obj.has("color")) return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean(),
                         jsonDeserializationContext.deserialize(obj.get("color"), Element.Color.class),
-                        obj.has("material") ? GTRegistries.MATERIALS.getMaterial(obj.get("material").getAsString()) :
+                        obj.has("material") ? GTRegistries.MATERIALS.get(!obj.get("material").getAsString().contains(":") ? GTCEu.id(obj.get("material").getAsString()) : ResourceLocation.tryParse(obj.get("material").getAsString())) :
                                 null);
                 else return Element.create(obj.get("symbol").getAsString(),
                         Objects.requireNonNullElse(obj.get("invisible"), new JsonPrimitive(false)).getAsBoolean());
@@ -263,7 +265,7 @@ public class Element {
             if (element.invisible) obj.add("invisible", new JsonPrimitive(true));
             if (!(element.color instanceof Element.Color.None))
                 obj.add("color", jsonSerializationContext.serialize(element.color, Element.Color.class));
-            if (!element.material.isNull())
+            if (Objects.nonNull(element.material))
                 obj.add("material", new JsonPrimitive(element.material.getResourceLocation().toString()));
             return obj;
         }

@@ -1,5 +1,6 @@
 package com.rubenverg.moldraw;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialStack;
@@ -12,6 +13,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.Unit;
@@ -179,7 +181,7 @@ public class MolDraw {
                             try (final var stream = resourceManager.open(id)) {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
                                 final var material = GTRegistries.MATERIALS
-                                        .getMaterial(id.toString().replace(".json", "").replace("molecules/", ""));
+                                        .get(ResourceLocation.tryParse(id.toString().replace(".json", "").replace("molecules/", "")));
                                 if (Objects.isNull(material)) {
                                     continue;
                                 }
@@ -215,7 +217,7 @@ public class MolDraw {
                             try (final var stream = resourceManager.open(id)) {
                                 final var file = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
                                 final var material = GTRegistries.MATERIALS
-                                        .getMaterial(id.toString().replace(".json", "").replace("alloys/", ""));
+                                        .get(ResourceLocation.tryParse(id.toString().replace(".json", "").replace("alloys/", "")));
                                 if (Objects.isNull(material)) {
                                     continue;
                                 }
@@ -224,8 +226,8 @@ public class MolDraw {
                                     alloys.put(material, Optional.empty());
                                 } else {
                                     alloys.put(material, Optional.of(alloy.get().stream().map(pair -> {
-                                        final var subMat = GTRegistries.MATERIALS.getMaterial(pair.getA().toString());
-                                        if (Objects.isNull(subMat) || subMat.isNull()) throw new RuntimeException(
+                                        final var subMat = GTRegistries.MATERIALS.get(!pair.getA().toString().contains(":") ? GTCEu.id(pair.getA().toString()) : ResourceLocation.tryParse(pair.getA().toString()));
+                                        if (Objects.isNull(subMat) || Objects.isNull(subMat)) throw new RuntimeException(
                                                 "Alloy JSON contains a material that doesn't exist");
                                         return new Pair<>(subMat, pair.getB());
                                     }).toList()));
@@ -287,10 +289,10 @@ public class MolDraw {
             material = ChemicalHelper.getMaterial(bi.content);
         } else {
             final var materialStack = ChemicalHelper.getMaterialEntry(event.getItemStack().getItem());
-            if (materialStack.isEmpty()) return;
+            if (Objects.isNull(materialStack)) return;
             material = materialStack.material();
         }
-        if (material.isNull()) return;
+        if (Objects.isNull(material)) return;
         final var mol = getMolecule(material);
         final var alloy = getAlloy(material);
         final var tooltipElements = event.getTooltipElements();
