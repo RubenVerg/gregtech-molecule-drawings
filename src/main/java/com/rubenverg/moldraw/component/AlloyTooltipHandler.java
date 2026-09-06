@@ -8,6 +8,7 @@ import java.util.function.IntBinaryOperator;
 import net.minecraft.client.Minecraft;
 
 import org.joml.Vector2i;
+import org.spongepowered.libraries.com.google.common.collect.Streams;
 
 import com.google.common.math.LongMath;
 import com.rubenverg.moldraw.MolDrawConfig;
@@ -149,7 +150,7 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
 
         c.remove(0);
         c.add(new Pair<>(total, null));
-        centers = org.spongepowered.libraries.com.google.common.collect.Streams
+        centers = Streams
             .zip(
                 s.stream(),
                 c.stream(),
