@@ -9,6 +9,7 @@ import org.joml.Matrix2f;
 
 import com.rubenverg.moldraw.molecule.*;
 
+import bartworks.system.material.Werkstoff;
 import bartworks.system.material.WerkstoffLoader;
 import goodgenerator.items.GGMaterial;
 import gregtech.api.enums.Materials;
@@ -1398,19 +1399,24 @@ public class Molecules {
                 .bond(3, 4)
                 .bond(4, 2)
                 .bond(2, 0, Bond.DOUBLE));
-        molecules.put(
-            WerkstoffMaterialPool.Tetrahydrofuran,
-            new Molecule().xy()
-                .invAtom(-0.5f, 0)
-                .invAtom(0.5f, 0)
-                .invAtom(-0.5f - MathUtils.SIN18f, MathUtils.COS18f)
-                .invAtom(0.5f + MathUtils.SIN18f, MathUtils.COS18f)
-                .atom(Element.O, 0, MathUtils.COS18f + MathUtils.COS54f)
-                .bond(0, 1)
-                .bond(1, 3)
-                .bond(3, 4)
-                .bond(4, 2)
-                .bond(2, 0));
+        try {
+            var thfField = WerkstoffMaterialPool.class.getDeclaredField("Tetrahydrofuran");
+            Werkstoff tetraHydroFuran = (Werkstoff) thfField.get(null);
+            molecules.put(
+                tetraHydroFuran,
+                new Molecule().xy()
+                    .invAtom(-0.5f, 0)
+                    .invAtom(0.5f, 0)
+                    .invAtom(-0.5f - MathUtils.SIN18f, MathUtils.COS18f)
+                    .invAtom(0.5f + MathUtils.SIN18f, MathUtils.COS18f)
+                    .atom(Element.O, 0, MathUtils.COS18f + MathUtils.COS54f)
+                    .bond(0, 1)
+                    .bond(1, 3)
+                    .bond(3, 4)
+                    .bond(4, 2)
+                    .bond(2, 0));
+        } catch (NoSuchFieldException | IllegalAccessException _) {}
+
         return molecules;
     }
 
