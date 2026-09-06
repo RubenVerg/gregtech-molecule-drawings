@@ -47,7 +47,17 @@ public class Alloys {
         alloys.put(Materials.VanadiumSteel, Optional.empty());
         alloys.put(MaterialsAlloy.POTIN, Optional.empty());
         alloys.put(Materials.NaquadahAlloy, Optional.empty());
-        alloys.put(WerkstoffLoader.LuVTierMaterial, Optional.empty());
+        Werkstoff rhodiumPlatedPalladium = null;
+        try {
+            var oldMatsName = WerkstoffLoader.class.getDeclaredField("LuVTierMaterial");
+            rhodiumPlatedPalladium = ((Werkstoff) oldMatsName.get(null));
+        } catch (NoSuchFieldException e) {
+            rhodiumPlatedPalladium = WerkstoffLoader.RhodiumPlatedPalladium;
+        } catch (IllegalAccessException _) {} finally {
+            if (rhodiumPlatedPalladium != null) {
+                alloys.put(rhodiumPlatedPalladium, Optional.empty());
+            }
+        }
         alloys.put(Materials.RedSteel, Optional.empty());
         alloys.put(Materials.BlueSteel, Optional.empty());
         alloys.put(Materials.HSSG, Optional.empty());

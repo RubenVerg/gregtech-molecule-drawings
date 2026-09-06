@@ -111,7 +111,18 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
             .isEmpty() ? "?" : gt.getChemicalFormula();
         if (material instanceof Werkstoff bw) return bw.getFormulaTooltip()
             .isEmpty() ? "?" : bw.getFormulaTooltip();
-        if (material instanceof Material pp) return pp.vChemicalFormula;
+        if (material instanceof Material pp) {
+            try {
+                var oldFieldName = pp.getClass()
+                    .getDeclaredField("vChemicalFormula");
+                return ((String) oldFieldName.get(pp));
+            } catch (NoSuchFieldException e) {
+                return pp.chemicalFormula;
+            } catch (IllegalAccessException e) {
+                // e.printStackTrace(GTLog.err);
+                return "?";
+            }
+        } ;
         return "?";
     }
 
