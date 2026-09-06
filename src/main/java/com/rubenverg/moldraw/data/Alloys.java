@@ -3,6 +3,7 @@ package com.rubenverg.moldraw.data;
 import java.util.*;
 
 import akka.japi.Pair;
+import bartworks.system.material.Werkstoff;
 import bartworks.system.material.WerkstoffLoader;
 import goodgenerator.items.GGMaterial;
 import gregtech.api.enums.Materials;
@@ -221,6 +222,21 @@ public class Alloys {
         alloys.put(GGMaterial.tairitsu, Optional.empty());
         alloys.put(GGMaterial.preciousMetalAlloy, Optional.empty());
         alloys.put(GGMaterial.enrichedNaquadahAlloy, Optional.empty());
+
+        alloys.put(
+            Materials.ElectrumFlux,
+            Optional.of(
+                List.of(
+                    new Pair<>(Materials.RoseGold, 1L),
+                    new Pair<>(Materials.InfusedGold, 1L),
+                    new Pair<>(Materials.AstralSilver, 1L),
+                    new Pair<>(Materials.SterlingSilver, 1L),
+                    new Pair<>(Materials.SolderingAlloy, 1L),
+                    new Pair<>(Materials.RedSteel, 1L),
+                    new Pair<>(Materials.BlueSteel, 1L),
+                    new Pair<>(Materials.Naquadah, 1L),
+                    // 2880 / 144 = 20
+                    new Pair<>(Materials.Redstone, 20L))));
 
         return alloys;
     }
