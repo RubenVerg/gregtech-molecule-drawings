@@ -8,6 +8,7 @@ import java.util.function.IntBinaryOperator;
 import net.minecraft.client.Minecraft;
 
 import org.joml.Vector2i;
+import org.spongepowered.libraries.com.google.common.collect.Streams;
 
 import com.google.common.math.LongMath;
 import com.rubenverg.moldraw.MolDrawConfig;
@@ -110,7 +111,18 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
             .isEmpty() ? "?" : gt.getChemicalFormula();
         if (material instanceof Werkstoff bw) return bw.getFormulaTooltip()
             .isEmpty() ? "?" : bw.getFormulaTooltip();
-        if (material instanceof Material pp) return pp.vChemicalFormula;
+        if (material instanceof Material pp) {
+            try {
+                var oldFieldName = pp.getClass()
+                    .getDeclaredField("vChemicalFormula");
+                return ((String) oldFieldName.get(pp));
+            } catch (NoSuchFieldException e) {
+                return pp.chemicalFormula;
+            } catch (IllegalAccessException e) {
+                // e.printStackTrace(GTLog.err);
+                return "?";
+            }
+        } ;
         return "?";
     }
 
@@ -149,7 +161,7 @@ public class AlloyTooltipHandler implements GuiDraw.ITooltipLineHandler {
 
         c.remove(0);
         c.add(new Pair<>(total, null));
-        centers = org.spongepowered.libraries.com.google.common.collect.Streams
+        centers = Streams
             .zip(
                 s.stream(),
                 c.stream(),

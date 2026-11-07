@@ -77,13 +77,16 @@ public class MolDraw {
                 mol = MolDraw.getMolecule(fluid);
         } else {
             IOreMaterial material = null;
-            if (Objects.isNull(material) && event.itemStack.getItem() instanceof BWMetaGeneratedItems)
+            if (event.itemStack.getItem() instanceof BWMetaGeneratedItems)
                 material = Werkstoff.werkstoffHashMap.get((short) event.itemStack.getItemDamage());
             if (Objects.isNull(material) && event.itemStack.getItem() instanceof BaseItemComponent bic)
                 material = bic.componentMaterial;
             if (Objects.isNull(material))
                 material = Optional.ofNullable(GTOreDictUnificator.getItemData(event.itemStack))
-                    .map(d -> d.mMaterial.mMaterial)
+                    .map(d -> d.mMaterial)
+                    // Fusion Coil Block in AE2 cpu crafting view maps to null here for example
+                    .filter(Objects::nonNull)
+                    .map(x -> x.mMaterial)
                     .orElse(null);
             if (!Objects.isNull(material)) {
                 mol = MolDraw.getMolecule(material);
