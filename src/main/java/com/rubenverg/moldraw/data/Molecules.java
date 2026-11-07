@@ -21,8 +21,13 @@ import gtnhlanth.common.register.WerkstoffMaterialPool;
 @SuppressWarnings("removal")
 public class Molecules {
 
+    private static final Map<IOreMaterial, Molecule> molecules = new HashMap<>();
+
     public static Map<IOreMaterial, Molecule> molecules() {
-        final Map<IOreMaterial, Molecule> molecules = new HashMap<>();
+        if (!molecules.isEmpty()) {
+            return molecules;
+        }
+
         molecules.put(Materials.Methane, Molecule.tetragonal(Element.C, Element.H, Element.H, Element.H, Element.H));
         molecules.put(
             Materials.Ethane,

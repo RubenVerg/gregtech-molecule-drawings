@@ -14,8 +14,13 @@ import gtPlusPlus.core.material.MaterialsElements;
 @SuppressWarnings("removal")
 public class Alloys {
 
+    private static final Map<IOreMaterial, Optional<List<Pair<IOreMaterial, Long>>>> alloys = new HashMap<>();
+
     public static Map<IOreMaterial, Optional<List<Pair<IOreMaterial, Long>>>> alloys() {
-        final Map<IOreMaterial, Optional<List<Pair<IOreMaterial, Long>>>> alloys = new HashMap<>();
+        if (!alloys.isEmpty()) {
+            return alloys;
+        }
+
         alloys.put(Materials.BatteryAlloy, Optional.empty());
         alloys.put(Materials.Brass, Optional.empty());
         alloys.put(Materials.Bronze, Optional.empty());
